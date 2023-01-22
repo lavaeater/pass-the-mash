@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
@@ -20,7 +19,6 @@ import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
 import mash.factories.CarSceneLoader
-import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.SceneManager
 
 
@@ -43,7 +41,7 @@ object Context : InjectionContext() {
                 fieldOfView = gameSettings.fieldOfView
                 near = gameSettings.cameraNear
                 far = gameSettings.cameraFar
-                position.set(5f, 5f, 5f)
+                //position.set(5f, 5f, -5f)
                 lookAt(vec3())
             })
             bindSingleton(

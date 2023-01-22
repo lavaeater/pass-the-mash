@@ -104,7 +104,7 @@ class CarSceneLoader : SceneLoader() {
             }
             with<Camera3dFollowComponent> {
                 distance = 0f
-                offset.set(3f, 3f, 3f)
+                offset.set(3f, 3f, -3f)
             }
             with<BulletRigidBody> {
                 carShape.calculateLocalInertia(10f, localInertia)
