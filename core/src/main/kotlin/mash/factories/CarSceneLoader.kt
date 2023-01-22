@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.btGImpactMeshShape
 import com.badlogic.gdx.physics.bullet.collision.btTriangleIndexVertexArray
+import com.badlogic.gdx.physics.bullet.dynamics.FilterableVehicleRaycaster
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import depth.ecs.components.*
@@ -32,7 +33,7 @@ class CarSceneLoader : SceneLoader() {
          * for this particular scene?
          */
         setUpScene(sceneManager)
-        createFloor(1000f, 1f, 1000f, sceneManager, dynamicsWorld)
+        createFloor(1000f, 0f, 1000f, sceneManager, dynamicsWorld)
         loadCar(sceneManager, dynamicsWorld)
     }
 
@@ -69,9 +70,11 @@ class CarSceneLoader : SceneLoader() {
 
         val carScene = Scene(someCar.scene).apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 1f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 2f, 0f), Vector3.Z, Vector3.Y
             )
         }
+
+        val vehicle = FilterableVehicleRaycaster
 
         val modelVertexArray = btTriangleIndexVertexArray(carScene.modelInstance.model.meshParts)
         val carShape = btGImpactMeshShape(modelVertexArray)
