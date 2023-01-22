@@ -32,25 +32,28 @@ class UpdatePerspectiveCameraSystem(
 
         val position = motionState.position
         val cc = Camera3dFollowComponent.get(entity)
-        val offset = cc.offset
-        info { "${cc.offsetDirection}" }
-        tmpVector
-            .set(motionState.forward * cc.offsetDirection)
-            .scl(cc.distance)
-            .add(offset.x, offset.y, offset.z)
 
-        target.set(
-            position
-                .cpy()
-                .add(tmpVector)
-        )
-        tmpVector.setZero()
-        tmpVector
-            .set(motionState.position)
-        perspectiveCamera.position.lerp(target, 0.8f)
-        cameraDirection.set(position)
+        perspectiveCamera.position.set(tmpVector.set(position).add(cc.offsetXZ.x, cc.offsetY, cc.offsetXZ.y))
 
-        perspectiveCamera.lookAt(cameraDirection)
+//        val offset = cc.offset
+//        info { "${cc.offsetDirection}" }
+//        tmpVector
+//            .set(motionState.forward * cc.offsetDirection)
+//            .scl(cc.distance)
+//            .add(offset.x, offset.y, offset.z)
+//
+//        target.set(
+//            position
+//                .cpy()
+//                .add(tmpVector)
+//        )
+//        tmpVector.setZero()
+//        tmpVector
+//            .set(motionState.position)
+//        perspectiveCamera.position.lerp(target, 0.8f)
+//        cameraDirection.set(position)
+
+        perspectiveCamera.lookAt(position)
         perspectiveCamera.up.set(Vector3.Y)
         perspectiveCamera.update()
     }

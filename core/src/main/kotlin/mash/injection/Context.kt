@@ -95,7 +95,7 @@ object Context : InjectionContext() {
             addSystem(UpdatePerspectiveCameraSystem(inject()))
             addSystem(BulletUpdateSystem(inject()))
             addSystem(RenderSystem3d(inject()))
-            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
             addSystem(EntityControlSystem())
         }
     }

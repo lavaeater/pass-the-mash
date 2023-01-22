@@ -4,10 +4,14 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.utils.Pool
 import ktx.ashley.mapperFor
+import ktx.math.vec2
 import ktx.math.vec3
 
 class Camera3dFollowComponent:Component, Pool.Poolable {
     val offsetDirection = vec3(0f, 0f, -1f)
+    val offsetXZ = vec2(0f, 5f)
+    var offsetY = 5f
+
     var distance = 10f
     val offset = vec3()
     override fun reset() {

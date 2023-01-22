@@ -33,13 +33,13 @@ class EntityControlSystem :
     private val controlMap = command("Controoool") {
         setBoth(
             Keys.W,
-            "Throttle F",
+            "Throttle",
             { controlComponent.remove(Direction.Forward) },
             { controlComponent.add(Direction.Forward) }
         )
         setBoth(
             Keys.S,
-            "Throttle R",
+            "Brake",
             { controlComponent.remove(Direction.Reverse) },
             { controlComponent.add(Direction.Reverse) }
         )
@@ -59,25 +59,25 @@ class EntityControlSystem :
             Keys.UP,
             "Up",
             {  },
-            { cameraFollowComponent.offset.add(0f,.1f,0f) }
+            { cameraFollowComponent.offsetY += 0.1f }
         )
         setBoth(
             Keys.DOWN,
             "Down",
             {  },
-            { cameraFollowComponent.offset.add(0f,-.1f,0f) }
+            { cameraFollowComponent.offsetY -= 0.1f }
         )
         setBoth(
             Keys.LEFT,
             "Up",
             { },
-            { cameraFollowComponent.offsetDirection.rotate(Vector3.Y,10f) }
+            { cameraFollowComponent.offsetXZ.rotateDeg(5f) }
         )
         setBoth(
             Keys.RIGHT,
             "Down",
             { },
-            { cameraFollowComponent.offsetDirection.rotate(Vector3.Y,-10f) }
+            { cameraFollowComponent.offsetXZ.rotateDeg(-5f) }
         )
     }
 
