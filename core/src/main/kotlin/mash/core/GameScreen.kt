@@ -2,22 +2,28 @@ package mash.core
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import mash.factories.createSubMarine
 import eater.core.MainGame
+import eater.injection.InjectionContext.Companion.inject
+import mash.factories.SceneLoader
 
-class GameScreen(game: MainGame, engine: Engine, viewport: ExtendViewport
+class GameScreen(
+    private val sceneLoader: SceneLoader,
+    game: MainGame,
+    engine: Engine,
+    viewport: ExtendViewport
 ) : Screen3d(game, engine, viewport) {
-    var needsInit = true
+    private var needsInit = true
     override fun show() {
         super.show()
-        if(needsInit) {
+        if (needsInit) {
             needsInit = false
-            createSubMarine()
+            sceneLoader.loadScene(inject(), inject())
         }
-//        Gdx.input.inputProcessor = engine.getSystem<SubmarineControlSystem>()
     }
 
 
-
-
+    override fun dispose() {
+        super.dispose()
+        sceneLoader.dispose()
+    }
 }

@@ -1,38 +1,37 @@
 package mash.core
 
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import ktx.app.KtxGame
-import ktx.app.KtxScreen
-import ktx.app.clearScreen
-import ktx.assets.disposeSafely
-import ktx.assets.toInternalFile
+import com.badlogic.gdx.physics.bullet.Bullet
+import mash.injection.Context
+import eater.core.MainGame
+import eater.injection.InjectionContext.Companion.inject
 import ktx.async.KtxAsync
-import ktx.graphics.use
+import mash.factories.CarSceneLoader
 
-class PassTheMash : KtxGame<KtxScreen>() {
+class PassTheMash : MainGame() {
+    override fun goToGameSelect() {
+        TODO("Not yet implemented")
+    }
+
+    override fun goToGameScreen() {
+        TODO("Not yet implemented")
+    }
+
+    override fun goToGameOver() {
+        TODO("Not yet implemented")
+    }
+
+    override fun gotoGameVictory() {
+        TODO("Not yet implemented")
+    }
+
     override fun create() {
         KtxAsync.initiate()
+        Bullet.init()
+        Context.initialize(this)
 
-        addScreen(FirstScreen())
-        setScreen<FirstScreen>()
-    }
-}
-
-class FirstScreen : KtxScreen {
-    private val image = Texture("logo.png".toInternalFile(), true).apply { setFilter(Linear, Linear) }
-    private val batch = SpriteBatch()
-
-    override fun render(delta: Float) {
-        clearScreen(red = 0.7f, green = 0.7f, blue = 0.7f)
-        batch.use {
-            it.draw(image, 100f, 160f)
-        }
-    }
-
-    override fun dispose() {
-        image.disposeSafely()
-        batch.disposeSafely()
+        addScreen(
+            inject<GameScreen>()
+        )
+        setScreen<GameScreen>()
     }
 }

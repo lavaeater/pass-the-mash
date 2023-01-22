@@ -18,7 +18,7 @@ fun <E> MutableSet<E>.addIndexed(element: E): Int {
 }
 
 class RenderSystem3d(
-    private val sceneManager: SceneManager,
+    private val sceneManager: SceneManager
 ) : IteratingSystem(allOf(SceneComponent::class, VisibleComponent::class).exclude(AddedToRenderableList::class).get()) {
     override fun update(deltaTime: Float) {
         super.update(deltaTime)

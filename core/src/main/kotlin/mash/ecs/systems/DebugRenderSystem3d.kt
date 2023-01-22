@@ -27,7 +27,7 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
 
     override fun update(deltaTime: Float) {
         debugDrawer.begin(viewport)
-        bulletWorld!!.debugDrawWorld()
+        bulletWorld.debugDrawWorld()
         super.update(deltaTime)
         debugDrawer.end()
     }

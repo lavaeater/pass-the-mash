@@ -7,8 +7,10 @@ import eater.core.toColor
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 
-open class Screen3d(protected val game: MainGame,
-                    protected val engine: Engine, protected val viewport: ExtendViewport
+open class Screen3d(
+    protected val game: MainGame,
+    private val engine: Engine,
+    protected val viewport: ExtendViewport
 ) : KtxScreen {
     private val bgColor = "000022".toColor()
     override fun render(delta: Float) {
