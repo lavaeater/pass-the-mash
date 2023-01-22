@@ -74,8 +74,6 @@ class CarSceneLoader : SceneLoader() {
             )
         }
 
-        val vehicle = FilterableVehicleRaycaster
-
         val modelVertexArray = btTriangleIndexVertexArray(carScene.modelInstance.model.meshParts)
         val carShape = btGImpactMeshShape(modelVertexArray)
 
