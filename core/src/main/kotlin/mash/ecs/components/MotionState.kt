@@ -45,7 +45,7 @@ class MotionState : btMotionState(), Component, Poolable {
     override fun setWorldTransform(worldTrans: Matrix4) {
         transform.set(worldTrans)
         transform.getTranslation(position)
-        getDirection(worldTrans)
+        getDirection(transform)
     }
 
     fun getDirection(transform: Matrix4?) {

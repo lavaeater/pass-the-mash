@@ -10,6 +10,7 @@ import depth.ecs.components.MotionState
 import ktx.ashley.allOf
 import ktx.math.minus
 import ktx.math.plus
+import ktx.math.times
 import ktx.math.vec3
 
 class UpdatePerspectiveCameraSystem(
@@ -32,9 +33,10 @@ class UpdatePerspectiveCameraSystem(
         val cc = Camera3dFollowComponent.get(entity)
         val offset = cc.offset
         tmpVector
-            .set(motionState.backwards)
-            .scl(offset.x)
-            .add(0f,offset.y, 0f)
+            .set(motionState.forward * cc.offsetDirection)
+            .scl(cc.distance)
+            .add(offset.x, offset.y, offset.z)
+
         target.set(
             position
                 .cpy()
@@ -42,14 +44,9 @@ class UpdatePerspectiveCameraSystem(
         )
         tmpVector.setZero()
         tmpVector
-            .set(motionState.forward)
-            .scl(10f)
+            .set(motionState.position)
         perspectiveCamera.position.lerp(target, 0.8f)
-        cameraDirection.set(
-            position
-                .cpy()
-                .add(tmpVector)
-        )
+        cameraDirection.set(position)
 
         perspectiveCamera.lookAt(cameraDirection)
         perspectiveCamera.up.set(Vector3.Y)

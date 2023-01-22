@@ -43,6 +43,8 @@ object Context : InjectionContext() {
                 fieldOfView = 67f
                 near = 1f
                 far = 3000f
+                position.set(5f, 5f, 5f)
+                lookAt(vec3())
             })
             bindSingleton(
                 ExtendViewport(
@@ -71,12 +73,12 @@ object Context : InjectionContext() {
         }
         sceneManager.environment.apply {
 
-            set(ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, .3f, 1f))
+            set(ColorAttribute(ColorAttribute.AmbientLight, 0.1f, 0.1f, .1f, 1f))
             add(DirectionalShadowLight().apply {
-                set(0.5f, 0.5f, 0.5f, -1f, -1f, 0f)
+                set(1f, 0.5f, 1f, -1f, -1f, 0f)
             })
             add(DirectionalShadowLight().apply {
-                set(0.5f, 0.5f, 0.5f, 1f, 0f, -1f)
+                set(0.5f, 1f, 1f, 1f, -1f, -1f)
             })
         }
 //        // setup skybox
@@ -92,7 +94,7 @@ object Context : InjectionContext() {
             bindSingleton<btBroadphaseInterface>(btDbvtBroadphase())
             bindSingleton<btConstraintSolver>(btSequentialImpulseConstraintSolver())
             bindSingleton<btDynamicsWorld>(btSoftRigidDynamicsWorld(inject(), inject(), inject(), inject()).apply {
-                gravity = vec3(0f, 0f, 0f)
+                gravity = vec3(0f, -10f, 0f)
             })
 
         }
@@ -105,8 +107,8 @@ object Context : InjectionContext() {
             addSystem(UpdatePerspectiveCameraSystem(inject()))
             addSystem(BulletUpdateSystem(inject()))
             addSystem(RenderSystem3d(inject()))
-            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
-            addSystem(SubmarineControlSystem())
+//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+            addSystem(EntityControlSystem())
         }
     }
 }

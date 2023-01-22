@@ -13,7 +13,7 @@ import ktx.math.vec3
 import mash.ecs.components.KeyboardControlComponent
 
 
-class SubmarineControlSystem :
+class EntityControlSystem :
     IteratingSystem(
         allOf(
             KeyboardControlComponent::class,
