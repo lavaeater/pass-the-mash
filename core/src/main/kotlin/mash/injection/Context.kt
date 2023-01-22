@@ -40,9 +40,9 @@ object Context : InjectionContext() {
             bindSingleton(gameSettings)
             bindSingleton(game)
             bindSingleton(PerspectiveCamera().apply {
-                fieldOfView = 67f
-                near = 1f
-                far = 3000f
+                fieldOfView = gameSettings.fieldOfView
+                near = gameSettings.cameraNear
+                far = gameSettings.cameraFar
                 position.set(5f, 5f, 5f)
                 lookAt(vec3())
             })
@@ -72,19 +72,8 @@ object Context : InjectionContext() {
             setCamera(inject<PerspectiveCamera>())
         }
         sceneManager.environment.apply {
-
-            set(ColorAttribute(ColorAttribute.AmbientLight, 0.1f, 0.1f, .1f, 1f))
-            add(DirectionalShadowLight().apply {
-                set(1f, 0.5f, 1f, -1f, -1f, 0f)
-            })
-            add(DirectionalShadowLight().apply {
-                set(0.5f, 1f, 1f, 1f, -1f, -1f)
-            })
+            return sceneManager
         }
-//        // setup skybox
-//        val skybox = SceneSkybox(environmentCubemap)
-//        sceneManager.skyBox = skybox
-        return sceneManager
     }
 
     private fun setupBullet(context: Context) {

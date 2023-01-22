@@ -48,5 +48,10 @@ abstract class SceneLoader(): DisposableRegistry by DisposableContainer() {
     }
 
     abstract fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld)
+    protected fun setUpScene(sceneManager: SceneManager) {
+        setupEnvironment(sceneManager)
+    }
+
+    abstract fun setupEnvironment(sceneManager: SceneManager)
 }
 
