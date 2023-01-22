@@ -18,6 +18,7 @@ import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
+import mash.ecs.systems.RenderSystem3d
 import mash.factories.CarSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
 

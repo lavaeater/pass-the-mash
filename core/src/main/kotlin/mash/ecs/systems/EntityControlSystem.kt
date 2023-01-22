@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.math.Vector3
 import depth.ecs.components.*
 import eater.input.KeyPress
 import eater.input.command
@@ -27,6 +28,7 @@ class EntityControlSystem :
     private val controlledEntity get() = engine.getEntitiesFor(family).first()
 
     private val controlComponent get() = KeyboardControlComponent.get(controlledEntity)
+    private val cameraFollowComponent get() = Camera3dFollowComponent.get(controlledEntity)
 
     private val controlMap = command("Controoool") {
         setBoth(
@@ -44,38 +46,38 @@ class EntityControlSystem :
         setBoth(
             Keys.A,
             "Left",
-            { controlComponent.remove(Direction.Left) },
-            { controlComponent.add(Direction.Left) }
-        )
-        setBoth(
-            Keys.D,
-            "Right",
-            { controlComponent.remove(Direction.Right) },
-            { controlComponent.add(Direction.Right) }
-        )
-        setBoth(
-            Keys.UP,
-            "Up",
-            { controlComponent.remove(Direction.Up) },
-            { controlComponent.add(Direction.Up) }
-        )
-        setBoth(
-            Keys.DOWN,
-            "Down",
-            { controlComponent.remove(Direction.Down) },
-            { controlComponent.add(Direction.Down) }
-        )
-        setBoth(
-            Keys.LEFT,
-            "Up",
             { controlComponent.remove(Rotation.YawLeft) },
             { controlComponent.add(Rotation.YawLeft) }
         )
         setBoth(
-            Keys.RIGHT,
-            "Down",
+            Keys.D,
+            "Right",
             { controlComponent.remove(Rotation.YawRight) },
             { controlComponent.add(Rotation.YawRight) }
+        )
+        setBoth(
+            Keys.UP,
+            "Up",
+            {  },
+            { cameraFollowComponent.offset.add(0f,.1f,0f) }
+        )
+        setBoth(
+            Keys.DOWN,
+            "Down",
+            {  },
+            { cameraFollowComponent.offset.add(0f,-.1f,0f) }
+        )
+        setBoth(
+            Keys.LEFT,
+            "Up",
+            { },
+            { cameraFollowComponent.offsetDirection.rotate(Vector3.Y,10f) }
+        )
+        setBoth(
+            Keys.RIGHT,
+            "Down",
+            { },
+            { cameraFollowComponent.offsetDirection.rotate(Vector3.Y,-10f) }
         )
     }
 

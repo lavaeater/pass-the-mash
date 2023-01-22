@@ -1,4 +1,4 @@
-package depth.ecs.systems
+package mash.ecs.systems
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
@@ -10,12 +10,6 @@ import ktx.ashley.allOf
 import ktx.ashley.exclude
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
-
-
-fun <E> MutableSet<E>.addIndexed(element: E): Int {
-    this.add(element)
-    return this.indexOf(element)
-}
 
 class RenderSystem3d(
     private val sceneManager: SceneManager
