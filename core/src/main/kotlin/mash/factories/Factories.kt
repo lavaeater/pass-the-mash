@@ -1,4 +1,4 @@
-package depth.injection
+package mash.factories
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Matrix4
@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCylinderShape
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import depth.ecs.components.*
+import mash.injection.assets
 import eater.core.engine
 import eater.injection.InjectionContext.Companion.inject
 import ktx.ashley.entity
@@ -17,6 +18,9 @@ import ktx.math.vec3
 import net.mgsx.gltf.scene3d.lights.PointLightEx
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
+
+fun
+
 
 fun createSubMarine() {
     val submarineScene = Scene(assets().submarine.scene).apply {

@@ -24,12 +24,10 @@ import eater.injection.InjectionContext
 import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
+import mash.injection.Assets
 import net.mgsx.gltf.scene3d.attributes.FogAttribute
-import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
-import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.SceneManager
-import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
 
 
