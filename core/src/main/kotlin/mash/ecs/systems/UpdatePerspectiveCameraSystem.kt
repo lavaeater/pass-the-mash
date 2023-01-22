@@ -8,6 +8,7 @@ import depth.ecs.components.BulletRigidBody
 import depth.ecs.components.Camera3dFollowComponent
 import depth.ecs.components.MotionState
 import ktx.ashley.allOf
+import ktx.log.info
 import ktx.math.minus
 import ktx.math.plus
 import ktx.math.times
@@ -32,6 +33,7 @@ class UpdatePerspectiveCameraSystem(
         val position = motionState.position
         val cc = Camera3dFollowComponent.get(entity)
         val offset = cc.offset
+        info { "${cc.offsetDirection}" }
         tmpVector
             .set(motionState.forward * cc.offsetDirection)
             .scl(cc.distance)
