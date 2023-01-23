@@ -11,11 +11,6 @@ import ktx.math.times
 import ktx.math.vec3
 
 
-/**
- * TODO: Fix the forward problem thingie, it can probably be handled
- * by using the orientation of the quaternion of the bodies.
- */
-
 class MotionState : btMotionState(), Component, Poolable {
 
     private var _transform: Matrix4? = null

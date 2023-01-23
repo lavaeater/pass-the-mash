@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import depth.ecs.components.*
@@ -78,24 +79,42 @@ class CarSceneLoader : SceneLoader() {
         carScene.modelInstance.model.calculateBoundingBox(boundingBox)
 
         val carShape = btBoxShape(boundingBox.getDimensions(vec3()) / 2f).alsoRegister()
-
-//        val modelVertexArray = btTriangleIndexVertexArray(carScene.modelInstance.model.meshParts)
-//        val carShape = btRigidBody.btRigidBodyConstructionInfo() btGImpactMeshShape(modelVertexArray)
-
-        //I have to fix this
-//        carShape.localScaling = Vector3(1f, 1f, 1f)
-//        carShape.margin = 1f
+        // Create the vehicle
+        val raycaster = btDefaultVehicleRaycaster(dynamicsWorld)
+        val tuning = btRaycastVehicle.btVehicleTuning()
+        val motionState = MotionState()
         val localInertia = vec3()
+        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(10f, motionState, carShape, localInertia)
+        val bulletBody = btRigidBody(bodyInfo)
+        val vehicle = btRaycastVehicle(tuning, bulletBody, raycaster)
+        bulletBody.activationState = Collision.DISABLE_DEACTIVATION
+        dynamicsWorld.addVehicle(vehicle)
+        vehicle.setCoordinateSystem(0, 1, 2)
+        lateinit var wheelInfo: btWheelInfo
+        val point = Vector3()
+        val direction = Vector3(0f, -1f, 0f)
+        val axis = Vector3(-1f, 0f, 0f)
+        wheelInfo = vehicle.addWheel(
+            point.set(chassisHalfExtents).scl(0.9f, -0.8f, 0.7f), direction, axis,
+            wheelHalfExtents.z * 0.3f, wheelHalfExtents.z, tuning, true
+        )
+        wheelInfo = vehicle.addWheel(
+            point.set(chassisHalfExtents).scl(-0.9f, -0.8f, 0.7f), direction, axis,
+            wheelHalfExtents.z * 0.3f, wheelHalfExtents.z, tuning, true
+        )
+        wheelInfo = vehicle.addWheel(
+            point.set(chassisHalfExtents).scl(0.9f, -0.8f, -0.5f), direction, axis,
+            wheelHalfExtents.z * 0.3f, wheelHalfExtents.z, tuning, false
+        )
+        wheelInfo = vehicle.addWheel(
+            point.set(chassisHalfExtents).scl(-0.9f, -0.8f, -0.5f), direction, axis,
+            wheelHalfExtents.z * 0.3f, wheelHalfExtents.z, tuning, false
+        )
 
-//        carShape.calculateLocalInertia(1f, localInertia)
 
-//        val boundingBox = BoundingBox()
-//        carScene.modelInstance.calculateBoundingBox(boundingBox)
-//        val dimensions = vec3(
-//            boundingBox.width / 2f,
-//            boundingBox.height / 2f,
-//            boundingBox.height / 2f
-//        )
+
+
+
 
         engine().entity {
             with<VisibleComponent>()
@@ -112,11 +131,7 @@ class CarSceneLoader : SceneLoader() {
             with<Camera3dFollowComponent>()
             with<BulletRigidBody> {
                 carShape.calculateLocalInertia(10f, localInertia)
-                val info = btRigidBody.btRigidBodyConstructionInfo(10f, motionState, carShape, localInertia)
-                bulletBody = btRigidBody(info).apply {
-                    setDamping(0.5f, 0.5f)
-//                    angularFactor = Vector3.Y
-                }
+
                 rigidBody = bulletBody
                 dynamicsWorld.addRigidBody(bulletBody)
             }
