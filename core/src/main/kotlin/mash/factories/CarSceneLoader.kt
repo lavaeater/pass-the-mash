@@ -70,7 +70,7 @@ class CarSceneLoader : SceneLoader() {
 
         val carScene = Scene(someCar.scene).apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 2f, 0f), Vector3.Z, Vector3.Y
             )
         }
 
@@ -109,16 +109,13 @@ class CarSceneLoader : SceneLoader() {
                 motionState = this
                 transform = carScene.modelInstance.transform
             }
-            with<Camera3dFollowComponent> {
-                distance = 0f
-                offset.set(3f, 3f, -3f)
-            }
+            with<Camera3dFollowComponent>()
             with<BulletRigidBody> {
                 carShape.calculateLocalInertia(10f, localInertia)
                 val info = btRigidBody.btRigidBodyConstructionInfo(10f, motionState, carShape, localInertia)
                 bulletBody = btRigidBody(info).apply {
                     setDamping(0.5f, 0.5f)
-                    angularFactor = Vector3.Y
+//                    angularFactor = Vector3.Y
                 }
                 rigidBody = bulletBody
                 dynamicsWorld.addRigidBody(bulletBody)
@@ -129,9 +126,13 @@ class CarSceneLoader : SceneLoader() {
                 val actualVehicle = btRaycastVehicle(btRaycastVehicle.btVehicleTuning(), bulletBody, rcv).alsoRegister()
                 //Front Right wheel
                 actualVehicle.addWheel(
-                    vec3(1f,0f,-1f),
-                    vec3(0f, 0f, -1f),
-                    Vector3.X, 3f, 1f, tuner, false).alsoRegister()
+                    vec3(0.5f,0f,0f),
+                    vec3(1f, 0f, 0f),
+                    Vector3.Z, 3f, 1f, tuner, false).alsoRegister()
+                actualVehicle.addWheel(
+                    vec3(-0.5f,0f,0f),
+                    vec3(1f, 0f, 0f),
+                    Vector3.Z, 3f, 1f, tuner, false).alsoRegister()
                 //Front left wheel
 //                actualVehicle.addWheel(
 //                    vec3(-1f,0f,-1f),
