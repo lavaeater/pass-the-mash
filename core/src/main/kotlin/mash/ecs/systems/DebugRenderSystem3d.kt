@@ -36,8 +36,8 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
         val motionState = MotionState.get(entity)
         //Draw the normals!
 
-        debugDrawer.drawLine(motionState.position, motionState.position + motionState.forward.cpy().scl(5f), forwardColor)
-        debugDrawer.drawLine(motionState.position, motionState.position + motionState.up.cpy().scl(5f), upColor)
-        debugDrawer.drawLine(motionState.position, motionState.position + motionState.right.cpy().scl(5f), rightColor)
+        debugDrawer.drawLine(motionState.position, motionState.position + motionState.forward.cpy().scl(2f), forwardColor)
+        debugDrawer.drawLine(motionState.position, motionState.position + motionState.up.cpy().scl(2f), upColor)
+        debugDrawer.drawLine(motionState.position, motionState.position + motionState.right.cpy().scl(2f), rightColor)
     }
 }

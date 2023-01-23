@@ -4,18 +4,18 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.physics.bullet.collision.btGImpactMeshShape
-import com.badlogic.gdx.physics.bullet.collision.btTriangleIndexVertexArray
-import com.badlogic.gdx.physics.bullet.dynamics.FilterableVehicleRaycaster
-import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
+import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.physics.bullet.collision.btBoxShape
+import com.badlogic.gdx.physics.bullet.dynamics.*
 import depth.ecs.components.*
 import eater.core.engine
 import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.assets.disposeSafely
+import ktx.math.div
 import ktx.math.vec3
 import mash.ecs.components.KeyboardControlComponent
+import mash.ecs.components.BulletVehicle
 import net.mgsx.gltf.loaders.gltf.GLTFLoader
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
@@ -70,16 +70,21 @@ class CarSceneLoader : SceneLoader() {
 
         val carScene = Scene(someCar.scene).apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 2f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
             )
         }
 
-        val modelVertexArray = btTriangleIndexVertexArray(carScene.modelInstance.model.meshParts)
-        val carShape = btGImpactMeshShape(modelVertexArray)
+        val boundingBox = BoundingBox()
+        carScene.modelInstance.model.calculateBoundingBox(boundingBox)
+
+        val carShape = btBoxShape(boundingBox.getDimensions(vec3()) / 2f).alsoRegister()
+
+//        val modelVertexArray = btTriangleIndexVertexArray(carScene.modelInstance.model.meshParts)
+//        val carShape = btRigidBody.btRigidBodyConstructionInfo() btGImpactMeshShape(modelVertexArray)
 
         //I have to fix this
-        carShape.localScaling = Vector3(1f, 1f, 1f)
-        carShape.margin = 1f
+//        carShape.localScaling = Vector3(1f, 1f, 1f)
+//        carShape.margin = 1f
         val localInertia = vec3()
 
 //        carShape.calculateLocalInertia(1f, localInertia)
@@ -99,6 +104,7 @@ class CarSceneLoader : SceneLoader() {
                 sceneManager.addScene(carScene)
             }
             lateinit var motionState: MotionState
+            lateinit var bulletBody: btRigidBody
             with<MotionState> {
                 motionState = this
                 transform = carScene.modelInstance.transform
@@ -109,14 +115,43 @@ class CarSceneLoader : SceneLoader() {
             }
             with<BulletRigidBody> {
                 carShape.calculateLocalInertia(10f, localInertia)
-                carShape.updateBound()
                 val info = btRigidBody.btRigidBodyConstructionInfo(10f, motionState, carShape, localInertia)
-                val carBody = btRigidBody(info).apply {
+                bulletBody = btRigidBody(info).apply {
                     setDamping(0.5f, 0.5f)
                     angularFactor = Vector3.Y
                 }
-                rigidBody = carBody
-                dynamicsWorld.addRigidBody(carBody)
+                rigidBody = bulletBody
+                dynamicsWorld.addRigidBody(bulletBody)
+            }
+            with<BulletVehicle> {
+                val rcv = btDefaultVehicleRaycaster(dynamicsWorld).alsoRegister()
+                val tuner = btRaycastVehicle.btVehicleTuning().alsoRegister()
+                val actualVehicle = btRaycastVehicle(btRaycastVehicle.btVehicleTuning(), bulletBody, rcv).alsoRegister()
+                //Front Right wheel
+                actualVehicle.addWheel(
+                    vec3(1f,0f,-1f),
+                    vec3(0f, 0f, -1f),
+                    Vector3.X, 3f, 1f, tuner, false).alsoRegister()
+                //Front left wheel
+//                actualVehicle.addWheel(
+//                    vec3(-1f,0f,-1f),
+//                    vec3(1f, 0f, -1f),
+//                    Vector3.Y, 1f, 1f, tuner, true).alsoRegister()
+
+                //Back Right wheel
+//                actualVehicle.addWheel(
+//                    vec3(1f,0f,1f),
+//                    vec3(0f, 0f, -1f),
+//                    Vector3.X, 1f, 1f, tuner, false).alsoRegister()
+//
+//                //Back left wheel.
+//                actualVehicle.addWheel(
+//                    vec3(1f,0f,1f),
+//                    vec3(0f, 0f, -1f),
+//                    Vector3.X, 1f, 1f, tuner, false).alsoRegister()
+
+                bulletVehicle = actualVehicle
+                dynamicsWorld.addVehicle(actualVehicle)
             }
             with<KeyboardControlComponent>()
         }

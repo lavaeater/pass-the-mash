@@ -19,6 +19,7 @@ import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.RenderSystem3d
+import mash.ecs.systems.VehicleControlSystem
 import mash.factories.CarSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
 
@@ -81,7 +82,12 @@ object Context : InjectionContext() {
             bindSingleton<btDispatcher>(btCollisionDispatcher(inject()))
             bindSingleton<btBroadphaseInterface>(btDbvtBroadphase())
             bindSingleton<btConstraintSolver>(btSequentialImpulseConstraintSolver())
-            bindSingleton<btDynamicsWorld>(btSoftRigidDynamicsWorld(inject(), inject(), inject(), inject()).apply {
+            bindSingleton<btDynamicsWorld>(
+                btSoftRigidDynamicsWorld(
+                    inject(),
+                    inject(),
+                    inject(),
+                    inject()).apply {
                 gravity = vec3(0f, -10f, 0f)
             })
 
@@ -95,8 +101,8 @@ object Context : InjectionContext() {
             addSystem(UpdatePerspectiveCameraSystem(inject()))
             addSystem(BulletUpdateSystem(inject()))
             addSystem(RenderSystem3d(inject()))
-//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
-            addSystem(EntityControlSystem())
+            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+            addSystem(VehicleControlSystem())
         }
     }
 }
