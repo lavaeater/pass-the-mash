@@ -220,7 +220,7 @@ open class BaseBulletTest : BulletTest() {
             initialized = true
         }
 
-        protected val tmpV1 = Vector3()
-        protected val tmpV2 = Vector3()
+        val tmpV1 = Vector3()
+        val tmpV2 = Vector3()
     }
 }

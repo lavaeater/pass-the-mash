@@ -5,6 +5,7 @@ package mash.core.lwjgl3
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import mash.core.PassTheMash
+import mash.tester.bullet.VehicleFilterTest
 import mash.tester.bullet.VehicleTest
 
 /** Launches the desktop (LWJGL3) application. */
