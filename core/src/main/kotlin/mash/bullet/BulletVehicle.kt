@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import depth.ecs.components.MotionState
+import eater.core.engine
 import ktx.math.vec3
 
 
@@ -42,6 +43,8 @@ class BulletVehicle(
 ) {
     val wheels = mutableMapOf<WheelPosition, btWheelInfo>()
     val chassisHalfExtents = boundingBox.getDimensions(vec3()).scl(0.5f)
+    val wheelIndexes = mutableMapOf<WheelPosition, Int>()
+    var wheelIndex = 0
 
     fun addWheel(position: WheelPosition, wheelDimensions: Vector3) {
         val wheelHalfExtents = wheelDimensions.cpy().scl(0.5f)
@@ -64,6 +67,21 @@ class BulletVehicle(
                 tuning,
                 position.isFrontWheel
             )
+        wheelIndexes[position] = wheelIndex
+        wheelIndex++
+    }
+
+    fun setSteering(steering: Float) {
+        for(wheelIndex in wheelIndexes.filterKeys { it.isFrontWheel }.values) {
+            vehicle.setSteeringValue(steering, wheelIndex)
+        }
+    }
+
+    fun setForces(engineForce: Float, brakeForce: Float) {
+        for(wheelIndex in wheelIndexes.filterKeys { !it.isFrontWheel }.values){
+            vehicle.applyEngineForce(engineForce, wheelIndex)
+            vehicle.setBrake(brakeForce, wheelIndex)
+        }
     }
 
     companion object {
@@ -80,15 +98,14 @@ class BulletVehicle(
         ): BulletVehicle {
             val raycaster = btDefaultVehicleRaycaster(dynamicsWorld)
             val tuning = btRaycastVehicle.btVehicleTuning()
-//            val motionState = MotionState()
             val localInertia = vec3()
-//            shape.calculateLocalInertia(mass, localInertia)
+            shape.calculateLocalInertia(mass, localInertia)
 
             val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, shape, localInertia)
             val bulletBody = btRigidBody(bodyInfo)
-//                .apply {
-//                Collision.DISABLE_DEACTIVATION
-//            }
+                .apply {
+                Collision.DISABLE_DEACTIVATION
+            }
             val vehicle = btRaycastVehicle(tuning, bulletBody, raycaster)
             dynamicsWorld.addVehicle(vehicle)
             vehicle.setCoordinateSystem(0, 1, 2)

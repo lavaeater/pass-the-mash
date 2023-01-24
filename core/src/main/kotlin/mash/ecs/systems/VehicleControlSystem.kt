@@ -12,6 +12,7 @@ import eater.input.KeyPress
 import eater.input.command
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
+import mash.bullet.FrontBack
 import mash.ecs.components.BulletVehicleComponent
 import mash.ecs.components.KeyboardControlComponent
 
@@ -123,14 +124,8 @@ class VehicleControlSystem :
         }
 
         val vehicle = BulletVehicleComponent.get(entity)
-//        vehicle.bulletVehicle.setSteeringValue(steering, 0)
-//        vehicle.bulletVehicle.setSteeringValue(steering, 1)
-//
-        vehicle.vehicle.applyEngineForce(engineForce, 0)
-//        vehicle.bulletVehicle.applyEngineForce(engineForce, 3)
-//
-//        vehicle.bulletVehicle.setBrake(brakeForce, 2)
-//        vehicle.bulletVehicle.setBrake(brakeForce, 3)
+        vehicle.bulletVehicle.setSteering(steering)
 
+        vehicle.bulletVehicle.setForces(engineForce, brakeForce)
     }
 }
