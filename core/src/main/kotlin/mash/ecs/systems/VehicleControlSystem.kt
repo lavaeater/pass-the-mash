@@ -12,7 +12,7 @@ import eater.input.KeyPress
 import eater.input.command
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
-import mash.ecs.components.BulletVehicle
+import mash.ecs.components.BulletVehicleComponent
 import mash.ecs.components.KeyboardControlComponent
 
 
@@ -20,7 +20,7 @@ class VehicleControlSystem :
     IteratingSystem(
         allOf(
             KeyboardControlComponent::class,
-            BulletVehicle::class
+            BulletVehicleComponent::class
         ).get()
     ),
     KtxInputAdapter {
@@ -122,11 +122,11 @@ class VehicleControlSystem :
             brakeForce = 100f
         }
 
-        val vehicle = BulletVehicle.get(entity)
+        val vehicle = BulletVehicleComponent.get(entity)
 //        vehicle.bulletVehicle.setSteeringValue(steering, 0)
 //        vehicle.bulletVehicle.setSteeringValue(steering, 1)
 //
-        vehicle.bulletVehicle.applyEngineForce(engineForce, 0)
+        vehicle.vehicle.applyEngineForce(engineForce, 0)
 //        vehicle.bulletVehicle.applyEngineForce(engineForce, 3)
 //
 //        vehicle.bulletVehicle.setBrake(brakeForce, 2)
