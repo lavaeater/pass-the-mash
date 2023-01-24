@@ -72,16 +72,16 @@ class CarSceneLoader : SceneLoader() {
         val carScene = Scene(someCar.scene)
             .apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 5f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 2.5f, 0f), Vector3.Z, Vector3.Y
             )
         }
 
         val boundingBox = carScene.getBoundingBox()
         val carShape = boundingBox.getBoxShape().alsoRegister()
         // Create the vehicle
-        val bv = BulletVehicle.createVehicle(carShape, boundingBox, 10f, dynamicsWorld)
+        val bv = BulletVehicle.createVehicle(carShape, boundingBox, 5f, dynamicsWorld)
         for (direction in WheelPosition.directions) {
-            bv.addWheel(direction, vec3(0.2f, 0.2f, 0.2f))
+            bv.addWheel(direction, vec3(0.5f, 0.5f, 0.5f))
         }
 
         engine().entity {

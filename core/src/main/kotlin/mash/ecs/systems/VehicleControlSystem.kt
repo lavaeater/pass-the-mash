@@ -12,7 +12,6 @@ import eater.input.KeyPress
 import eater.input.command
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
-import mash.bullet.FrontBack
 import mash.ecs.components.BulletVehicleComponent
 import mash.ecs.components.KeyboardControlComponent
 
@@ -60,13 +59,13 @@ class VehicleControlSystem :
         setBoth(
             Keys.UP,
             "Up",
-            {  },
+            { },
             { cameraFollowComponent.offsetY += 0.1f }
         )
         setBoth(
             Keys.DOWN,
             "Down",
-            {  },
+            { },
             { cameraFollowComponent.offsetY -= 0.1f }
         )
         setBoth(
@@ -100,10 +99,6 @@ class VehicleControlSystem :
     private var steering = 0f
     private val steeringClamp = 45f
     override fun processEntity(entity: Entity, deltaTime: Float) {
-
-        var engineForce = 0f
-        var brakeForce = 0f
-
         if (controlComponent.has(Rotation.YawLeft)) {
             steering += deltaTime * steeringIncrement
         }
@@ -115,13 +110,17 @@ class VehicleControlSystem :
         steering = MathUtils.clamp(steering, -steeringClamp, steeringClamp)
 
         val vehicle = BulletVehicleComponent.get(entity).bulletVehicle
-        vehicle.setSteering(steering)
+        vehicle.setSteeringDeg(steering)
 
         if (controlComponent.has(Direction.Forward)) {
-            vehicle.applyEngineForce(1000f)
+            vehicle.applyEngineForce(1000f * deltaTime)
         }
         if (controlComponent.has(Direction.Reverse)) {
-            vehicle.applyBrakeForce(100f)
+            vehicle.applyBrakeForce(10f)
+        }
+
+        for (i in vehicle.wheelIndices.values) {
+            vehicle.vehicle.updateWheelTransform(i, true)
         }
     }
 }

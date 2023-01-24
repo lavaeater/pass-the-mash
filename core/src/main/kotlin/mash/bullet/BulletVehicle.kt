@@ -1,8 +1,8 @@
 package mash.bullet
 
+import com.badlogic.gdx.math.MathUtils.degreesToRadians
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
-import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import ktx.log.info
@@ -42,7 +42,7 @@ class BulletVehicle(
 ) {
     val wheels = mutableMapOf<WheelPosition, btWheelInfo>()
     val chassisHalfExtents = boundingBox.getDimensions(vec3()).scl(0.5f)
-    val wheelIndexes = mutableMapOf<WheelPosition, Int>()
+    val wheelIndices = mutableMapOf<WheelPosition, Int>()
     var wheelIndex = 0
 
     fun addWheel(position: WheelPosition, wheelDimensions: Vector3) {
@@ -56,7 +56,7 @@ class BulletVehicle(
                 point.set(chassisHalfExtents)
                     .scl(
                         if (position.leftOrRight is LeftRight.Left) 0.9f else -0.9f,
-                        -0.8f,
+                        -2f,
                         if(position.frontOrBack is FrontBack.Front) 0.7f else -0.5f
                     ),
                 direction,
@@ -66,25 +66,26 @@ class BulletVehicle(
                 tuning,
                 position.isFrontWheel
             )
-        wheelIndexes[position] = wheelIndex
+        wheelIndices[position] = wheelIndex
         wheelIndex++
     }
 
-    fun setSteering(steering: Float) {
-        for(wheelIndex in wheelIndexes.filterKeys { it.isFrontWheel }.values) {
+    fun setSteeringDeg(steeringAngle: Float) {
+        val steering = steeringAngle * degreesToRadians
+        for(wheelIndex in wheelIndices.filterKeys { it.isFrontWheel }.values) {
             vehicle.setSteeringValue(steering, wheelIndex)
         }
     }
 
     fun applyEngineForce(engineForce: Float) {
-        for(wheelIndex in wheelIndexes.filterKeys { !it.isFrontWheel }.values) {
+        for(wheelIndex in wheelIndices.filterKeys { it.isFrontWheel }.values) {
             info { "Applying force $engineForce to wheel $wheelIndex" }
             vehicle.applyEngineForce(engineForce, wheelIndex)
         }
     }
 
     fun applyBrakeForce(brakeForce: Float) {
-        for (wheelIndex in wheelIndexes.filterKeys { !it.isFrontWheel }.values) {
+        for (wheelIndex in wheelIndices.filterKeys { !it.isFrontWheel }.values) {
             info { "Applying brake $brakeForce to wheel $wheelIndex" }
             vehicle.setBrake(brakeForce, wheelIndex)
         }
@@ -105,18 +106,18 @@ class BulletVehicle(
             val raycaster = btDefaultVehicleRaycaster(dynamicsWorld)
             val tuning = btRaycastVehicle.btVehicleTuning()
             val localInertia = vec3()
-            shape.calculateLocalInertia(mass, localInertia)
+            //shape.calculateLocalInertia(mass, localInertia)
 
             val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, shape, localInertia)
-            val bulletBody = btRigidBody(bodyInfo)
-                .apply {
-                Collision.DISABLE_DEACTIVATION
-            }
-            val vehicle = btRaycastVehicle(tuning, bulletBody, raycaster)
+            val carBody = btRigidBody(bodyInfo)
+//                .apply {
+//                Collision.DISABLE_DEACTIVATION
+//            }
+            val vehicle = btRaycastVehicle(tuning, carBody, raycaster)
+            dynamicsWorld.addRigidBody(carBody)
             dynamicsWorld.addVehicle(vehicle)
-            dynamicsWorld.addRigidBody(bulletBody)
-            vehicle.setCoordinateSystem(0, 1, 2)
-            return BulletVehicle(raycaster, tuning, localInertia, boundingBox, bulletBody, vehicle)
+//            vehicle.setCoordinateSystem(0, 1, 2)
+            return BulletVehicle(raycaster, tuning, localInertia, boundingBox, carBody, vehicle)
         }
     }
 }

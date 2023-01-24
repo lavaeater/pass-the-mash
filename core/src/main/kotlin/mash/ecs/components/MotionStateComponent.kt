@@ -33,7 +33,7 @@ class MotionState(val transform: Matrix4) : btMotionState() {
         getDirection(transform)
     }
 
-    fun getDirection(transform: Matrix4?) {
+    private fun getDirection(transform: Matrix4?) {
         forward.set(Vector3.Z)
         up.set(Vector3.Y)
         right.set(Vector3.X)
