@@ -3,6 +3,7 @@ package mash.factories
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import depth.ecs.components.*
 import eater.core.engine
@@ -76,7 +77,7 @@ class CarSceneLoader : SceneLoader() {
         }
 
         val boundingBox = carScene.getBoundingBox()
-        val carShape = boundingBox.getBoxShape()//.alsoRegister()
+        val carShape = boundingBox.getBoxShape().alsoRegister()
         // Create the vehicle
         val bv = BulletVehicle.createVehicle(carShape, boundingBox, 10f, dynamicsWorld)
         for (direction in WheelPosition.directions) {
@@ -97,8 +98,9 @@ class CarSceneLoader : SceneLoader() {
                 bulletVehicle = bv
             }
             with<KeyboardControlComponent>()
-        }.apply {
-            add(bv.motionState)
+            with<MotionState> {
+                transform = carScene.modelInstance.transform
+            }
         }
     }
 

@@ -35,7 +35,6 @@ sealed class WheelPosition(val leftOrRight: LeftRight, val frontOrBack: FrontBac
 class BulletVehicle(
     val raycaster: btDefaultVehicleRaycaster,
     val tuning: btRaycastVehicle.btVehicleTuning,
-    val motionState: MotionState,
     val localInertia: Vector3,
     val boundingBox: BoundingBox,
     val bulletBody: btRigidBody,
@@ -81,11 +80,11 @@ class BulletVehicle(
         ): BulletVehicle {
             val raycaster = btDefaultVehicleRaycaster(dynamicsWorld)
             val tuning = btRaycastVehicle.btVehicleTuning()
-            val motionState = MotionState()
+//            val motionState = MotionState()
             val localInertia = vec3()
-            shape.calculateLocalInertia(mass, localInertia)
+//            shape.calculateLocalInertia(mass, localInertia)
 
-            val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, motionState, shape, localInertia)
+            val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, shape, localInertia)
             val bulletBody = btRigidBody(bodyInfo)
 //                .apply {
 //                Collision.DISABLE_DEACTIVATION
@@ -93,7 +92,7 @@ class BulletVehicle(
             val vehicle = btRaycastVehicle(tuning, bulletBody, raycaster)
             dynamicsWorld.addVehicle(vehicle)
             vehicle.setCoordinateSystem(0, 1, 2)
-            return BulletVehicle(raycaster, tuning, motionState, localInertia, boundingBox, bulletBody, vehicle)
+            return BulletVehicle(raycaster, tuning, localInertia, boundingBox, bulletBody, vehicle)
         }
     }
 }
