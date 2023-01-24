@@ -50,7 +50,7 @@ class BulletVehicle(
         val wheelHalfExtents = wheelDimensions.cpy().scl(0.5f)
         val point = Vector3()
         val direction = Vector3(0f, -1f, 0f) //Oh, so the wheel should point DOWN of all things?
-        val axis = Vector3(-1f, 0f, 0f)
+        val axis = Vector3(-1f, 0f, 0f) // Why is the axis x: -1?
 
         wheels[position] = vehicle
             .addWheel(
@@ -58,7 +58,7 @@ class BulletVehicle(
                     .scl(
                         if (position.leftOrRight is LeftRight.Left) 0.9f else -0.9f,
                         -0.8f,
-                        if(position.frontOrBack is FrontBack.Front) 0.7f else -0.5f
+                        if(position.frontOrBack is FrontBack.Front) -0.7f else 0.5f
                     ),
                 direction,
                 axis,
