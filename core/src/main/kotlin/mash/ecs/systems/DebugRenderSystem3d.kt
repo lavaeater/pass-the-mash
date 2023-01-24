@@ -6,14 +6,14 @@ import com.badlogic.gdx.physics.bullet.DebugDrawer
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw
 import com.badlogic.gdx.utils.viewport.Viewport
-import depth.ecs.components.MotionState
+import depth.ecs.components.MotionStateComponent
 import ktx.ashley.allOf
 import ktx.math.plus
 import ktx.math.vec3
 
 class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorld: btDynamicsWorld) : IteratingSystem(
     allOf(
-        MotionState::class
+        MotionStateComponent::class
     ).get()
 ) {
     val debugDrawer = DebugDrawer().apply {
@@ -33,7 +33,7 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        val motionState = MotionState.get(entity)
+        val motionState = MotionStateComponent.get(entity)
         //Draw the normals!
 
         debugDrawer.drawLine(motionState.position, motionState.position + motionState.forward.cpy().scl(2f), forwardColor)

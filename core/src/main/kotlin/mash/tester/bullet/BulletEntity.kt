@@ -67,18 +67,16 @@ class BulletEntity(modelInstance: ModelInstance, body: btCollisionObject?) : Bas
             body.userData = this
             if (body is btRigidBody) {
                 motionState = MotionState(this.modelInstance!!.transform)
-                (this.body as btRigidBody)!!.motionState = motionState
+                (this.body as btRigidBody).motionState = motionState
             } else body.worldTransform = transform
         }
     }
 
     override fun dispose() {
         // Don't rely on the GC
-        if (motionState != null) motionState!!.dispose()
+        motionState.dispose()
         if (body != null) body!!.dispose()
         // And remove the reference
-        motionState
-        body
     }
 
     class MotionState(private val transform: Matrix4) : btMotionState() {

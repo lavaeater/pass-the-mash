@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
-import com.badlogic.gdx.math.Vector3
 import depth.ecs.components.*
 import eater.input.KeyPress
 import eater.input.command
@@ -18,7 +17,7 @@ class EntityControlSystem :
     IteratingSystem(
         allOf(
             KeyboardControlComponent::class,
-            MotionState::class,
+            MotionStateComponent::class,
             SceneComponent::class
         ).get()
     ),
@@ -101,7 +100,7 @@ class EntityControlSystem :
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val rigidBody = BulletRigidBody.get(entity).rigidBody
-        val motionState = MotionState.get(entity)
+        val motionState = MotionStateComponent.get(entity)
 
         if (controlComponent.has(Rotation.YawLeft)) {
             rigidBody.applyTorqueImpulse(vec3(0f, torqueFactor, 0f))

@@ -5,8 +5,6 @@ import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape
 import com.badlogic.gdx.physics.bullet.dynamics.*
-import depth.ecs.components.MotionState
-import eater.core.engine
 import ktx.math.vec3
 
 

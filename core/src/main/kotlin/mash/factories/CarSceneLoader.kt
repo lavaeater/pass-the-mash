@@ -72,7 +72,7 @@ class CarSceneLoader : SceneLoader() {
         val carScene = Scene(someCar.scene)
             .apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 2f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
             )
         }
 
@@ -98,8 +98,10 @@ class CarSceneLoader : SceneLoader() {
                 bulletVehicle = bv
             }
             with<KeyboardControlComponent>()
-            with<MotionState> {
-                transform = carScene.modelInstance.transform
+            with<MotionStateComponent> {
+                val ms = MotionState(carScene.modelInstance.transform)
+                motionState = ms
+                bv.bulletBody.motionState = ms
             }
         }
     }

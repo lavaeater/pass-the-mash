@@ -4,14 +4,9 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.math.Vector3
-import depth.ecs.components.BulletRigidBody
 import depth.ecs.components.Camera3dFollowComponent
-import depth.ecs.components.MotionState
+import depth.ecs.components.MotionStateComponent
 import ktx.ashley.allOf
-import ktx.log.info
-import ktx.math.minus
-import ktx.math.plus
-import ktx.math.times
 import ktx.math.vec3
 
 class UpdatePerspectiveCameraSystem(
@@ -19,7 +14,7 @@ class UpdatePerspectiveCameraSystem(
 ) :
     IteratingSystem(
         allOf(
-            MotionState::class,
+            MotionStateComponent::class,
             Camera3dFollowComponent::class
         ).get()
     ) {
@@ -28,7 +23,7 @@ class UpdatePerspectiveCameraSystem(
     val cameraDirection = vec3()
     val tmpVector = vec3()
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        val motionState = MotionState.get(entity)
+        val motionState = MotionStateComponent.get(entity)
 
         val position = motionState.position
         val cc = Camera3dFollowComponent.get(entity)
