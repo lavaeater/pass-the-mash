@@ -34,7 +34,7 @@ class CarSceneLoader : SceneLoader() {
          * for this particular scene?
          */
         setUpScene(sceneManager)
-        createFloor(1000f, 0f, 1000f, sceneManager, dynamicsWorld)
+        createFloor(1000f, 1f, 1000f, sceneManager, dynamicsWorld)
         loadCar(sceneManager, dynamicsWorld)
     }
 
@@ -72,7 +72,7 @@ class CarSceneLoader : SceneLoader() {
         val carScene = Scene(someCar.scene)
             .apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 5f, 0f), Vector3.Z, Vector3.Y
             )
         }
 

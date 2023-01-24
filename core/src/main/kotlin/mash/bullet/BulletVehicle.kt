@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape
 import com.badlogic.gdx.physics.bullet.dynamics.*
+import ktx.log.info
 import ktx.math.vec3
 
 
@@ -56,7 +57,7 @@ class BulletVehicle(
                     .scl(
                         if (position.leftOrRight is LeftRight.Left) 0.9f else -0.9f,
                         -0.8f,
-                        if(position.frontOrBack is FrontBack.Front) -0.7f else 0.5f
+                        if(position.frontOrBack is FrontBack.Front) 0.7f else -0.5f
                     ),
                 direction,
                 axis,
@@ -75,9 +76,16 @@ class BulletVehicle(
         }
     }
 
-    fun setForces(engineForce: Float, brakeForce: Float) {
-        for(wheelIndex in wheelIndexes.filterKeys { !it.isFrontWheel }.values){
+    fun applyEngineForce(engineForce: Float) {
+        for(wheelIndex in wheelIndexes.filterKeys { !it.isFrontWheel }.values) {
+            info { "Applying force $engineForce to wheel $wheelIndex" }
             vehicle.applyEngineForce(engineForce, wheelIndex)
+        }
+    }
+
+    fun applyBrakeForce(brakeForce: Float) {
+        for (wheelIndex in wheelIndexes.filterKeys { !it.isFrontWheel }.values) {
+            info { "Applying brake $brakeForce to wheel $wheelIndex" }
             vehicle.setBrake(brakeForce, wheelIndex)
         }
     }
@@ -106,6 +114,7 @@ class BulletVehicle(
             }
             val vehicle = btRaycastVehicle(tuning, bulletBody, raycaster)
             dynamicsWorld.addVehicle(vehicle)
+            dynamicsWorld.addRigidBody(bulletBody)
             vehicle.setCoordinateSystem(0, 1, 2)
             return BulletVehicle(raycaster, tuning, localInertia, boundingBox, bulletBody, vehicle)
         }

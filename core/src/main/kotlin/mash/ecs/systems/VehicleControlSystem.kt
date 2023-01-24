@@ -114,18 +114,14 @@ class VehicleControlSystem :
 
         steering = MathUtils.clamp(steering, -steeringClamp, steeringClamp)
 
+        val vehicle = BulletVehicleComponent.get(entity).bulletVehicle
+        vehicle.setSteering(steering)
+
         if (controlComponent.has(Direction.Forward)) {
-            engineForce = 1000f
-            brakeForce = 0f
+            vehicle.applyEngineForce(1000f)
         }
         if (controlComponent.has(Direction.Reverse)) {
-            engineForce = 0f
-            brakeForce = 100f
+            vehicle.applyBrakeForce(100f)
         }
-
-        val vehicle = BulletVehicleComponent.get(entity)
-        vehicle.bulletVehicle.setSteering(steering)
-
-        vehicle.bulletVehicle.setForces(engineForce, brakeForce)
     }
 }
