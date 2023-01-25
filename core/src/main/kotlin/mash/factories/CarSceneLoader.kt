@@ -67,7 +67,7 @@ class CarSceneLoader : SceneLoader() {
     }
 
     fun loadCar(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
-        val someCar = "models/my-cars/delivery-van.gltf".loadModel().alsoRegister()
+        val someCar = "models/new/boxycar.gltf".loadModel().alsoRegister()
 
         val carScene = Scene(someCar.scene)
             .apply {
