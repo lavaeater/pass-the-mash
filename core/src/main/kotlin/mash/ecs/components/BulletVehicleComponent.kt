@@ -19,10 +19,15 @@ class BulletVehicleComponent: Component, Pool.Poolable {
     val vehicle: btRaycastVehicle
         get() = _bulletVehicle?.vehicle!!
 
+    var currentForce = 0f
+    var currentAngle = 0f
+
 
 
     override fun reset() {
         _bulletVehicle = null
+        currentAngle = 0f
+        currentForce = 0f
     }
 
     companion object {

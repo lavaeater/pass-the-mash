@@ -9,29 +9,12 @@ import com.badlogic.gdx.physics.bullet.dynamics.*
 import ktx.log.info
 import ktx.math.vec3
 
-
-sealed class LeftRight {
-    object Left : LeftRight()
-    object Right : LeftRight()
-}
-
-sealed class FrontBack {
-    object Front : FrontBack()
-    object Back : FrontBack()
-}
-
-sealed class WheelPosition(val leftOrRight: LeftRight, val frontOrBack: FrontBack) {
-    val isFrontWheel get() = frontOrBack == FrontBack.Front
-
-    object FrontLeft : WheelPosition(LeftRight.Left, FrontBack.Front)
-    object FrontRight : WheelPosition(LeftRight.Right, FrontBack.Front)
-    object BackLeft : WheelPosition(LeftRight.Left, FrontBack.Back)
-    object BackRight : WheelPosition(LeftRight.Right, FrontBack.Back)
-
-    companion object {
-        val directions = listOf(FrontLeft, FrontRight, BackLeft, BackRight)
-    }
-}
+data class VehicleParams(
+    val maxForce: Float,
+    val acceleration: Float,
+    val maxSteerAngle: Float,
+    val steeringSpeed: Float
+)
 
 class BulletVehicle(
     val raycaster: btDefaultVehicleRaycaster,
@@ -39,7 +22,8 @@ class BulletVehicle(
     val localInertia: Vector3,
     val boundingBox: BoundingBox,
     val bulletBody: btRigidBody,
-    val vehicle: btRaycastVehicle
+    val vehicle: btRaycastVehicle,
+    val vehicleParams: VehicleParams
 ) {
     val wheels = mutableMapOf<WheelPosition, btWheelInfo>()
     val chassisHalfExtents = boundingBox.getDimensions(vec3()).scl(0.5f)
@@ -103,7 +87,11 @@ class BulletVehicle(
             shape: btCollisionShape,
             boundingBox: BoundingBox,
             mass: Float,
-            dynamicsWorld: btDynamicsWorld
+            dynamicsWorld: btDynamicsWorld,
+            maxForce: Float,
+            acceleration: Float,
+            maxSteerAngle: Float,
+            steeringSpeed: Float
         ): BulletVehicle {
             val raycaster = btDefaultVehicleRaycaster(dynamicsWorld)
             val tuning = btRaycastVehicle.btVehicleTuning()
@@ -119,7 +107,20 @@ class BulletVehicle(
             vehicle.setCoordinateSystem(0, 1, 2)
 
 
-            val bulletVehicle = BulletVehicle(raycaster, tuning, localInertia, boundingBox, carBody, vehicle)
+            val bulletVehicle = BulletVehicle(
+                raycaster,
+                tuning,
+                localInertia,
+                boundingBox,
+                carBody,
+                vehicle,
+                VehicleParams(
+                    maxForce,
+                    acceleration,
+                    maxSteerAngle,
+                    steeringSpeed
+                )
+            )
 
             for (direction in WheelPosition.directions) {
                 bulletVehicle.addWheel(
@@ -127,7 +128,9 @@ class BulletVehicle(
                     vec3(
                         0.1f,
                         0.1f,
-                        0.5f))
+                        0.5f
+                    )
+                )
             }
 
 
