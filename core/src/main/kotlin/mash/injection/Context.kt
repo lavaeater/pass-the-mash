@@ -102,7 +102,7 @@ object Context : InjectionContext() {
             addSystem(UpdatePerspectiveCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(RenderSystem3d(inject()))
-//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }
 }
