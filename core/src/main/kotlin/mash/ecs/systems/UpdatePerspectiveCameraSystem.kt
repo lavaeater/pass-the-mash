@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector3
 import depth.ecs.components.Camera3dFollowComponent
 import depth.ecs.components.MotionStateComponent
 import ktx.ashley.allOf
+import ktx.math.plus
+import ktx.math.times
 import ktx.math.vec3
 
 class UpdatePerspectiveCameraSystem(
@@ -22,13 +24,15 @@ class UpdatePerspectiveCameraSystem(
     val target = vec3()
     val cameraDirection = vec3()
     val tmpVector = vec3()
+    val rotatedOffset = vec3()
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val motionState = MotionStateComponent.get(entity)
 
         val position = motionState.position
         val cc = Camera3dFollowComponent.get(entity)
-
-        perspectiveCamera.position.set(tmpVector.set(position).add(cc.offsetXZ.x, cc.offsetY, cc.offsetXZ.y))
+        rotatedOffset.set(motionState.backwards).scl(cc.offsetXZ.y).add(0f, cc.offsetY, 0f)
+        tmpVector.set(position).add(rotatedOffset)
+        perspectiveCamera.position.lerp(tmpVector, 0.2f)
 
 //        val offset = cc.offset
 //        info { "${cc.offsetDirection}" }
@@ -48,7 +52,7 @@ class UpdatePerspectiveCameraSystem(
 //        perspectiveCamera.position.lerp(target, 0.8f)
 //        cameraDirection.set(position)
 
-        perspectiveCamera.lookAt(position)
+        perspectiveCamera.lookAt(position + motionState.forward * 2f)
         perspectiveCamera.up.set(Vector3.Y)
         perspectiveCamera.update()
     }
