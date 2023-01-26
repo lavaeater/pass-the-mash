@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import depth.ecs.components.*
 import eater.core.engine
@@ -72,7 +73,7 @@ class CarSceneLoader : SceneLoader() {
         val carScene = Scene(someCar.scene)
             .apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 2.5f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
             )
         }
 
@@ -80,9 +81,8 @@ class CarSceneLoader : SceneLoader() {
         val carShape = boundingBox.getBoxShape().alsoRegister()
         // Create the vehicle
         val bv = BulletVehicle.createVehicle(carShape, boundingBox, 5f, dynamicsWorld)
-        for (direction in WheelPosition.directions) {
-            bv.addWheel(direction, vec3(0.5f, 0.5f, 0.5f))
-        }
+
+
 
         engine().entity {
             with<VisibleComponent>()

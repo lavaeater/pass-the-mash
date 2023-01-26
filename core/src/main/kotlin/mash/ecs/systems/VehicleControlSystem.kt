@@ -116,7 +116,7 @@ class VehicleControlSystem :
             vehicle.applyEngineForce(1000f * deltaTime)
         }
         if (controlComponent.has(Direction.Reverse)) {
-            vehicle.applyBrakeForce(10f)
+            vehicle.applyBrakeForce(1000f * deltaTime)
         }
 
         for (i in vehicle.wheelIndices.values) {

@@ -28,7 +28,7 @@ fun String.loadModel(): SceneAsset {
 
 fun BoundingBox.getBoxShape(): btBoxShape {
     return btBoxShape(
-        this.getDimensions(vec3()).scl(0.25f)
+        this.getDimensions(vec3()).scl(0.5f)
     )
 }
 
