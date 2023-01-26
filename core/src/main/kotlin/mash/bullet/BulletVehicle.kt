@@ -13,7 +13,8 @@ data class VehicleParams(
     val maxForce: Float,
     val acceleration: Float,
     val maxSteerAngle: Float,
-    val steeringSpeed: Float
+    val steeringSpeed: Float,
+    val brakeForce: Float
 )
 
 class BulletVehicle(
@@ -41,7 +42,7 @@ class BulletVehicle(
                 point.set(chassisHalfExtents)
                     .scl(
                         if (position.leftOrRight is LeftRight.Left) 0.9f else -0.9f,
-                        -0f,
+                        -0.8f,
                         if (position.frontOrBack is FrontBack.Front) 0.7f else -0.5f
                     ),
                 direction,
@@ -63,7 +64,7 @@ class BulletVehicle(
     }
 
     fun applyEngineForce(engineForce: Float) {
-        for (wheelIndex in wheelIndices.filterKeys { !it.isFrontWheel }.values) {
+        for (wheelIndex in wheelIndices.filterKeys { it.isFrontWheel }.values) {
             info { "Applying force $engineForce to wheel $wheelIndex" }
             vehicle.applyEngineForce(engineForce, wheelIndex)
         }
@@ -72,7 +73,6 @@ class BulletVehicle(
     fun applyBrakeForce(brakeForce: Float) {
         for (wheelIndex in wheelIndices.filterKeys { !it.isFrontWheel }.values) {
             info { "Applying brake $brakeForce to wheel $wheelIndex" }
-            vehicle.applyEngineForce(0f, wheelIndex)
             vehicle.setBrake(brakeForce, wheelIndex)
         }
     }
@@ -91,7 +91,8 @@ class BulletVehicle(
             maxForce: Float,
             acceleration: Float,
             maxSteerAngle: Float,
-            steeringSpeed: Float
+            steeringSpeed: Float,
+            brakeForce: Float
         ): BulletVehicle {
             val raycaster = btDefaultVehicleRaycaster(dynamicsWorld)
             val tuning = btRaycastVehicle.btVehicleTuning()
@@ -118,7 +119,8 @@ class BulletVehicle(
                     maxForce,
                     acceleration,
                     maxSteerAngle,
-                    steeringSpeed
+                    steeringSpeed,
+                    brakeForce
                 )
             )
 

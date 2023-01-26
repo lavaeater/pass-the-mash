@@ -95,28 +95,32 @@ class VehicleControlSystem :
         super.update(deltaTime)
     }
 
-    private val steeringIncrement = 45f
-    private var steering = 0f
-    private val steeringClamp = 45f
     override fun processEntity(entity: Entity, deltaTime: Float) {
+        val vc = BulletVehicleComponent.get(entity)
+        val vehicle = vc.bulletVehicle
+
+        val vehicleParams = vehicle.vehicleParams
         if (controlComponent.has(Rotation.YawLeft)) {
-            steering += deltaTime * steeringIncrement
+            vc.currentAngle += deltaTime * vehicleParams.steeringSpeed
+        } else if (controlComponent.has(Rotation.YawRight)) {
+            vc.currentAngle -= deltaTime * vehicleParams.steeringSpeed
+        } else {
+            vc.currentAngle = 0f // for now
         }
 
-        if (controlComponent.has(Rotation.YawRight)) {
-            steering -= deltaTime * steeringIncrement
-        }
+        vc.currentAngle = MathUtils.clamp(vc.currentAngle, -vehicleParams.maxSteerAngle, vehicleParams.maxSteerAngle)
 
-        steering = MathUtils.clamp(steering, -steeringClamp, steeringClamp)
-
-        val vehicle = BulletVehicleComponent.get(entity).bulletVehicle
-        vehicle.setSteeringDeg(steering)
+        vehicle.setSteeringDeg(vc.currentAngle)
 
         if (controlComponent.has(Direction.Forward)) {
-            vehicle.applyEngineForce(1000f * deltaTime)
+            vc.currentForce += vehicleParams.acceleration * deltaTime
+            vc.currentForce = MathUtils.clamp(vc.currentForce, 0f, vehicleParams.maxForce)
+        } else {
+            vc.currentForce = 0f
         }
+        vehicle.applyEngineForce(vc.currentForce)
         if (controlComponent.has(Direction.Reverse)) {
-            vehicle.applyBrakeForce(1000f * deltaTime)
+            vehicle.applyBrakeForce(vehicleParams.brakeForce * deltaTime)
         }
 
         for (i in vehicle.wheelIndices.values) {

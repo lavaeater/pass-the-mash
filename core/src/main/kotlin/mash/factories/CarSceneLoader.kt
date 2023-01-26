@@ -68,19 +68,28 @@ class CarSceneLoader : SceneLoader() {
     }
 
     fun loadCar(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
-        val someCar = "models/new/boxycar.gltf".loadModel().alsoRegister()
+        val someCar = "models/my-cars/delivery-van.gltf".loadModel().alsoRegister()
 
         val carScene = Scene(someCar.scene)
             .apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 5f, 0f), Vector3.Z, Vector3.Y
             )
         }
 
         val boundingBox = carScene.getBoundingBox()
         val carShape = boundingBox.getBoxShape().alsoRegister()
         // Create the vehicle
-        val bv = BulletVehicle.createVehicle(carShape, boundingBox, 5f, dynamicsWorld)
+        val bv = BulletVehicle.createVehicle(
+            carShape,
+            boundingBox,
+            5f,
+            dynamicsWorld,
+            100f,
+            25f,
+            30f,
+            30f,
+            100f)
 
 
 
