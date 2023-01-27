@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import depth.ecs.components.*
 import eater.core.engine
@@ -13,7 +12,6 @@ import ktx.ashley.with
 import ktx.assets.disposeSafely
 import ktx.math.vec3
 import mash.bullet.BulletVehicle
-import mash.bullet.WheelPosition
 import mash.core.getBoundingBox
 import mash.core.getBoxShape
 import mash.core.loadModel
@@ -28,15 +26,22 @@ import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
 
 
-class CarSceneLoader : SceneLoader() {
+class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         /**
          * Is it reasonable to just load resources here that we just might only need
          * for this particular scene?
          */
         setUpScene(sceneManager)
+        loadTrack(sceneManager, dynamicsWorld)
         createFloor(1000f, 1f, 1000f, sceneManager, dynamicsWorld)
         loadCar(sceneManager, dynamicsWorld)
+    }
+
+    private fun loadTrack(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
+        val track = trackGenerator.generateTrack()
+        sceneManager.addScene(track.scene)
+        dynamicsWorld.addRigidBody(track.body)
     }
 
     override fun setupEnvironment(sceneManager: SceneManager) {
