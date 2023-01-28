@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder
 import com.badlogic.gdx.math.Vector
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.Bullet
@@ -78,37 +79,49 @@ class TrackGenerator {
          * or even rectangles!
          */
         val modelBuilder = ModelBuilder()
-        modelBuilder.begin()
-        val bbb = modelBuilder.part(
-            "TRAAACK",
+//        modelBuilder.begin()
+//        val bbb = modelBuilder.part(
+//            "TRAAACK",
+//            GL20.GL_TRIANGLES,
+//            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong(),
+//            Material()
+//        )
+//        val normal = vec3()
+//        val builder = BoxShapeBuilder()
+        val model = modelBuilder.createBox(
+            5f,
+            5f,
+            5f,
             GL20.GL_TRIANGLES,
-            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong(),
-            Material()
+            Material(),
+            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong()
         )
-        val normal = vec3()
 
-        for (i in leftPoints.indices) {
-            if (i != leftPoints.lastIndex) {
-                val c00 = leftPoints[i]
-                val c10 = leftPoints[i + 1]
-                val c11 = rightPoints[i + 1]
-                val c01 = rightPoints[i]
-                val u = c10 - c00
-                val v = c11 - c00
-                normal.apply {
-                    x = -(u.y * v.z - u.z * v.y)
-                    y = -(u.z * v.x - u.x * v.z)
-                    z = -(u.x * v.y - u.y * v.x)
-                }.nor().scl(-1f)
-                bbb.rect(c00, c10, c11, c01, Vector3.Y.cpy())
-            }
-        }
-        
-        val model = modelBuilder.end()
 
-        var scene = Scene(model).
-            apply {
-                modelInstance.transform.setToWorld(vec3(),-Vector3.Z, Vector3.Y)
+//        for (i in leftPoints.indices) {
+//            if (i != leftPoints.lastIndex) {
+//                val c00 = leftPoints[i]
+//                val c10 = leftPoints[i + 1]
+//                val c11 = rightPoints[i + 1]
+//                val c01 = rightPoints[i]
+//                val u = c10 - c00
+//                val v = c11 - c00
+//                normal.apply {
+//                    x = -(u.y * v.z - u.z * v.y)
+//                    y = -(u.z * v.x - u.x * v.z)
+//                    z = -(u.x * v.y - u.y * v.x)
+//                }.nor().scl(-1f)
+//                bbb.rect(c00, c10, c11, c01, Vector3.Y.cpy())
+//            }
+//        }
+
+//        val model = modelBuilder.end()
+
+        var scene = Scene(model)
+            .apply {
+                this.modelInstance.transform.setToWorld(
+                    vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
+                )
             }
 
         return MashTrack(scene)

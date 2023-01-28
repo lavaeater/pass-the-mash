@@ -44,7 +44,7 @@ object Context : InjectionContext() {
                 fieldOfView = gameSettings.fieldOfView
                 near = gameSettings.cameraNear
                 far = gameSettings.cameraFar
-                position.set(5f, 5f, -5f)
+                position.set(15f, 15f, -15f)
                 lookAt(vec3())
             })
             bindSingleton(
