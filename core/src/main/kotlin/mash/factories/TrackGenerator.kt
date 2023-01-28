@@ -3,9 +3,10 @@ package mash.factories
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Material
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
+import com.badlogic.gdx.math.Vector
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.bullet.Bullet
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.math.minus
 import ktx.math.random
@@ -63,7 +64,7 @@ class TrackGenerator {
             rightPoints.add(rightPoint())
 
             forward.rotate(Vector3.Y, (-5f..5f).random())
-            travelingPoint.add(tmpVector.set(forward).scl(5f))
+            travelingPoint.add(tmpVector.set(forward).scl(15f))
             travelingPoint.y += (-2.5f..2.5f).random()
         }
 
@@ -98,15 +99,17 @@ class TrackGenerator {
                     x = -(u.y * v.z - u.z * v.y)
                     y = -(u.z * v.x - u.x * v.z)
                     z = -(u.x * v.y - u.y * v.x)
-                }.nor()
-                bbb.rect(c00, c10, c11, c01, normal)
+                }.nor().scl(-1f)
+                bbb.rect(c00, c10, c11, c01, Vector3.Y.cpy())
             }
         }
-
+        
         val model = modelBuilder.end()
 
-        var scene = Scene(model)
-
+        var scene = Scene(model).
+            apply {
+                modelInstance.transform.setToWorld(vec3(),-Vector3.Z, Vector3.Y)
+            }
 
         return MashTrack(scene)
     }

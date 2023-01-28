@@ -44,7 +44,7 @@ object Context : InjectionContext() {
                 fieldOfView = gameSettings.fieldOfView
                 near = gameSettings.cameraNear
                 far = gameSettings.cameraFar
-                //position.set(5f, 5f, -5f)
+                position.set(5f, 5f, -5f)
                 lookAt(vec3())
             })
             bindSingleton(
@@ -101,7 +101,7 @@ object Context : InjectionContext() {
             addSystem(RemoveEntitySystem())
             addSystem(VehicleControlSystem())
             addSystem(BulletUpdateSystem(inject()))
-            addSystem(UpdatePerspectiveCameraSystem(inject()))
+//            addSystem(UpdatePerspectiveCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(RenderSystem3d(inject()))
 //            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
