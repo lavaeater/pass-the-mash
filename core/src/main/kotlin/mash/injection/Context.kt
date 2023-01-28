@@ -21,6 +21,7 @@ import mash.core.GameScreen
 import mash.ecs.systems.RenderSystem3d
 import mash.ecs.systems.VehicleControlSystem
 import mash.factories.CarSceneLoader
+import mash.factories.TrackGenerator
 import net.mgsx.gltf.scene3d.scene.SceneManager
 
 
@@ -56,9 +57,10 @@ object Context : InjectionContext() {
             bindSingleton(createSceneManager())
             setupBullet(this)
             bindSingleton(getEngine())
+            bindSingleton(TrackGenerator())
             bindSingleton(
                 GameScreen(
-                CarSceneLoader(),
+                CarSceneLoader(inject()),
                 inject(),
                 inject(),
                 inject()
