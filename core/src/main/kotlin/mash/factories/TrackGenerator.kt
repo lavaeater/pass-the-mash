@@ -1,19 +1,17 @@
 package mash.factories
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Material
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder
-import com.badlogic.gdx.math.Vector
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.physics.bullet.Bullet
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
-import ktx.math.minus
-import ktx.math.random
 import ktx.math.unaryMinus
 import ktx.math.vec3
 import net.mgsx.gltf.scene3d.scene.Scene
+
 
 class TrackGenerator {
     fun generateTrack(): MashTrack {
@@ -59,14 +57,14 @@ class TrackGenerator {
             return travelingPoint.cpy().add(left().scl(5f))
         }
 
-        for (i in 0..10) {
+        for (i in 0..100) {
             centerPoints.add(travelingPoint.cpy())
             leftPoints.add(leftPoint())
             rightPoints.add(rightPoint())
 
-            forward.rotate(Vector3.Y, (-5f..5f).random())
+//            forward.rotate(Vector3.Y, (-5f..5f).random())
             travelingPoint.add(tmpVector.set(forward).scl(15f))
-            travelingPoint.y += (-2.5f..2.5f).random()
+//            travelingPoint.y += (-2.5f..2.5f).random()
         }
 
         val minY = centerPoints.minOf { it.y }
@@ -104,20 +102,20 @@ class TrackGenerator {
                 val c10 = leftPoints[i + 1]
                 val c11 = rightPoints[i + 1]
                 val c01 = rightPoints[i]
-                val u = c10 - c00
-                val v = c11 - c00
-//                normal.apply {
-//                    x = -(u.y * v.z - u.z * v.y)
-//                    y = -(u.z * v.x - u.x * v.z)
-//                    z = -(u.x * v.y - u.y * v.x)
-//                }.nor().scl(-1f)
-                bbb.rect(c00, c01, c10, c11, Vector3.Y.cpy())
+                bbb.setColor(Color.RED)
+                val v1 = VertexInfo().setPos(c00).setNor(0f, 0f, 1f).setCol(null).setUV(0.5f, 0.0f)
+                val v2 = VertexInfo().setPos(c10).setNor(0f, 0f, 1f).setCol(null).setUV(0.0f, 0.0f)
+                val v3 = VertexInfo().setPos(c11).setNor(0f, 0f, 1f).setCol(null).setUV(0.0f, 0.5f)
+                val v4 = VertexInfo().setPos(c01).setNor(0f, 0f, 1f).setCol(null).setUV(0.5f, 0.5f)
+                bbb.rect(v1, v2, v3, v4)
+
+//                bbb.rect (c00, c11, c10, c01, Vector3.Y.cpy())
             }
         }
 
         val model = modelBuilder.end()
 
-        var scene = Scene(model)
+        val scene = Scene(model)
             .apply {
                 this.modelInstance.transform.setToWorld(
                     vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
