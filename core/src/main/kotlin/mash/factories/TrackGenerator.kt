@@ -40,6 +40,8 @@ class TrackGenerator {
         point.
          */
 
+        val roadWidth = 50f
+
         val centerPoints = mutableListOf<Vector3>()
         val leftPoints = mutableListOf<Vector3>()
         val rightPoints = mutableListOf<Vector3>()
@@ -51,22 +53,22 @@ class TrackGenerator {
             return tmpVector.set(forward).rotate(Vector3.Y, 90f)
         }
         val leftPoint = fun(): Vector3 {
-            return travelingPoint.cpy().add(left().scl(15f))
+            return travelingPoint.cpy().add(left().scl(roadWidth))
         }
 
         val right = fun(): Vector3 {
             return tmpVector.set(forward).rotate(Vector3.Y, -90f)
         }
         val rightPoint = fun(): Vector3 {
-            return travelingPoint.cpy().add(right().scl(15f))
+            return travelingPoint.cpy().add(right().scl(roadWidth))
         }
 
-        for (i in 0..15) {
+        for (i in 0..1000) {
             centerPoints.add(travelingPoint.cpy())
             leftPoints.add(leftPoint())
             rightPoints.add(rightPoint())
             forward.rotate(Vector3.Y, (-15f..15f).random())
-            travelingPoint.add(tmpVector.set(forward).scl(15f))
+            travelingPoint.add(tmpVector.set(forward).scl(25f))
             travelingPoint.y += (-5f..5f).random()
             tmpVector.setZero()
         }
@@ -87,23 +89,8 @@ class TrackGenerator {
             (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong(),
             Material()
         )
-        val normal = vec3(0f, 1f, 0f)
-//        val builder = BoxShapeBuilder()
-//        val model = modelBuilder.createBox(
-//            5f,
-//            5f,
-//            5f,
-//            GL20.GL_TRIANGLES,
-//            Material(),
-//            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong()
-//        )
-
 
         for (i in leftPoints.indices) {
-
-//            if( i > 0)
-//                bbb.setVertexTransform(Matrix4().setToWorld(centerPoints[i - 1].cpy(), -Vector3.Z, Vector3.Y))
-
             if (i != leftPoints.lastIndex) {
                 bbb.setColor(Color.RED)
 
@@ -135,25 +122,14 @@ class TrackGenerator {
         val model = modelBuilder.end()
 
         val scene = Scene(model)
-//            .apply {
-//                this.modelInstance.transform.setToWorld(
-//                    vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
-//                )
-//            }
 
-        val bodies = scene.modelInstance.nodes.map {
-            val rigidBodyShape = Bullet.obtainStaticNodeShape(it, false)
-//            val motionState = MotionState(it.globalTransform)
-            btRigidBody(btRigidBody.btRigidBodyConstructionInfo(0f, null, rigidBodyShape))
-        }
+        val body = btRigidBody(btRigidBody.btRigidBodyConstructionInfo(0f, null, Bullet.obtainStaticNodeShape(scene.modelInstance.nodes)))
 
-
-
-        return MashTrack(scene, bodies)
+        return MashTrack(scene, body)
     }
 
 
 }
 
-class MashTrack(val scene: Scene, val bodies: List<btRigidBody>) {
+class MashTrack(val scene: Scene, val body: btRigidBody) {
 }

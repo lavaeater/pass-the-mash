@@ -65,7 +65,13 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
         sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap))
         sceneManager.environment.apply {
             add(DirectionalShadowLight().apply {
-                set(1f, 0.5f, 1f, -1f, -1f, 0f)
+                set(1f, 1f, 0f, -1f, -1f, 0f)
+            }.alsoRegister())
+        }
+
+        sceneManager.environment.apply {
+            add(DirectionalShadowLight().apply {
+                set(1f, 1f, 1f, 0f, -1f, 1f)
             }.alsoRegister())
         }
         // setup skybox
@@ -88,12 +94,12 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
         val bv = BulletVehicle.createVehicle(
             carShape,
             boundingBox,
-            5f,
+            50f,
             dynamicsWorld,
-            100f,
-            25f,
+            1000f,
+            250f,
             30f,
-            30f,
+            15f,
             100f)
 
 

@@ -52,6 +52,8 @@ class BulletVehicle(
                 tuning,
                 position.isFrontWheel
             )
+        wheels[position]!!.rollInfluence = 0.1f
+        wheels[position]!!.rollInfluence = 0.1f
         wheelIndices[position] = wheelIndex
         wheelIndex++
     }
@@ -106,7 +108,6 @@ class BulletVehicle(
                 }
             val vehicle = btRaycastVehicle(tuning, carBody, raycaster)
             vehicle.setCoordinateSystem(0, 1, 2)
-
 
             val bulletVehicle = BulletVehicle(
                 raycaster,
