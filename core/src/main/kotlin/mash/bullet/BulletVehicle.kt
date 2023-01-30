@@ -104,7 +104,8 @@ class BulletVehicle(
             val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, shape, localInertia)
             val carBody = btRigidBody(bodyInfo)
                 .apply {
-                    Collision.DISABLE_DEACTIVATION
+                    //collisionFlags = Collision.DISABLE_DEACTIVATION
+                    angularFactor = Vector3.Y
                 }
             val vehicle = btRaycastVehicle(tuning, carBody, raycaster)
             vehicle.setCoordinateSystem(0, 1, 2)

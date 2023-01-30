@@ -41,7 +41,7 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
     private fun loadTrack(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         val track = trackGenerator.generateTrack()
         sceneManager.addScene(track.scene)
-        track.bodies.forEach { dynamicsWorld.addRigidBody(it) }
+        dynamicsWorld.addRigidBody(track.body)
     }
 
     override fun setupEnvironment(sceneManager: SceneManager) {
@@ -94,11 +94,11 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
         val bv = BulletVehicle.createVehicle(
             carShape,
             boundingBox,
-            50f,
+            5f,
             dynamicsWorld,
-            1000f,
-            250f,
-            30f,
+            50f,
+            15f,
+            20f,
             15f,
             100f)
 
