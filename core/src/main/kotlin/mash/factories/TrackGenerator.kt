@@ -4,10 +4,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Material
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
+import ktx.math.random
 import ktx.math.unaryMinus
 import ktx.math.vec3
 import net.mgsx.gltf.scene3d.scene.Scene
@@ -47,28 +48,27 @@ class TrackGenerator {
             return tmpVector.set(forward).rotate(Vector3.Y, 90f)
         }
         val leftPoint = fun(): Vector3 {
-            return travelingPoint.cpy().add(left().scl(5f))
+            return travelingPoint.cpy().add(left().scl(15f))
         }
 
         val right = fun(): Vector3 {
             return tmpVector.set(forward).rotate(Vector3.Y, -90f)
         }
         val rightPoint = fun(): Vector3 {
-            return travelingPoint.cpy().add(left().scl(5f))
+            return travelingPoint.cpy().add(right().scl(15f))
         }
 
         for (i in 0..100) {
             centerPoints.add(travelingPoint.cpy())
             leftPoints.add(leftPoint())
             rightPoints.add(rightPoint())
-
-//            forward.rotate(Vector3.Y, (-5f..5f).random())
-            travelingPoint.add(tmpVector.set(forward).scl(15f))
-//            travelingPoint.y += (-2.5f..2.5f).random()
+            forward.rotate(Vector3.Y, (-15f..15f).random())
+            travelingPoint.add(tmpVector.set(forward).scl(500f))
+            travelingPoint.y += (-15f..15f).random()
+            tmpVector.setZero()
         }
 
-        val minY = centerPoints.minOf { it.y }
-
+        val minY = centerPoints.minOf { it.y } - 10f
         // Generate mesh magic goes here!
 
         /**
@@ -98,18 +98,29 @@ class TrackGenerator {
 
         for (i in leftPoints.indices) {
             if (i != leftPoints.lastIndex) {
-                val c00 = leftPoints[i]
-                val c10 = leftPoints[i + 1]
-                val c11 = rightPoints[i + 1]
-                val c01 = rightPoints[i]
                 bbb.setColor(Color.RED)
-                val v1 = VertexInfo().setPos(c00).setNor(0f, 0f, 1f).setCol(null).setUV(0.5f, 0.0f)
-                val v2 = VertexInfo().setPos(c10).setNor(0f, 0f, 1f).setCol(null).setUV(0.0f, 0.0f)
-                val v3 = VertexInfo().setPos(c11).setNor(0f, 0f, 1f).setCol(null).setUV(0.0f, 0.5f)
-                val v4 = VertexInfo().setPos(c01).setNor(0f, 0f, 1f).setCol(null).setUV(0.5f, 0.5f)
-                bbb.rect(v1, v2, v3, v4)
 
-//                bbb.rect (c00, c11, c10, c01, Vector3.Y.cpy())
+                val c010 = rightPoints[i] // vec3(0f,10f,0f) // near top right
+                val c110 = leftPoints[i] // vec3(10f,10f,0f) // near top left
+                val c011 = rightPoints[i + 1] //vec3(0f,10f,10f) // far top right
+                val c111 = leftPoints[i + 1] // vec3(10f,10f,10f) // far top left
+
+                val c000 = c010.cpy().apply { y = minY } // vec3(0f,0f,0f) // near bottom right
+                val c100 = c110.cpy().apply { y = minY } // vec3(10f,0f,0f) // near bottom left
+                val c001 = c011.cpy().apply { y = minY } // vec3(0f,0f,10f) // far bottom right
+                val c101 = c111.cpy().apply { y = minY } // vec3(10f,0f,10f) // far bottom left
+
+                BoxShapeBuilder.build(
+                    bbb,
+                    c000,
+                    c010,
+                    c100,
+                    c110,
+                    c001,
+                    c011,
+                    c101,
+                    c111
+                )
             }
         }
 
