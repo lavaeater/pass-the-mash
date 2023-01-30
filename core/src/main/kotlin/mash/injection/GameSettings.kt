@@ -6,7 +6,7 @@ class GameSettings(
 ) {
     val fieldOfView = 60f
     val cameraNear = 0.02f
-    val cameraFar = 100f
+    val cameraFar = 1000f
 
     val gameHeight = aspectRatio * gameWidth
     val metersPerPixel = 1f / pixelsPerMeter

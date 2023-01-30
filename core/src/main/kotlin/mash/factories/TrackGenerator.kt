@@ -6,8 +6,11 @@ import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.bullet.Bullet
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
+import depth.ecs.components.MotionState
 import ktx.math.random
 import ktx.math.unaryMinus
 import ktx.math.vec3
@@ -58,17 +61,17 @@ class TrackGenerator {
             return travelingPoint.cpy().add(right().scl(15f))
         }
 
-        for (i in 0..100) {
+        for (i in 0..15) {
             centerPoints.add(travelingPoint.cpy())
             leftPoints.add(leftPoint())
             rightPoints.add(rightPoint())
             forward.rotate(Vector3.Y, (-15f..15f).random())
-            travelingPoint.add(tmpVector.set(forward).scl(500f))
-            travelingPoint.y += (-15f..15f).random()
+            travelingPoint.add(tmpVector.set(forward).scl(15f))
+            travelingPoint.y += (-5f..5f).random()
             tmpVector.setZero()
         }
 
-        val minY = centerPoints.minOf { it.y } - 10f
+        val minY = centerPoints.minOf { it.y } - 1f
         // Generate mesh magic goes here!
 
         /**
@@ -84,7 +87,7 @@ class TrackGenerator {
             (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong(),
             Material()
         )
-        val normal = vec3(0f,1f,0f)
+        val normal = vec3(0f, 1f, 0f)
 //        val builder = BoxShapeBuilder()
 //        val model = modelBuilder.createBox(
 //            5f,
@@ -97,6 +100,10 @@ class TrackGenerator {
 
 
         for (i in leftPoints.indices) {
+
+//            if( i > 0)
+//                bbb.setVertexTransform(Matrix4().setToWorld(centerPoints[i - 1].cpy(), -Vector3.Z, Vector3.Y))
+
             if (i != leftPoints.lastIndex) {
                 bbb.setColor(Color.RED)
 
@@ -109,6 +116,7 @@ class TrackGenerator {
                 val c100 = c110.cpy().apply { y = minY } // vec3(10f,0f,0f) // near bottom left
                 val c001 = c011.cpy().apply { y = minY } // vec3(0f,0f,10f) // far bottom right
                 val c101 = c111.cpy().apply { y = minY } // vec3(10f,0f,10f) // far bottom left
+
 
                 BoxShapeBuilder.build(
                     bbb,
@@ -127,17 +135,25 @@ class TrackGenerator {
         val model = modelBuilder.end()
 
         val scene = Scene(model)
-            .apply {
-                this.modelInstance.transform.setToWorld(
-                    vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
-                )
-            }
+//            .apply {
+//                this.modelInstance.transform.setToWorld(
+//                    vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
+//                )
+//            }
 
-        return MashTrack(scene)
+        val bodies = scene.modelInstance.nodes.map {
+            val rigidBodyShape = Bullet.obtainStaticNodeShape(it, false)
+//            val motionState = MotionState(it.globalTransform)
+            btRigidBody(btRigidBody.btRigidBodyConstructionInfo(0f, null, rigidBodyShape))
+        }
+
+
+
+        return MashTrack(scene, bodies)
     }
 
 
 }
 
-class MashTrack(val scene: Scene, val body: btRigidBody? = null) {
+class MashTrack(val scene: Scene, val bodies: List<btRigidBody>) {
 }

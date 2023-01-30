@@ -19,6 +19,7 @@ import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.RenderSystem3d
+import mash.ecs.systems.UpdatePerspectiveCameraSystem
 import mash.ecs.systems.VehicleControlSystem
 import mash.factories.CarSceneLoader
 import mash.factories.TrackGenerator
@@ -44,7 +45,7 @@ object Context : InjectionContext() {
                 fieldOfView = gameSettings.fieldOfView
                 near = gameSettings.cameraNear
                 far = gameSettings.cameraFar
-                position.set(15f, 15f, -15f)
+                position.set(0f, 15f, 25f)
                 lookAt(vec3())
             })
             bindSingleton(
@@ -101,7 +102,8 @@ object Context : InjectionContext() {
             addSystem(RemoveEntitySystem())
             addSystem(VehicleControlSystem())
             addSystem(BulletUpdateSystem(inject()))
-//            addSystem(UpdatePerspectiveCameraSystem(inject()))
+            addSystem(UpdatePerspectiveCameraSystem(inject()))
+//            addSystem(CameraControlSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(RenderSystem3d(inject()))
 //            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))

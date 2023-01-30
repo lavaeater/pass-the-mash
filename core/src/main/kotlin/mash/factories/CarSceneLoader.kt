@@ -41,7 +41,7 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
     private fun loadTrack(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         val track = trackGenerator.generateTrack()
         sceneManager.addScene(track.scene)
-//        dynamicsWorld.addRigidBody(track.body)
+        track.bodies.forEach { dynamicsWorld.addRigidBody(it) }
     }
 
     override fun setupEnvironment(sceneManager: SceneManager) {
@@ -78,7 +78,7 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
         val carScene = Scene(someCar.scene)
             .apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 5f, 0f), Vector3.Z, Vector3.Y
+                vec3(0f, 5f, -25f), Vector3.Z, Vector3.Y
             )
         }
 

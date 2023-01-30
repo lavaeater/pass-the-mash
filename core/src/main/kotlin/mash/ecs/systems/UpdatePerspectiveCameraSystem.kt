@@ -1,4 +1,4 @@
-package depth.ecs.systems
+package mash.ecs.systems
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
@@ -9,6 +9,7 @@ import depth.ecs.components.MotionStateComponent
 import ktx.ashley.allOf
 import ktx.math.plus
 import ktx.math.times
+import ktx.math.unaryMinus
 import ktx.math.vec3
 
 class UpdatePerspectiveCameraSystem(
@@ -22,9 +23,8 @@ class UpdatePerspectiveCameraSystem(
     ) {
 
     val target = vec3()
-    val cameraDirection = vec3()
-    val tmpVector = vec3()
-    val rotatedOffset = vec3()
+    private val tmpVector = vec3()
+    private val rotatedOffset = vec3()
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val motionState = MotionStateComponent.get(entity)
 
@@ -33,7 +33,7 @@ class UpdatePerspectiveCameraSystem(
         rotatedOffset.set(motionState.backwards).scl(cc.offsetXZ.y).add(0f, cc.offsetY, 0f)
         tmpVector.set(position).add(rotatedOffset)
         perspectiveCamera.position.lerp(tmpVector, 0.2f)
-
+//
 //        val offset = cc.offset
 //        info { "${cc.offsetDirection}" }
 //        tmpVector
