@@ -18,7 +18,6 @@ data class VehicleParams(
 )
 
 class BulletVehicle(
-    val raycaster: btDefaultVehicleRaycaster,
     val tuning: btRaycastVehicle.btVehicleTuning,
     val localInertia: Vector3,
     val boundingBox: BoundingBox,
@@ -52,13 +51,12 @@ class BulletVehicle(
                 tuning,
                 position.isFrontWheel
             )
-        wheels[position]!!.rollInfluence = 0.1f
-        wheels[position]!!.rollInfluence = 0.1f
         wheelIndices[position] = wheelIndex
         wheelIndex++
     }
 
     fun setSteeringDeg(steeringAngle: Float) {
+        info { "Current angle: $steeringAngle" }
         val steering = steeringAngle * degreesToRadians
         for (wheelIndex in wheelIndices.filterKeys { it.isFrontWheel }.values) {
             vehicle.setSteeringValue(steering, wheelIndex)
@@ -67,14 +65,12 @@ class BulletVehicle(
 
     fun applyEngineForce(engineForce: Float) {
         for (wheelIndex in wheelIndices.filterKeys { it.isFrontWheel }.values) {
-            info { "Applying force $engineForce to wheel $wheelIndex" }
             vehicle.applyEngineForce(engineForce, wheelIndex)
         }
     }
 
     fun applyBrakeForce(brakeForce: Float) {
         for (wheelIndex in wheelIndices.filterKeys { !it.isFrontWheel }.values) {
-            info { "Applying brake $brakeForce to wheel $wheelIndex" }
             vehicle.setBrake(brakeForce, wheelIndex)
         }
     }
@@ -104,14 +100,14 @@ class BulletVehicle(
             val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, shape, localInertia)
             val carBody = btRigidBody(bodyInfo)
                 .apply {
-                    //collisionFlags = Collision.DISABLE_DEACTIVATION
-                    angularFactor = Vector3.Y
+                    activationState = Collision.DISABLE_DEACTIVATION
+                //collisionFlags = Collision.DISABLE_DEACTIVATION
+                    setDamping(0.1f, 0.1f)
                 }
             val vehicle = btRaycastVehicle(tuning, carBody, raycaster)
             vehicle.setCoordinateSystem(0, 1, 2)
 
             val bulletVehicle = BulletVehicle(
-                raycaster,
                 tuning,
                 localInertia,
                 boundingBox,

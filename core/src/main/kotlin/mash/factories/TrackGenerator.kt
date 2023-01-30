@@ -2,6 +2,7 @@ package mash.factories
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
@@ -11,9 +12,13 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.Bullet
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import depth.ecs.components.MotionState
+import ktx.assets.toInternalFile
 import ktx.math.random
 import ktx.math.unaryMinus
 import ktx.math.vec3
+import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
+import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute
+import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.scene.Scene
 
 
@@ -63,7 +68,7 @@ class TrackGenerator {
             return travelingPoint.cpy().add(right().scl(roadWidth))
         }
 
-        for (i in 0..1000) {
+        for (i in 0..50) {
             centerPoints.add(travelingPoint.cpy())
             leftPoints.add(leftPoint())
             rightPoints.add(rightPoint())
@@ -75,7 +80,12 @@ class TrackGenerator {
 
         val minY = centerPoints.minOf { it.y } - 1f
         // Generate mesh magic goes here!
-
+        val checkboard = Texture("data/g3d/checkboard.png".toInternalFile())
+        val material = Material().apply {
+            set(PBRTextureAttribute.createBaseColorTexture(checkboard))
+            set(PBRColorAttribute.createSpecular(Color.WHITE))
+            set(PBRFloatAttribute.createShininess(16f))
+        }
         /**
          * It is, to start, just a plane with triangles. It's easy, we
          * can probably just use a mesh-builder to do triangles triangles
@@ -86,8 +96,8 @@ class TrackGenerator {
         val bbb = modelBuilder.part(
             "TRAAACK",
             GL20.GL_TRIANGLES,
-            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong(),
-            Material()
+            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal or VertexAttributes.Usage.TextureCoordinates).toLong(),
+            material
         )
 
         for (i in leftPoints.indices) {
@@ -123,7 +133,7 @@ class TrackGenerator {
 
         val scene = Scene(model)
 
-        val body = btRigidBody(btRigidBody.btRigidBodyConstructionInfo(0f, null, Bullet.obtainStaticNodeShape(scene.modelInstance.nodes)))
+        val body = btRigidBody(btRigidBody.btRigidBodyConstructionInfo(0f, null, Bullet.obtainStaticNodeShape(scene.modelInstance.nodes).apply { calculateLocalInertia(0f, Vector3.Zero) }))
 
         return MashTrack(scene, body)
     }

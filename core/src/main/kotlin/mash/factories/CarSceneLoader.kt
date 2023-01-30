@@ -3,7 +3,9 @@ package mash.factories
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
 import com.badlogic.gdx.physics.bullet.dynamics.*
 import depth.ecs.components.*
 import eater.core.engine
@@ -90,16 +92,17 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
 
         val boundingBox = carScene.getBoundingBox()
         val carShape = boundingBox.getBoxShape().alsoRegister()
+
         // Create the vehicle
         val bv = BulletVehicle.createVehicle(
             carShape,
             boundingBox,
             5f,
             dynamicsWorld,
-            50f,
-            15f,
+            100f,
+            25f,
+            45f,
             20f,
-            15f,
             100f)
 
 

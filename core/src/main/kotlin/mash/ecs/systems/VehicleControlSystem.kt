@@ -5,6 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.MathUtils.degreesToRadians
 import depth.ecs.components.Camera3dFollowComponent
 import depth.ecs.components.Direction
 import depth.ecs.components.Rotation
@@ -123,8 +124,8 @@ class VehicleControlSystem :
             vehicle.applyBrakeForce(vehicleParams.brakeForce * deltaTime)
         }
 
-        for (i in vehicle.wheelIndices.values) {
-            vehicle.vehicle.updateWheelTransform(i, true)
-        }
+//        for (i in vehicle.wheelIndices.values) {
+//            vehicle.vehicle.updateWheelTransform(i, true)
+//        }
     }
 }

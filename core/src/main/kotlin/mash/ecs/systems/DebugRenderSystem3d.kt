@@ -17,7 +17,7 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
     ).get()
 ) {
     val debugDrawer = DebugDrawer().apply {
-        debugMode = 1 or 2 //or 4 or 8 or 16 or 32 or 64// or 128 or 256 or 512 or 1024
+        debugMode = 1 or 2 or 4 or 8 or 16 or 32 or 64 or 128 or 256 or 512 or 1024
         bulletWorld.debugDrawer = this
     }
 

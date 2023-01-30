@@ -18,6 +18,7 @@ import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
+import mash.ecs.systems.KeepCarFromFlippingSystem
 import mash.ecs.systems.RenderSystem3d
 import mash.ecs.systems.UpdatePerspectiveCameraSystem
 import mash.ecs.systems.VehicleControlSystem
@@ -102,6 +103,7 @@ object Context : InjectionContext() {
             addSystem(RemoveEntitySystem())
             addSystem(VehicleControlSystem())
             addSystem(BulletUpdateSystem(inject()))
+            addSystem(KeepCarFromFlippingSystem())
             addSystem(UpdatePerspectiveCameraSystem(inject()))
 //            addSystem(CameraControlSystem(inject()))
             addSystem(UpdatePointLightSystem())
