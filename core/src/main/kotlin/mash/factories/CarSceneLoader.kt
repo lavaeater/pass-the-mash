@@ -78,7 +78,7 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
         val carScene = Scene(someCar.scene)
             .apply {
             this.modelInstance.transform.setToWorld(
-                vec3(0f, 5f, -25f), Vector3.Z, Vector3.Y
+                vec3(0f, 15f, -5f), Vector3.Z, Vector3.Y
             )
         }
 
