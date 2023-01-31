@@ -33,7 +33,7 @@ abstract class BaseEntity : Disposable {
         if (modelInstance != null) {
             for (m in modelInstance!!.materials) {
                 val ca = m[ColorAttribute.Diffuse] as ColorAttribute
-                ca?.color?.set(r, g, b, a)
+                ca.color?.set(r, g, b, a)
             }
         }
     }

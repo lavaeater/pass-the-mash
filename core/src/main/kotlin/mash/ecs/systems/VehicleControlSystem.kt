@@ -91,11 +91,6 @@ class VehicleControlSystem :
         return controlMap.execute(keycode, KeyPress.Up)
     }
 
-    override fun update(deltaTime: Float) {
-        Gdx.input.inputProcessor = this
-        super.update(deltaTime)
-    }
-
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val vc = BulletVehicleComponent.get(entity)
         val vehicle = vc.bulletVehicle

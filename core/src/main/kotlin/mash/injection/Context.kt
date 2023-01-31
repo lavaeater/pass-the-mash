@@ -2,6 +2,8 @@ package mash.injection
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.physics.bullet.collision.*
@@ -9,14 +11,25 @@ import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
 import com.badlogic.gdx.physics.bullet.softbody.btSoftRigidDynamicsWorld
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import depth.ecs.systems.*
+import com.badlogic.gdx.utils.viewport.ScreenViewport
+import depth.ecs.systems.BulletUpdateSystem
+import depth.ecs.systems.DebugRenderSystem3d
+import depth.ecs.systems.UpdatePointLightSystem
 import eater.core.MainGame
 import eater.ecs.ashley.systems.RemoveEntitySystem
 import eater.injection.InjectionContext
+import ktx.actors.stage
+import ktx.ashley.getSystem
 import ktx.assets.disposeSafely
+import ktx.assets.toInternalFile
 import ktx.inject.Context
 import ktx.math.vec3
+import ktx.scene2d.Scene2DSkin
+import ktx.scene2d.actors
+import ktx.scene2d.label
 import mash.core.GameScreen
 import mash.ecs.systems.KeepCarFromFlippingSystem
 import mash.ecs.systems.RenderSystem3d
@@ -38,6 +51,9 @@ object Context : InjectionContext() {
     }
 
     fun initialize(game: MainGame) {
+//        val skin = Skin("metal-ui/metal-ui.json".toInternalFile())
+//        Scene2DSkin.defaultSkin = skin
+
         buildContext {
             val gameSettings = GameSettings()
             bindSingleton(gameSettings)
@@ -56,19 +72,38 @@ object Context : InjectionContext() {
                     inject<PerspectiveCamera>() as Camera
                 )
             )
+//            bindSingleton(createStage())
             bindSingleton(createSceneManager())
             setupBullet(this)
             bindSingleton(getEngine())
+            bindSingleton(InputMultiplexer(inject<Engine>().getSystem<VehicleControlSystem>()).apply {
+                //, inject<Stage>()
+                Gdx.input.inputProcessor = this
+            })
             bindSingleton(TrackGenerator())
             bindSingleton(
                 GameScreen(
-                CarSceneLoader(inject()),
-                inject(),
-                inject(),
-                inject()
-            )
+                    CarSceneLoader(inject()),
+                    inject(),
+                    inject(),
+                    inject(),
+//                    inject()
+                )
             )
         }
+    }
+
+    private fun createStage(): Stage {
+        val vp = ScreenViewport()
+        return stage(viewport = vp).apply {
+            actors {
+                label("WHAWTHWHWTHT").apply {
+                    setFontScale(10f)
+                    setPosition(vp.worldWidth / 2f, vp.worldHeight / 2f)
+                }
+            }
+        }
+
     }
 
     fun createSceneManager(): SceneManager {
@@ -91,9 +126,10 @@ object Context : InjectionContext() {
                     inject(),
                     inject(),
                     inject(),
-                    inject()).apply {
-                gravity = vec3(0f, -10f, 0f)
-            })
+                    inject()
+                ).apply {
+                    gravity = vec3(0f, -10f, 0f)
+                })
 
         }
     }
@@ -103,7 +139,7 @@ object Context : InjectionContext() {
             addSystem(RemoveEntitySystem())
             addSystem(VehicleControlSystem())
             addSystem(BulletUpdateSystem(inject()))
-            addSystem(KeepCarFromFlippingSystem())
+            //addSystem(KeepCarFromFlippingSystem())
             addSystem(UpdatePerspectiveCameraSystem(inject()))
 //            addSystem(CameraControlSystem(inject()))
             addSystem(UpdatePointLightSystem())

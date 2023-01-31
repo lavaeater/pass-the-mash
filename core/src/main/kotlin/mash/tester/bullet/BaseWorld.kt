@@ -66,12 +66,12 @@ open class BaseWorld<T : BaseEntity> : Disposable {
 
     open fun render(batch: ModelBatch, lights: Environment?, entities: Iterable<T>) {
         for (e in entities) {
-            batch.render(e!!.modelInstance, lights)
+            batch.render(e.modelInstance, lights)
         }
     }
 
     fun render(batch: ModelBatch, lights: Environment?, entity: T) {
-        batch.render(entity!!.modelInstance, lights)
+        batch.render(entity.modelInstance, lights)
     }
 
     open fun update() {}

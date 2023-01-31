@@ -64,9 +64,9 @@ class BasicBulletTest : BulletTest() {
             3f,
             3f * height / width
         )
-        camera!!.position[10f, 10f] = 10f
-        camera!!.lookAt(0f, 0f, 0f)
-        camera!!.update()
+        camera.position[10f, 10f] = 10f
+        camera.lookAt(0f, 0f, 0f)
+        camera.update()
         // Create the model batch
         modelBatch = ModelBatch()
         // Create some basic models
@@ -154,7 +154,7 @@ class BasicBulletTest : BulletTest() {
         fpsCounter.put(Gdx.graphics.framesPerSecond.toFloat())
         performanceCounter.tick()
         performanceCounter.start()
-        collisionWorld!!.stepSimulation(Gdx.graphics.deltaTime, 5)
+        collisionWorld.stepSimulation(Gdx.graphics.deltaTime, 5)
         performanceCounter.stop()
         val c = motionStates.size
         for (i in 0 until c) {
@@ -169,11 +169,11 @@ class BasicBulletTest : BulletTest() {
     }
 
     override fun dispose() {
-        collisionWorld!!.dispose()
-        solver!!.dispose()
-        broadphase!!.dispose()
-        dispatcher!!.dispose()
-        collisionConfiguration!!.dispose()
+        collisionWorld.dispose()
+        solver.dispose()
+        broadphase.dispose()
+        dispatcher.dispose()
+        collisionConfiguration.dispose()
         for (body in bodies) body.dispose()
         bodies.clear()
         for (motionState in motionStates) motionState.dispose()

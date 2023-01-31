@@ -47,7 +47,6 @@ class BulletVehicle(
     }
 
     fun setSteeringDeg(steeringAngle: Float) {
-        info { "Current angle: $steeringAngle" }
         val steering = steeringAngle * degreesToRadians
         for (wheelIndex in wheelIndices.filterKeys { it.isFrontWheel }.values) {
             vehicle.setSteeringValue(steering, wheelIndex)
