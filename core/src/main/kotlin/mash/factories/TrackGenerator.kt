@@ -101,7 +101,23 @@ class TrackGenerator {
          *
          * And also, perhaps the car could be a different shapen instead of that simple box?
          *
-         * Could we use a fucking heightmap for this? Maybe. 
+         * Could we use a fucking heightmap for this? Maybe.
+         *
+         * But go with mesh first, fucker.
+         *
+         * And just create a plane.
+         *
+         * An reuse the vertices. But how do we actually do that? We need to keep track of the winding. And
+         * the indexes, but I think the index thing isn't that hard, really.
+         *
+         * a______________b
+         * |
+         * |
+         * |
+         * |
+         * |
+         * |
+         * d______________c
          *
          *
          */
