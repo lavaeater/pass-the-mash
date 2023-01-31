@@ -74,7 +74,7 @@ class TrackGenerator {
             rightPoints.add(rightPoint())
             forward.rotate(Vector3.Y, (-15f..15f).random())
             travelingPoint.add(tmpVector.set(forward).scl(25f))
-            travelingPoint.y += (-5f..5f).random()
+            //travelingPoint.y += (-5f..5f).random()
             tmpVector.setZero()
         }
 
@@ -90,6 +90,20 @@ class TrackGenerator {
          * It is, to start, just a plane with triangles. It's easy, we
          * can probably just use a mesh-builder to do triangles triangles
          * or even rectangles!
+         *
+         *
+         * Oh nooo, we have to do a mesh again, don't we?
+         *
+         * Well, it shouldn't be that hard, should it? Because the only reason I made boxes with
+         * heights was so that I could be 100% that I would actually SEE the models for the ground.
+         *
+         * So can we do it some other way?
+         *
+         * And also, perhaps the car could be a different shapen instead of that simple box?
+         *
+         * Could we use a fucking heightmap for this? Maybe. 
+         *
+         *
          */
         val modelBuilder = ModelBuilder()
         modelBuilder.begin()
