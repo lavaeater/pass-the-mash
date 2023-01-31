@@ -9,26 +9,17 @@ import com.badlogic.gdx.physics.bullet.dynamics.*
 import ktx.log.info
 import ktx.math.vec3
 
-data class VehicleParams(
-    val maxForce: Float,
-    val acceleration: Float,
-    val maxSteerAngle: Float,
-    val steeringSpeed: Float,
-    val brakeForce: Float
-)
-
 class BulletVehicle(
-    val tuning: btRaycastVehicle.btVehicleTuning,
-    val localInertia: Vector3,
-    val boundingBox: BoundingBox,
+    private val tuning: btRaycastVehicle.btVehicleTuning,
+    private val boundingBox: BoundingBox,
     val bulletBody: btRigidBody,
     val vehicle: btRaycastVehicle,
     val vehicleParams: VehicleParams
 ) {
-    val wheels = mutableMapOf<WheelPosition, btWheelInfo>()
-    val chassisHalfExtents = boundingBox.getDimensions(vec3()).scl(0.5f)
-    val wheelIndices = mutableMapOf<WheelPosition, Int>()
-    var wheelIndex = 0
+    private val wheels = mutableMapOf<WheelPosition, btWheelInfo>()
+    private val chassisHalfExtents = boundingBox.getDimensions(vec3()).scl(0.5f)
+    private val wheelIndices = mutableMapOf<WheelPosition, Int>()
+    private var wheelIndex = 0
 
     fun addWheel(position: WheelPosition, wheelDimensions: Vector3) {
         val wheelHalfExtents = wheelDimensions.cpy().scl(0.5f)
@@ -102,14 +93,13 @@ class BulletVehicle(
                 .apply {
                     activationState = Collision.DISABLE_DEACTIVATION
                 //collisionFlags = Collision.DISABLE_DEACTIVATION
-                    setDamping(0.1f, 0.1f)
+                    setDamping(0.1f, 0.7f)
                 }
             val vehicle = btRaycastVehicle(tuning, carBody, raycaster)
             vehicle.setCoordinateSystem(0, 1, 2)
 
             val bulletVehicle = BulletVehicle(
                 tuning,
-                localInertia,
                 boundingBox,
                 carBody,
                 vehicle,
