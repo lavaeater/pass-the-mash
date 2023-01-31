@@ -119,6 +119,16 @@ class TrackGenerator {
          * |
          * d______________c
          *
+         * Lets NOT share the vertices at first. I think the issue is actually the fact that the
+         * body of the car hits the floor due to the position of the wheels or some such.
+         *
+         * And then we of course have the complex stuff of lowering the center of gravity.
+         *
+         * Try some of that stuff out first. Should we make a UI to set settings for the car?
+         *
+         * Yes. Yes we should.
+         *
+         * So, let's say the track generator is DONE for now - we can easily make a mesh out of it later.
          *
          */
         val modelBuilder = ModelBuilder()
