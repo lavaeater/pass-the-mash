@@ -9,7 +9,7 @@ import mash.factories.SceneLoader
 
 class GameScreen(
     private val sceneLoader: SceneLoader,
-//    private val stage: Stage,
+    private val stage: Stage,
     game: MainGame,
     engine: Engine,
     viewport: ExtendViewport
@@ -26,19 +26,19 @@ class GameScreen(
 
     override fun render(delta: Float) {
         super.render(delta)
-//        stage.act(delta)
-//        stage.draw()
+        stage.act(delta)
+        stage.draw()
     }
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
-//        stage.viewport.update(width, height)
+        stage.viewport.update(width, height)
     }
 
 
     override fun dispose() {
         super.dispose()
         sceneLoader.dispose()
-//        stage.dispose()
+        stage.dispose()
     }
 }

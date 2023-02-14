@@ -51,8 +51,8 @@ object Context : InjectionContext() {
     }
 
     fun initialize(game: MainGame) {
-//        val skin = Skin("metal-ui/metal-ui.json".toInternalFile())
-//        Scene2DSkin.defaultSkin = skin
+        val skin = Skin("metal-ui/metal-ui.json".toInternalFile())
+        Scene2DSkin.defaultSkin = skin
 
         buildContext {
             val gameSettings = GameSettings()
@@ -72,12 +72,11 @@ object Context : InjectionContext() {
                     inject<PerspectiveCamera>() as Camera
                 )
             )
-//            bindSingleton(createStage())
+            bindSingleton(createStage())
             bindSingleton(createSceneManager())
             setupBullet(this)
             bindSingleton(getEngine())
-            bindSingleton(InputMultiplexer(inject<Engine>().getSystem<VehicleControlSystem>()).apply {
-                //, inject<Stage>()
+            bindSingleton(InputMultiplexer(inject<Engine>().getSystem<VehicleControlSystem>(), inject<Stage>()).apply {
                 Gdx.input.inputProcessor = this
             })
             bindSingleton(TrackGenerator())
@@ -87,7 +86,7 @@ object Context : InjectionContext() {
                     inject(),
                     inject(),
                     inject(),
-//                    inject()
+                    inject()
                 )
             )
         }
