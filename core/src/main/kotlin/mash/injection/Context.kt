@@ -14,13 +14,14 @@ import depth.ecs.systems.*
 import eater.core.MainGame
 import eater.ecs.ashley.systems.RemoveEntitySystem
 import eater.injection.InjectionContext
+import ecs.systems.UpdatePointLightSystem
 import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.KeepCarFromFlippingSystem
 import mash.ecs.systems.RenderSystem3d
-import mash.ecs.systems.UpdatePerspectiveCameraSystem
+import ecs.systems.UpdatePerspectiveCameraSystem
 import mash.ecs.systems.VehicleControlSystem
 import mash.factories.CarSceneLoader
 import mash.factories.TrackGenerator

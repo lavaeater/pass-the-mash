@@ -55,4 +55,5 @@ dependencies {
 	api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 	api "space.earlygrey:shapedrawer:$shapeDrawerVersion"
 	implementation project(":gdx-lava")
+	implementation project(":gdx-lava-3d")
 }
