@@ -41,7 +41,7 @@ class GirlSceneLoader: SceneLoader() {
         val girlScene = Scene(girlAsset.scene)
             .apply {
                 this.modelInstance.transform.setToWorld(
-                    vec3(0f, 1f, 0f), Vector3.Z, Vector3.Y
+                    vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
                 )
             }
 
@@ -66,7 +66,7 @@ class GirlSceneLoader: SceneLoader() {
                 animations = girlAsset.animations
                 animationPlayer = girlScene.animations
                 animationController = girlScene.animationController
-                animationController.setAnimation(girlAsset.animations.last().id, -1, 1f, null)
+                animationController.setAnimation(girlAsset.animations.first().id, -1, 1f, null)
             }
             with<BulletRigidBody> {
                 rigidBody = girlBody

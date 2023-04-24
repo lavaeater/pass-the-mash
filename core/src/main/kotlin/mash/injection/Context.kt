@@ -4,13 +4,13 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
 import com.badlogic.gdx.physics.bullet.softbody.btSoftRigidDynamicsWorld
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import depth.ecs.systems.*
 import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
@@ -47,11 +47,17 @@ object Context : InjectionContext() {
                 position.set(10f, 10f, 10f)
                 lookAt(vec3())
             })
+            bindSingleton(OrthographicCamera().apply {
+                setToOrtho(false)
+                position.set(1f,1f, 1f)
+                rotate(Vector3.X, -30f)
+                rotate(Vector3.Y, -45f)
+            })
             bindSingleton(
                 ExtendViewport(
                     gameSettings.gameWidth,
                     gameSettings.gameHeight,
-                    inject<PerspectiveCamera>() as Camera
+                    inject<OrthographicCamera>() as Camera
                 )
             )
             bindSingleton(createSceneManager())
@@ -80,7 +86,7 @@ object Context : InjectionContext() {
         depthConfig.numBones = 60
 
         val sceneManager = SceneManager(PBRShaderProvider(config), PBRDepthShaderProvider(depthConfig)).apply {
-            setCamera(inject<PerspectiveCamera>())
+            setCamera(inject<OrthographicCamera>())
         }
         sceneManager.environment.apply {
             return sceneManager
@@ -112,7 +118,7 @@ object Context : InjectionContext() {
 //            addSystem(BulletUpdateSystem(inject()))
 //            addSystem(KeepCarFromFlippingSystem())
 //            addSystem(UpdatePerspectiveCameraSystem(inject()))
-            addSystem(CameraControlSystem(inject()))
+            addSystem(OrthographicCameraControlSystem())
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())
             addSystem(RenderSystem3d(inject()))
