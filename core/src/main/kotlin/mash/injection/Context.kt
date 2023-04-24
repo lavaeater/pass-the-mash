@@ -50,6 +50,8 @@ object Context : InjectionContext() {
             bindSingleton(OrthographicCamera().apply {
                 setToOrtho(false)
                 position.set(1f,1f, 1f)
+                near = 0f
+                far = 100f
                 rotate(Vector3.X, -30f)
                 rotate(Vector3.Y, -45f)
             })
@@ -75,7 +77,7 @@ object Context : InjectionContext() {
         }
     }
 
-    fun createSceneManager(): SceneManager {
+    private fun createSceneManager(): SceneManager {
 
         val config = PBRShaderProvider.createDefaultConfig()
         config.numBones = 60
@@ -118,11 +120,12 @@ object Context : InjectionContext() {
 //            addSystem(BulletUpdateSystem(inject()))
 //            addSystem(KeepCarFromFlippingSystem())
 //            addSystem(UpdatePerspectiveCameraSystem(inject()))
-            addSystem(OrthographicCameraControlSystem())
+            addSystem(IsometricCharacterControlSystem())
+            addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())
             addSystem(RenderSystem3d(inject()))
-            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }
 }

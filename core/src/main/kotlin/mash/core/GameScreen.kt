@@ -22,18 +22,8 @@ class GameScreen(
         super.show()
         if (needsInit) {
             needsInit = false
-            createCameraEntity()
 
             sceneLoader.loadScene(inject(), inject())
-        }
-    }
-
-    private fun createCameraEntity() {
-        engine().entity {
-            with<CameraComponent> {
-                camera = viewport.camera
-            }
-            with<KeyboardControlComponent>()
         }
     }
 
