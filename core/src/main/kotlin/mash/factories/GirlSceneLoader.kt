@@ -3,8 +3,8 @@ package mash.factories
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.ashley.entity
@@ -32,9 +32,13 @@ class GirlSceneLoader: SceneLoader() {
     }
 
     fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
-        val someGirl = "models/girl-gltf/run.glb".loadModel().alsoRegister()
+        val girlAsset = "models/girl-gltf/run.glb".loadModel().alsoRegister()
 
-        val girlScene = Scene(someGirl.scene)
+        val idleAsset = "models/girl-gltf/idle.glb".loadModel().alsoRegister()
+        girlAsset.scene.model.animations.addAll(idleAsset.animations)
+        girlAsset.animations.addAll(idleAsset.animations)
+
+        val girlScene = Scene(girlAsset.scene)
             .apply {
                 this.modelInstance.transform.setToWorld(
                     vec3(0f, 1f, 0f), Vector3.Z, Vector3.Y
@@ -57,6 +61,12 @@ class GirlSceneLoader: SceneLoader() {
             with<SceneComponent> {
                 scene = girlScene
                 sceneManager.addScene(girlScene)
+            }
+            with<Animation3dComponent> {
+                animations = girlAsset.animations
+                animationPlayer = girlScene.animations
+                animationController = girlScene.animationController
+                animationController.setAnimation(girlAsset.animations.last().id, -1, 1f, null)
             }
             with<BulletRigidBody> {
                 rigidBody = girlBody

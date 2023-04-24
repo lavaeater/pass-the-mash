@@ -19,9 +19,9 @@ fun <E> MutableSet<E>.addIndexed(element: E): Int {
 
 fun String.loadModel(): SceneAsset {
     return if(this.endsWith(".gltf"))
-        GLTFLoader().load(this.toInternalFile())
+        GLTFLoader().load(this.toInternalFile(), true)
     else if(this.endsWith(".glb"))
-        GLBLoader().load(this.toInternalFile())
+        GLBLoader().load(this.toInternalFile(),true)
     else
         throw Exception("File doesn't seem to be either gltf or glb.")
 }
