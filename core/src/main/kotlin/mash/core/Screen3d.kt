@@ -2,8 +2,8 @@ package mash.core
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import eater.core.MainGame
-import eater.core.toColor
+import twodee.core.MainGame
+import twodee.core.toColor
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 

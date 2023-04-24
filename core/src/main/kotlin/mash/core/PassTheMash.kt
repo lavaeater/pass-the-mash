@@ -2,10 +2,9 @@ package mash.core
 
 import com.badlogic.gdx.physics.bullet.Bullet
 import mash.injection.Context
-import eater.core.MainGame
-import eater.injection.InjectionContext.Companion.inject
+import twodee.core.MainGame
+import twodee.injection.InjectionContext.Companion.inject
 import ktx.async.KtxAsync
-import mash.factories.CarSceneLoader
 
 class PassTheMash : MainGame() {
     override fun goToGameSelect() {

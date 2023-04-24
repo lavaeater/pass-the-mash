@@ -2,8 +2,8 @@ package mash.core
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import eater.core.MainGame
-import eater.injection.InjectionContext.Companion.inject
+import twodee.core.MainGame
+import twodee.injection.InjectionContext.Companion.inject
 import mash.factories.SceneLoader
 
 class GameScreen(

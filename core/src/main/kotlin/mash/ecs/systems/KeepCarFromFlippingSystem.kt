@@ -3,9 +3,9 @@ package mash.ecs.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Quaternion
-import ecs.components.MotionStateComponent
 import ktx.ashley.allOf
-import ecs.components.BulletVehicleComponent
+import threedee.ecs.components.BulletVehicleComponent
+import threedee.ecs.components.MotionStateComponent
 
 class KeepCarFromFlippingSystem :
     IteratingSystem(allOf(BulletVehicleComponent::class, MotionStateComponent::class).get()) {

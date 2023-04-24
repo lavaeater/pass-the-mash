@@ -22,7 +22,7 @@ import net.mgsx.gltf.scene3d.attributes.PBRVertexAttributes
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 
-abstract class SceneLoader() : DisposableRegistry by DisposableContainer() {
+abstract class SceneLoader : DisposableRegistry by DisposableContainer() {
 
     protected fun createFloor(
         width: Float,

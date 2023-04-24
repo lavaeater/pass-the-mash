@@ -1,6 +1,6 @@
 package mash.injection
 
-import eater.injection.InjectionContext.Companion.inject
+import twodee.injection.InjectionContext.Companion.inject
 import ktx.assets.DisposableContainer
 import ktx.assets.DisposableRegistry
 import ktx.assets.disposeSafely

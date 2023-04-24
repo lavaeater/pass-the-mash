@@ -5,15 +5,15 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.math.MathUtils
-import ecs.components.Camera3dFollowComponent
-import general.Direction
-import general.Rotation
-import eater.input.KeyPress
-import eater.input.command
+import twodee.input.KeyPress
+import twodee.input.command
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
-import ecs.components.BulletVehicleComponent
-import ecs.components.KeyboardControlComponent
+import threedee.ecs.components.BulletVehicleComponent
+import threedee.ecs.components.Camera3dFollowComponent
+import threedee.ecs.components.KeyboardControlComponent
+import threedee.general.Direction
+import threedee.general.Rotation
 
 
 class VehicleControlSystem :

@@ -11,18 +11,18 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 import com.badlogic.gdx.physics.bullet.softbody.btSoftRigidDynamicsWorld
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import depth.ecs.systems.*
-import eater.core.MainGame
-import eater.ecs.ashley.systems.RemoveEntitySystem
-import eater.injection.InjectionContext
+import twodee.core.MainGame
+import twodee.ecs.ashley.systems.RemoveEntitySystem
+import twodee.injection.InjectionContext
 import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.KeepCarFromFlippingSystem
 import mash.ecs.systems.VehicleControlSystem
-import mash.factories.CarSceneLoader
-import mash.factories.TrackGenerator
+import mash.factories.GirlSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
+import threedee.ecs.systems.*
 
 
 object Context : InjectionContext() {
@@ -57,10 +57,10 @@ object Context : InjectionContext() {
             bindSingleton(createSceneManager())
             setupBullet(this)
             bindSingleton(getEngine())
-            bindSingleton(TrackGenerator())
+            //            bindSingleton(TrackGenerator())
             bindSingleton(
                 GameScreen(
-                CarSceneLoader(inject()),
+                GirlSceneLoader(),
                 inject(),
                 inject(),
                 inject()
