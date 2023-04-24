@@ -4,23 +4,24 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.assets.disposeSafely
 import ktx.math.vec3
+import mash.core.getBoundingBox
+import mash.core.getBoxShape
 import mash.core.loadModel
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
-import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
-import threedee.ecs.components.Camera3dFollowComponent
-import threedee.ecs.components.KeyboardControlComponent
-import threedee.ecs.components.SceneComponent
-import threedee.ecs.components.VisibleComponent
+import threedee.bullet.MotionState
+import threedee.ecs.components.*
 import twodee.core.engine
 
 class GirlSceneLoader: SceneLoader() {
@@ -31,14 +32,24 @@ class GirlSceneLoader: SceneLoader() {
     }
 
     fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
-        val someGirl = "models/girl-gltf/idle/idle.gltf".loadModel().alsoRegister()
+        val someGirl = "models/girl-gltf/run.glb".loadModel().alsoRegister()
 
         val girlScene = Scene(someGirl.scene)
             .apply {
                 this.modelInstance.transform.setToWorld(
-                    vec3(0f, 15f, -5f), Vector3.Z, Vector3.Y
+                    vec3(0f, 1f, 0f), Vector3.Z, Vector3.Y
                 )
             }
+
+        val boundingBox = girlScene.getBoundingBox()
+        val girlShape = boundingBox.getBoxShape().alsoRegister()
+        val localInertia = vec3()
+        val mass = 5f
+        girlShape.calculateLocalInertia(mass, localInertia)
+
+        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
+        val girlBody = btRigidBody(bodyInfo).alsoRegister()
+        dynamicsWorld.addRigidBody(girlBody)
 
 
         engine().entity {
@@ -47,8 +58,16 @@ class GirlSceneLoader: SceneLoader() {
                 scene = girlScene
                 sceneManager.addScene(girlScene)
             }
-            with<Camera3dFollowComponent>()
-            with<KeyboardControlComponent>()
+            with<BulletRigidBody> {
+                rigidBody = girlBody
+            }
+            with<MotionStateComponent> {
+                val ms = MotionState(girlScene.modelInstance.transform)
+                motionState = ms
+                girlBody.motionState = ms
+            }
+//            with<Camera3dFollowComponent>()
+//            with<KeyboardControlComponent>()
         }
     }
 
@@ -83,7 +102,7 @@ class GirlSceneLoader: SceneLoader() {
             }.alsoRegister())
         }
         // setup skybox
-        sceneManager.skyBox = SceneSkybox(environmentCubemap).alsoRegister()
+//        sceneManager.skyBox = SceneSkybox(environmentCubemap).alsoRegister()
     }
 
     override fun dispose() {
