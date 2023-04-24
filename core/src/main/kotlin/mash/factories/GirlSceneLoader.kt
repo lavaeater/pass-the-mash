@@ -12,6 +12,7 @@ import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.assets.disposeSafely
 import ktx.collections.toGdxArray
+import ktx.math.times
 import ktx.math.vec3
 import mash.core.getBoundingBox
 import mash.core.getBoxShape
@@ -22,13 +23,12 @@ import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
-import threedee.bullet.MotionState
 import threedee.ecs.components.*
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 
 class GirlSceneLoader : SceneLoader() {
-    val anims = listOf("idle", "idle-2", "idle-3", "idle-4", "idle-5", "walking", "jump-up", "hard-landing")
+    val anims = listOf("idle", "walking-backwards", "lowcrawl")
 
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
@@ -38,11 +38,12 @@ class GirlSceneLoader : SceneLoader() {
     }
 
     fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
-        val girlAsset = "models/girl-gltf/run.glb".loadModel().alsoRegister()
-        girlAsset.animations.first().id = "run"
+        val girlAsset = "models/girl-walking.glb".loadModel().alsoRegister()
+        girlAsset.animations.first().id = "walking"
 
         val loadedAnims = anims.map {
-            val m = "models/girl-gltf/$it.glb".loadModel()
+            val m = "models/girl-$it.glb".loadModel()
+
             val s = m.animations.toList()
             s.forEach { animation ->
                 animation.id = it
@@ -55,23 +56,21 @@ class GirlSceneLoader : SceneLoader() {
 
         val girlScene = Scene(girlAsset.scene)
             .apply {
+                this.modelInstance.calculateTransforms()
                 this.modelInstance.transform.setToWorld(
-                    vec3(0f, 0.1f, 0f), Vector3.Z, Vector3.Y
+                    vec3(0f, 0f, 0f), Vector3.Y * -1f, Vector3.Z
                 )
-                this.modelInstance.transform.rotate(Quaternion().apply {
-                    setEulerAngles(0f, -90f, 0f)
-                })
             }
 
-//        val boundingBox = girlScene.getBoundingBox()
-//        val girlShape = boundingBox.getBoxShape().alsoRegister()
-//        val localInertia = vec3()
-//        val mass = 5f
-//        girlShape.calculateLocalInertia(mass, localInertia)
-//
-//        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
-//        val girlBody = btRigidBody(bodyInfo).alsoRegister()
-//        dynamicsWorld.addRigidBody(girlBody)
+        val boundingBox = girlScene.getBoundingBox()
+        val girlShape = boundingBox.getBoxShape().alsoRegister()
+        val localInertia = vec3()
+        val mass = 5f
+        girlShape.calculateLocalInertia(mass, localInertia)
+
+        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
+        val girlBody = btRigidBody(bodyInfo).alsoRegister()
+        dynamicsWorld.addRigidBody(girlBody)
 
 
         engine().entity {
@@ -84,7 +83,7 @@ class GirlSceneLoader : SceneLoader() {
                 animations = girlAsset.animations
                 animationPlayer = girlScene.animations
                 animationController = girlScene.animationController
-                animationController.setAnimation("run", -1, 1f, null)
+                animationController.setAnimation("walking", -1, 0.75f, null)
             }
 //            with<BulletRigidBody> {
 //                rigidBody = girlBody

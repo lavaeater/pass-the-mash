@@ -50,7 +50,7 @@ object Context : InjectionContext() {
             bindSingleton(OrthographicCamera().apply {
                 setToOrtho(false)
                 position.set(1f,1f, 1f)
-                near = 0f
+                near = -25f
                 far = 100f
                 rotate(Vector3.X, -30f)
                 rotate(Vector3.Y, -45f)
