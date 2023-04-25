@@ -22,6 +22,18 @@ import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 
+fun createMaterial(name: String) : Material {
+    val material = Material()
+
+    val diffuseTexture = Texture("textures/$name/${name}_albedo.png".toInternalFile(), true)
+    val normalTexture = Texture("textures/$name/${name}_normal-ogl.png".toInternalFile(), true)
+    val mrTexture = Texture("textures/$name/${name}_roughness.png".toInternalFile(), true)
+    material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture))
+    material.set(PBRTextureAttribute.createNormalTexture(normalTexture))
+    material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture))
+    return material
+}
+
 abstract class SceneLoader : DisposableRegistry by DisposableContainer() {
 
     protected fun createBrickFloor(
@@ -33,14 +45,7 @@ abstract class SceneLoader : DisposableRegistry by DisposableContainer() {
     ) {
         val mb = ModelBuilder()
         mb.begin()
-        val material = Material()
-
-        val diffuseTexture = Texture("textures/red_bricks_04_diff_1k.jpg".toInternalFile(), true)
-        val normalTexture = Texture("textures/red_bricks_04_nor_gl_1k.jpg".toInternalFile(), true)
-        val mrTexture = Texture("textures/red_bricks_04_rough_1k.jpg".toInternalFile(), true)
-        material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture))
-        material.set(PBRTextureAttribute.createNormalTexture(normalTexture))
-        material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture))
+        val material = createMaterial("shades-tile")
 
         val attributes = VertexAttributes(
             VertexAttribute.Position(),
