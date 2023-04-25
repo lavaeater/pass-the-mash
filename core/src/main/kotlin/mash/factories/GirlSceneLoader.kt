@@ -33,7 +33,7 @@ class GirlSceneLoader : SceneLoader() {
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
-        createFloor(25f, 1f, 25f, sceneManager, dynamicsWorld)
+        createBrickFloor(25f, 1f, 25f, sceneManager, dynamicsWorld)
         loadGirl(sceneManager, dynamicsWorld)
     }
 

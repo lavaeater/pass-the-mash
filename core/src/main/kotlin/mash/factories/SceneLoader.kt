@@ -1,13 +1,13 @@
 package mash.factories
 
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.VertexAttributes
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
@@ -15,14 +15,57 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.assets.DisposableContainer
 import ktx.assets.DisposableRegistry
 import ktx.assets.toInternalFile
+import net.mgsx.gltf.loaders.shared.geometry.MeshTangentSpaceGenerator
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
-import net.mgsx.gltf.scene3d.attributes.PBRVertexAttributes
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 
 abstract class SceneLoader : DisposableRegistry by DisposableContainer() {
+
+    protected fun createBrickFloor(
+        width: Float,
+        height: Float,
+        depth: Float,
+        sceneManager: SceneManager,
+        dynamicsWorld: btDynamicsWorld
+    ) {
+        val mb = ModelBuilder()
+        mb.begin()
+        val material = Material()
+
+        val diffuseTexture = Texture("textures/red_bricks_04_diff_1k.jpg".toInternalFile(), true)
+        val normalTexture = Texture("textures/red_bricks_04_nor_gl_1k.jpg".toInternalFile(), true)
+        val mrTexture = Texture("textures/red_bricks_04_rough_1k.jpg".toInternalFile(), true)
+        material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture))
+        material.set(PBRTextureAttribute.createNormalTexture(normalTexture))
+        material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture))
+
+        val attributes = VertexAttributes(
+            VertexAttribute.Position(),
+            VertexAttribute.Normal(),
+            VertexAttribute(VertexAttributes.Usage.Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
+            VertexAttribute.TexCoords(0)
+        )
+        val mpb = mb.part("floor", GL20.GL_TRIANGLES, attributes, material)
+        BoxShapeBuilder.build(mpb, width, height, depth)
+        val btBoxShape = btBoxShape(Vector3(width / 2f, height / 2f, depth / 2f))
+        val floor = mb.end()
+
+        floor.meshes.forEach { mesh ->
+            MeshTangentSpaceGenerator.computeTangentSpace(mesh, material, false, true)
+        }
+        val floorInstance = ModelInstance(floor)
+        floorInstance.transform.trn(0f, -0.5f, 0f)
+
+        val info = btRigidBody.btRigidBodyConstructionInfo(0f, null, btBoxShape, Vector3.Zero)
+        val body = btRigidBody(info)
+        body.worldTransform = floorInstance.transform
+        sceneManager.addScene(Scene(floorInstance))
+        dynamicsWorld.addRigidBody(body)
+    }
+
 
     protected fun createFloor(
         width: Float,
