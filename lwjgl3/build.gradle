@@ -28,11 +28,11 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
 	implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-	implementation "com.github.Hangman:TuningFork:$tuningForkVersion"
 	implementation "com.github.MrStahlfelge.gdx-websockets:common:$websocketVersion"
 	implementation "com.github.crykn.guacamole:gdx-desktop:$guacamoleVersion"
 	implementation "de.tomgrill.gdxdialogs:gdx-dialogs-desktop:$dialogsVersion"
 	implementation project(":gdx-lava")
+	implementation project(":gdx-lava-3d")
 	implementation project(':core')
 }
 
