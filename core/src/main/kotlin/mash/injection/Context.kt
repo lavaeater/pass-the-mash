@@ -15,7 +15,7 @@ import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
-import mash.ecs.systems.IsometricCharacterControlSystem
+import mash.ecs.systems.BulletGhostObjectControlSystem
 import mash.factories.GirlSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
@@ -118,15 +118,15 @@ object Context : InjectionContext() {
         return PooledEngine().apply {
             addSystem(RemoveEntitySystem())
 //            addSystem(VehicleControlSystem())
-//            addSystem(BulletUpdateSystem(inject()))
+            addSystem(BulletUpdateSystem(inject()))
 //            addSystem(KeepCarFromFlippingSystem())
 //            addSystem(UpdatePerspectiveCameraSystem(inject()))
-            addSystem(IsometricCharacterControlSystem())
+            addSystem(BulletGhostObjectControlSystem())
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())
             addSystem(RenderSystem3d(inject()))
-//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }
 }
