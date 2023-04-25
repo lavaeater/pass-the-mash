@@ -29,8 +29,7 @@ import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 
 class GirlSceneLoader : SceneLoader() {
-    val anims = listOf("idle", "walking-backwards", "lowcrawl")
-
+    val anims = listOf("idle", "walking-backwards", "lowcrawl", "pistol-walk", "rifle-walk")
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
