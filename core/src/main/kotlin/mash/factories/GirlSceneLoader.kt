@@ -3,6 +3,7 @@ package mash.factories
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController
 import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
@@ -12,6 +13,7 @@ import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.assets.disposeSafely
 import ktx.collections.toGdxArray
+import ktx.log.info
 import ktx.math.times
 import ktx.math.vec3
 import mash.core.getBoundingBox
@@ -37,8 +39,23 @@ class GirlSceneLoader : SceneLoader() {
         loadGirl(sceneManager, dynamicsWorld)
     }
 
+    fun printNode(node: Node) {
+        info { node.id }
+        if(node.id == "Cube.001") {
+            val what = "what is this cube, eh?"
+        }
+        node.children.forEach {
+            printNode(it)
+        }
+    }
+
     fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         val girlAsset = "models/girl-walking.glb".loadModel().alsoRegister()
+
+        girlAsset.scene.model.nodes.forEach {
+            printNode(it)
+        }
+
         girlAsset.animations.first().id = "walking"
 
         val loadedAnims = anims.map {

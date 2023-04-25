@@ -15,6 +15,7 @@ import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
+import mash.ecs.systems.IsometricCharacterControlSystem
 import mash.factories.GirlSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
