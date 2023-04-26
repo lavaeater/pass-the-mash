@@ -15,6 +15,7 @@ import ktx.assets.disposeSafely
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
+import mash.ecs.systems.BulletCharacterControlSystem
 import mash.ecs.systems.BulletGhostObjectControlSystem
 import mash.factories.GirlSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
@@ -121,12 +122,12 @@ object Context : InjectionContext() {
             addSystem(BulletUpdateSystem(inject()))
 //            addSystem(KeepCarFromFlippingSystem())
 //            addSystem(UpdatePerspectiveCameraSystem(inject()))
-            addSystem(BulletGhostObjectControlSystem())
+            addSystem(BulletCharacterControlSystem())
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())
             addSystem(RenderSystem3d(inject()))
-//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }
 }

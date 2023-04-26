@@ -3,10 +3,14 @@ package mash.factories
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.physics.bullet.collision.btGhostObject
+import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape
+import com.badlogic.gdx.physics.bullet.collision.btShapeHull
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.assets.disposeSafely
@@ -31,6 +35,23 @@ import twodee.ecs.ashley.components.Player
 
 class GirlSceneLoader : SceneLoader() {
     val anims = listOf("idle", "walking-backwards", "lowcrawl", "pistol-walk", "rifle-walk")
+
+    fun createConvexHullShape(model: Model, optimize: Boolean): btConvexHullShape {
+        val mesh = model.meshes[0]
+        val shape = btConvexHullShape(
+            mesh.verticesBuffer, mesh.numVertices,
+            mesh.vertexSize
+        )
+        if (!optimize) return shape
+        // now optimize the shape
+        val hull = btShapeHull(shape)
+        hull.buildHull(shape.margin)
+        val result = btConvexHullShape(hull)
+        // delete the temporary shape
+        shape.dispose()
+        hull.dispose()
+        return result
+    }
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
@@ -79,22 +100,24 @@ class GirlSceneLoader : SceneLoader() {
                 )
             }
 
-        val boundingBox = girlScene.getBoundingBox()
-        val girlShape = boundingBox.getBoxShape().alsoRegister()
-//        val localInertia = vec3()
-//        val mass = 1f
-//        girlShape.calculateLocalInertia(mass, localInertia)
+        val boundingBox = BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
+        val girlShape = boundingBox.getBoxShape()
+//        val girlShape = createConvexHullShape(girlScene.modelInstance.model, true).alsoRegister()
+        val localInertia = vec3()
+        val mass = 1f
+        girlShape.calculateLocalInertia(mass, localInertia)
+//
+//        val collisionObject = btGhostObject().apply {
+//            collisionShape = girlShape
+//            worldTransform = girlScene.modelInstance.transform
+//        }.alsoRegister()
 
-        val collisionObject = btGhostObject().apply {
-            collisionShape = girlShape
-            worldTransform = girlScene.modelInstance.transform
-        }.alsoRegister()
+        val ms = MotionState(girlScene.modelInstance.transform)
 
-        dynamicsWorld.addCollisionObject(collisionObject)
 
-//        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
-//        val girlBody = btRigidBody(bodyInfo).alsoRegister()
-//        dynamicsWorld.addRigidBody(girlBody)
+        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, ms, girlShape, localInertia)
+        val girlBody = btRigidBody(bodyInfo).alsoRegister()
+        dynamicsWorld.addRigidBody(girlBody)
 
 
         engine().entity {
@@ -109,14 +132,14 @@ class GirlSceneLoader : SceneLoader() {
                 animationController = girlScene.animationController
                 animationController.setAnimation("walking", -1, 0.75f, null)
             }
-            with<BulletGhostObject> {
-                ghostObject = collisionObject
+            with<BulletRigidBody> {
+                rigidBody = girlBody
             }
             with<Player>()
             with<IsometricCameraFollowComponent>()
             with<KeyboardControlComponent>()
             with<MotionStateComponent> {
-                motionState = MotionState(girlScene.modelInstance.transform)
+                motionState = ms
             }
         }
     }
