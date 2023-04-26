@@ -19,13 +19,13 @@ import ktx.assets.disposeSafely
 import ktx.collections.toGdxArray
 import ktx.log.info
 import ktx.math.vec3
-import mash.core.getBoundingBox
 import mash.core.getBoxShape
 import mash.core.loadModel
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
+import net.mgsx.gltf.scene3d.scene.SceneAsset
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
@@ -62,7 +62,7 @@ class GirlSceneLoader : SceneLoader() {
         loadGirl(sceneManager, dynamicsWorld)
     }
 
-    fun printNode(node: Node, level: Int = 0) {
+    private fun printNode(node: Node, level: Int = 0) {
         val tabs = (0..level).joinToString("") { " " }
         info { "$tabs${node.id} ${node.isAnimated} ${node.childCount}"  }
 
@@ -74,7 +74,7 @@ class GirlSceneLoader : SceneLoader() {
         }
     }
 
-    fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
+    private fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         val girlAsset = "models/girl-walking.glb".loadModel().alsoRegister()
 
         girlAsset.scene.model.nodes.forEach {
@@ -98,10 +98,6 @@ class GirlSceneLoader : SceneLoader() {
 
         val girlScene = Scene(girlAsset.scene)
             .apply {
-////                this.modelInstance.calculateTransforms()
-////                this.modelInstance.nodes.first().localTransform.translate(vec3(0f, 1f, 0f))
-////                this.modelInstance.nodes.first().calculateLocalTransform()
-//                this.modelInstance.model.calculateTransforms()
                 this.modelInstance.transform.setToWorld(
                     vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
                 )
@@ -118,41 +114,44 @@ class GirlSceneLoader : SceneLoader() {
         val localInertia = vec3()
         val mass = 1f
         girlShape.calculateLocalInertia(mass, localInertia)
-//
-//        val collisionObject = btGhostObject().apply {
-//            collisionShape = girlShape
-//            worldTransform = girlScene.modelInstance.transform
-//        }.alsoRegister()
-
         val ms = MotionState(girlScene.modelInstance.transform)
-
 
         val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
         val girlBody = btRigidBody(bodyInfo).apply {
         }.alsoRegister()
         dynamicsWorld.addRigidBody(girlBody)
 
+        createCharacterEntity(girlScene, sceneManager, girlAsset, girlBody, ms)
+    }
+
+    private fun createCharacterEntity(
+        characterScene: Scene,
+        sceneManager: SceneManager,
+        characterAsset: SceneAsset,
+        characterBody: btRigidBody,
+        motionState: MotionState
+    ) {
         engine().entity {
             with<VisibleComponent>()
             with<SceneComponent> {
-                scene = girlScene
-                sceneManager.addScene(girlScene)
+                scene = characterScene
+                sceneManager.addScene(characterScene)
             }
             with<Animation3dComponent> {
-                animations = girlAsset.animations
-                animationPlayer = girlScene.animations
-                animationController = girlScene.animationController
+                animations = characterAsset.animations
+                animationPlayer = characterScene.animations
+                animationController = characterScene.animationController
                 animationController.setAnimation("walking", -1, 0.75f, null)
             }
             with<BulletRigidBody> {
-                rigidBody = girlBody
+                rigidBody = characterBody
             }
             with<Player>()
             with<IsometricCameraFollowComponent>()
             with<KeyboardControlComponent>()
             with<MotionStateComponent> {
-                motionState = ms
-                girlBody.motionState = ms
+                this.motionState = motionState
+                characterBody.motionState = motionState
             }
         }
     }

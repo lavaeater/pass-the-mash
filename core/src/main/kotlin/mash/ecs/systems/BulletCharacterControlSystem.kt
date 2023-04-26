@@ -39,7 +39,6 @@ class BulletCharacterControlSystem :
     private val animationController by lazy { Animation3dComponent.get(controlledEntity).animationController }
     private val rigidBodyComponent by lazy { BulletRigidBody.get(controlledEntity) }
     private val rigidBody by lazy { rigidBodyComponent.rigidBody }
-    private val motionStateComponent by lazy { MotionStateComponent.get(controlledEntity) }
 
     private val controlMap = command("Controoool") {
         setBoth(
@@ -113,30 +112,6 @@ class BulletCharacterControlSystem :
             }
             animationController.setAnimation(animKeys[currentAnimIndex], -1, 0.75f, null)
         }
-//        setBoth(
-//            Input.Keys.UP,
-//            "Up",
-//            { },
-//            { cameraFollowComponent.offsetY += 0.1f }
-//        )
-//        setBoth(
-//            Input.Keys.DOWN,
-//            "Down",
-//            { },
-//            { cameraFollowComponent.offsetY -= 0.1f }
-//        )
-//        setBoth(
-//            Input.Keys.LEFT,
-//            "Up",
-//            { },
-//            { cameraFollowComponent.offsetXZ.rotateDeg(5f) }
-//        )
-//        setBoth(
-//            Input.Keys.RIGHT,
-//            "Down",
-//            { },
-//            { cameraFollowComponent.offsetXZ.rotateDeg(-5f) }
-//        )
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -184,13 +159,13 @@ class BulletCharacterControlSystem :
         directionVector.nor()
     }
 
-    val neckNode by lazy { scene.modelInstance.getNode("mixamorig:RightUpLeg") }
-    val otherNeckNode by lazy { scene.modelInstance.getNode("mixamorig:LeftUpLeg") }
+    private val rotate = false
+    private val otherNeckNode by lazy { scene.modelInstance.getNode("mixamorig:LeftUpLeg") }
 
-    val worldPosition = vec3()
-    val rotationDirection = Vector3.X
-    val towardsCameraVector = vec3(-1f, 0f, 1f)
-    var angle = 1f
+    private val worldPosition = vec3()
+    private val rotationDirection = Vector3.X.cpy()
+    private val towardsCameraVector = vec3(-1f, 0f, 1f)
+    private var angle = 1f
     override fun processEntity(entity: Entity, deltaTime: Float) {
         setDirectionVector(controlComponent.directionControl)
         if (directionVector.isZero) {
@@ -204,35 +179,16 @@ class BulletCharacterControlSystem :
         scene.modelInstance.transform.rotateTowardDirection(rotationDirection, Vector3.Y)
 
         rigidBody.worldTransform = scene.modelInstance.transform
-        scene.modelInstance.calculateTransforms()
 
-        //motionStateComponent.motionState.setWorldTransform(scene.modelInstance.transform)
-//        val neckRotation = Quaternion()
-//        neckNode.localTransform.getRotation(neckRotation)
-//        neckRotation.setEulerAngles(neckRotation.yaw + angle, neckRotation.pitch + angle, neckRotation.roll + angle)
-//        neckNode.localTransform.rotate(neckRotation)
-//        neckNode.calculateLocalTransform()
-//        neckNode.calculateBoneTransforms(true)
-//        neckNode.calculateTransforms(true)
-        neckNode.localTransform.rotate(Vector3.X, angle)
-        neckNode.localTransform.rotate(Vector3.Y, angle)
-        neckNode.localTransform.rotate(Vector3.Z, angle)
-//        neckNode.localTransform.translate(vec3(5f,5f,5f))// .rotate(Vector3.X, 5f) // .rotate(neckRotation)
-
-        val currentRotation = otherNeckNode.rotation.cpy()
-        if(currentRotation.pitch > 45f || currentRotation.pitch < -45f)
-            angle = -angle
-        currentRotation.setEulerAngles(currentRotation.yaw, currentRotation.pitch + angle, currentRotation.roll)
-        info { currentRotation.pitch.toString() }
-        otherNeckNode.rotation.set(currentRotation)
-//        otherNeckNode.calculateBoneTransforms(true)
-
-//        neckNode.globalTransform.rotate(Quaternion(Vector3.Y, 15f))
-//        neckNode.localTransform.rotate(Quaternion(Vector3.Y, 15f))
-//
-//        otherNeckNode.globalTransform.rotate(Quaternion(Vector3.Y, 15f))
-//        otherNeckNode.localTransform.rotate(Quaternion(Vector3.Y, 15f))
-        scene.modelInstance.calculateTransforms()
+        if(rotate) {
+            val currentRotation = otherNeckNode.rotation.cpy()
+            if (currentRotation.pitch > 45f || currentRotation.pitch < -45f)
+                angle = -angle
+            currentRotation.setEulerAngles(currentRotation.yaw, currentRotation.pitch + angle, currentRotation.roll)
+            info { currentRotation.pitch.toString() }
+            otherNeckNode.rotation.set(currentRotation)
+            scene.modelInstance.calculateTransforms()
+        }
 
     }
 }
