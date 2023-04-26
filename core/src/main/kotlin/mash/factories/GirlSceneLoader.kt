@@ -5,8 +5,10 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.model.Node
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
 import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape
 import com.badlogic.gdx.physics.bullet.collision.btShapeHull
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
@@ -56,7 +58,7 @@ class GirlSceneLoader : SceneLoader() {
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
         BulletStuffCreator.createTiledFloor(25f, 1f, 25f, vec3(0f, -1f, 0f), sceneManager, dynamicsWorld)
-        BulletStuffCreator.createWall(25f, 5f, 1f, vec3(5f, 2f, 5f), sceneManager, dynamicsWorld)
+        BulletStuffCreator.createWall(1f, 5f, 25f, vec3(5f, 2f, 5f), sceneManager, dynamicsWorld)
         loadGirl(sceneManager, dynamicsWorld)
     }
 
@@ -94,15 +96,23 @@ class GirlSceneLoader : SceneLoader() {
 
         val girlScene = Scene(girlAsset.scene)
             .apply {
-                this.modelInstance.calculateTransforms()
+////                this.modelInstance.calculateTransforms()
+////                this.modelInstance.nodes.first().localTransform.translate(vec3(0f, 1f, 0f))
+////                this.modelInstance.nodes.first().calculateLocalTransform()
+//                this.modelInstance.model.calculateTransforms()
                 this.modelInstance.transform.setToWorld(
                     vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
                 )
             }
 
-        val boundingBox = BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
-        val girlShape = boundingBox.getBoxShape()
-//        val girlShape = createConvexHullShape(girlScene.modelInstance.model, true).alsoRegister()
+        val boundingBox = girlScene.modelInstance.calculateBoundingBox(BoundingBox()) //BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
+        boundingBox.mul(girlScene.modelInstance.transform)
+        boundingBox.update()
+        val girlShape = btCompoundShape().apply {
+            val transform = Matrix4()
+            transform.setTranslation(boundingBox.getCenter(vec3()))
+            addChildShape(transform, boundingBox.getBoxShape())
+        }
         val localInertia = vec3()
         val mass = 1f
         girlShape.calculateLocalInertia(mass, localInertia)
@@ -115,10 +125,10 @@ class GirlSceneLoader : SceneLoader() {
         val ms = MotionState(girlScene.modelInstance.transform)
 
 
-        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, ms, girlShape, localInertia)
-        val girlBody = btRigidBody(bodyInfo).alsoRegister()
+        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
+        val girlBody = btRigidBody(bodyInfo).apply {
+        }.alsoRegister()
         dynamicsWorld.addRigidBody(girlBody)
-
 
         engine().entity {
             with<VisibleComponent>()
@@ -140,6 +150,7 @@ class GirlSceneLoader : SceneLoader() {
             with<KeyboardControlComponent>()
             with<MotionStateComponent> {
                 motionState = ms
+                girlBody.motionState = ms
             }
         }
     }
