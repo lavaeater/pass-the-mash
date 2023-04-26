@@ -28,18 +28,19 @@ import threedee.ecs.components.*
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 
+
 class GirlSceneLoader : SceneLoader() {
     val anims = listOf("idle", "walking-backwards", "lowcrawl", "pistol-walk", "rifle-walk")
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
-        createBrickFloor(25f, 1f, 25f, sceneManager, dynamicsWorld)
+        BulletStuffCreator.createTiledFloor(25f, 1f, 25f, sceneManager, dynamicsWorld)
         loadGirl(sceneManager, dynamicsWorld)
     }
 
     fun printNode(node: Node) {
         info { node.id }
-        if(node.id == "Cube.001") {
+        if (node.id == "Cube.001") {
             val what = "what is this cube, eh?"
         }
         node.children.forEach {
