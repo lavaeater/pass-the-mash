@@ -62,13 +62,15 @@ class GirlSceneLoader : SceneLoader() {
         loadGirl(sceneManager, dynamicsWorld)
     }
 
-    fun printNode(node: Node) {
-        info { node.id }
-        if (node.id == "Cube.001") {
-            val what = "what is this cube, eh?"
-        }
-        node.children.forEach {
-            printNode(it)
+    fun printNode(node: Node, level: Int = 0) {
+        val tabs = (0..level).joinToString("") { " " }
+        info { "$tabs${node.id} ${node.isAnimated} ${node.childCount}"  }
+
+        if(node.hasChildren()) {
+            info { "${tabs}Children: " }
+            node.children.forEach {
+                printNode(it, level + 1)
+            }
         }
     }
 

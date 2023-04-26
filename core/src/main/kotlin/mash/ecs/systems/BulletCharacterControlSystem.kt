@@ -5,16 +5,20 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Quaternion
+import com.badlogic.gdx.math.Vector
 import com.badlogic.gdx.math.Vector3
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.log.info
+import ktx.math.minus
 import ktx.math.vec3
 import threedee.ecs.components.*
 import threedee.ecs.systems.plus
 import threedee.general.Direction
 import threedee.general.DirectionControl
 import twodee.injection.InjectionContext.Companion.inject
+import twodee.input.Axis
 import twodee.input.KeyPress
 import twodee.input.command
 
@@ -180,9 +184,13 @@ class BulletCharacterControlSystem :
         directionVector.nor()
     }
 
+    val neckNode by lazy { scene.modelInstance.getNode("mixamorig:RightUpLeg") }
+    val otherNeckNode by lazy { scene.modelInstance.getNode("mixamorig:LeftUpLeg") }
+
     val worldPosition = vec3()
     val rotationDirection = Vector3.X
     val towardsCameraVector = vec3(-1f, 0f, 1f)
+    var angle = 1f
     override fun processEntity(entity: Entity, deltaTime: Float) {
         setDirectionVector(controlComponent.directionControl)
         if (directionVector.isZero) {
@@ -196,6 +204,35 @@ class BulletCharacterControlSystem :
         scene.modelInstance.transform.rotateTowardDirection(rotationDirection, Vector3.Y)
 
         rigidBody.worldTransform = scene.modelInstance.transform
+        scene.modelInstance.calculateTransforms()
+
         //motionStateComponent.motionState.setWorldTransform(scene.modelInstance.transform)
+//        val neckRotation = Quaternion()
+//        neckNode.localTransform.getRotation(neckRotation)
+//        neckRotation.setEulerAngles(neckRotation.yaw + angle, neckRotation.pitch + angle, neckRotation.roll + angle)
+//        neckNode.localTransform.rotate(neckRotation)
+//        neckNode.calculateLocalTransform()
+//        neckNode.calculateBoneTransforms(true)
+//        neckNode.calculateTransforms(true)
+        neckNode.localTransform.rotate(Vector3.X, angle)
+        neckNode.localTransform.rotate(Vector3.Y, angle)
+        neckNode.localTransform.rotate(Vector3.Z, angle)
+//        neckNode.localTransform.translate(vec3(5f,5f,5f))// .rotate(Vector3.X, 5f) // .rotate(neckRotation)
+
+        val currentRotation = otherNeckNode.rotation.cpy()
+        if(currentRotation.pitch > 45f || currentRotation.pitch < -45f)
+            angle = -angle
+        currentRotation.setEulerAngles(currentRotation.yaw, currentRotation.pitch + angle, currentRotation.roll)
+        info { currentRotation.pitch.toString() }
+        otherNeckNode.rotation.set(currentRotation)
+//        otherNeckNode.calculateBoneTransforms(true)
+
+//        neckNode.globalTransform.rotate(Quaternion(Vector3.Y, 15f))
+//        neckNode.localTransform.rotate(Quaternion(Vector3.Y, 15f))
+//
+//        otherNeckNode.globalTransform.rotate(Quaternion(Vector3.Y, 15f))
+//        otherNeckNode.localTransform.rotate(Quaternion(Vector3.Y, 15f))
+        scene.modelInstance.calculateTransforms()
+
     }
 }
