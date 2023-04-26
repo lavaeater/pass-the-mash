@@ -143,9 +143,23 @@ class BulletCharacterControlSystem :
         return controlMap.execute(keycode, KeyPress.Up)
     }
 
+    var mouseScreenPosition = vec3()
+        get() {
+            field.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
+            return field
+        }
+        private set
+
+    var mousePosition = vec3()
+        get() {
+            field.set(mouseScreenPosition)
+            return camera.unproject(field)
+        }
+        private set
 
     override fun update(deltaTime: Float) {
         Gdx.input.inputProcessor = this
+        controlComponent.mouseWorldPosition.set(mousePosition)
         super.update(deltaTime)
     }
 
@@ -165,7 +179,6 @@ class BulletCharacterControlSystem :
         directionControl.orthogonal.forEach { directionVector.add(directionToVector[it]!!) }
         directionVector.nor()
     }
-
 
     val worldPosition = vec3()
     val rotationDirection = Vector3.X
