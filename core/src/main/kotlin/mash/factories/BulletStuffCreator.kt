@@ -25,22 +25,50 @@ import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 
 object BulletStuffCreator {
-    fun createMaterial(name: String) : Material {
-        val material = Material()
+    val materials = mutableMapOf<String, Material>()
 
-        val diffuseTexture = Texture("textures/$name/${name}_albedo.png".toInternalFile(), true)
-        val normalTexture = Texture("textures/$name/${name}_normal-ogl.png".toInternalFile(), true)
-        val mrTexture = Texture("textures/$name/${name}_roughness.png".toInternalFile(), true)
-        material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture))
-        material.set(PBRTextureAttribute.createNormalTexture(normalTexture))
-        material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture))
-        return material
+    fun createMaterial(name: String, textureFileExtension: String = "png") : Material {
+        if (!materials.containsKey(name)) {
+            val material = Material()
+
+            val diffuseTexture = Texture("textures/$name/${name}_albedo.$textureFileExtension".toInternalFile(), true)
+            val normalTexture = Texture("textures/$name/${name}_normal-ogl.$textureFileExtension".toInternalFile(), true)
+            val mrTexture = Texture("textures/$name/${name}_roughness.$textureFileExtension".toInternalFile(), true)
+            material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture))
+            material.set(PBRTextureAttribute.createNormalTexture(normalTexture))
+            material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture))
+            materials[name] = material
+        }
+        return materials[name]!!
+    }
+
+    fun createWall(
+        width: Float,
+        height: Float,
+        depth: Float,
+        position: Vector3,
+        sceneManager: SceneManager,
+        dynamicsWorld: btDynamicsWorld
+    ) {
+        val material = createMaterial("red-bricks", "jpg")
+        createBox(
+            "wall",
+            material,
+            width,
+            height,
+            depth,
+            position,
+            CF_STATIC_OBJECT,
+            sceneManager,
+            dynamicsWorld
+        )
     }
 
     fun createTiledFloor(
         width: Float,
         height: Float,
         depth: Float,
+        position: Vector3,
         sceneManager: SceneManager,
         dynamicsWorld: btDynamicsWorld
     ) {
@@ -52,7 +80,7 @@ object BulletStuffCreator {
             width,
             height,
             depth,
-            Vector3.Zero.cpy(),
+            position,
             CF_STATIC_OBJECT,
             sceneManager,
             dynamicsWorld
@@ -66,7 +94,7 @@ object BulletStuffCreator {
         height: Float,
         depth: Float,
         position: Vector3,
-        collisionFlags: CollisionFlags,
+        cFlags: Int,
         sceneManager: SceneManager,
         dynamicsWorld: btDynamicsWorld) {
         val mb = ModelBuilder()
@@ -90,7 +118,7 @@ object BulletStuffCreator {
 
         val info = btRigidBody.btRigidBodyConstructionInfo(0f, null, btBoxShape, Vector3.Zero)
         val body = btRigidBody(info).apply {
-            collisionFlags = if (static) btCollisionObject.CollisionFlags.CF_STATIC_OBJECT else btCollisionObject.CollisionFlags.CF_CHARACTER_OBJECT
+            collisionFlags = cFlags
         }
         body.worldTransform = floorInstance.transform
         sceneManager.addScene(Scene(floorInstance))

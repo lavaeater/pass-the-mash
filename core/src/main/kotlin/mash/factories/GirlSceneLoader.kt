@@ -34,7 +34,8 @@ class GirlSceneLoader : SceneLoader() {
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
-        BulletStuffCreator.createTiledFloor(25f, 1f, 25f, sceneManager, dynamicsWorld)
+        BulletStuffCreator.createTiledFloor(25f, 1f, 25f, vec3(0f, -1f, 0f), sceneManager, dynamicsWorld)
+        BulletStuffCreator.createWall(25f, 5f, 1f, vec3(5f, 2f, 5f), sceneManager, dynamicsWorld)
         loadGirl(sceneManager, dynamicsWorld)
     }
 
