@@ -139,7 +139,6 @@ class GirlSceneLoader : SceneLoader() {
             }
             with<Animation3dComponent> {
                 animations = characterAsset.animations
-                animationPlayer = characterScene.animations
                 animationController = characterScene.animationController
                 animationController.setAnimation("walking", -1, 0.75f, null)
             }
