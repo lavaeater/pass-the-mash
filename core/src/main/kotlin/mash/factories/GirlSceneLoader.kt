@@ -137,10 +137,11 @@ class GirlSceneLoader : SceneLoader() {
                 scene = characterScene
                 sceneManager.addScene(characterScene)
             }
-            with<Animation3dComponent> {
-                animations = characterAsset.animations
-                animationController = characterScene.animationController
-                animationController.setAnimation("walking", -1, 0.75f, null)
+            with<CharacterAnimationStateComponent> {
+                stateMachine = CharacterStateMachine(characterScene.animationController)
+//                animations = characterAsset.animations
+//                animationController = characterScene.animationController
+//                animationController.setAnimation("walking", -1, 0.75f, null)
             }
             with<BulletRigidBody> {
                 rigidBody = characterBody

@@ -5,20 +5,16 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.math.Quaternion
-import com.badlogic.gdx.math.Vector
 import com.badlogic.gdx.math.Vector3
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.log.info
-import ktx.math.minus
 import ktx.math.vec3
 import threedee.ecs.components.*
 import threedee.ecs.systems.plus
 import threedee.general.Direction
 import threedee.general.DirectionControl
 import twodee.injection.InjectionContext.Companion.inject
-import twodee.input.Axis
 import twodee.input.KeyPress
 import twodee.input.command
 
@@ -36,34 +32,55 @@ class BulletCharacterControlSystem :
     private val controlComponent by lazy { KeyboardControlComponent.get(controlledEntity) }
     private val scene by lazy { SceneComponent.get(controlledEntity).scene }
     private val camera by lazy { inject<OrthographicCamera>() }
-    private val animationController by lazy { Animation3dComponent.get(controlledEntity).animationController }
+    private val characterStateMachineComponent by lazy { CharacterAnimationStateComponent.get(controlledEntity) }
     private val rigidBodyComponent by lazy { BulletRigidBody.get(controlledEntity) }
     private val rigidBody by lazy { rigidBodyComponent.rigidBody }
 
     private val controlMap = command("Controoool") {
         setBoth(
             Input.Keys.W,
-            "Throttle",
-            { controlComponent.remove(Direction.Forward) },
-            { controlComponent.add(Direction.Forward) }
+            "WalkForward",
+            {
+                controlComponent.remove(Direction.Forward)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            },
+            {
+                controlComponent.add(Direction.Forward)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.MoveForwards)
+            }
         )
         setBoth(
             Input.Keys.S,
             "Brake",
-            { controlComponent.remove(Direction.Reverse) },
-            { controlComponent.add(Direction.Reverse) }
+            {
+                controlComponent.remove(Direction.Reverse)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            },
+            {
+                controlComponent.add(Direction.Reverse)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.MoveBackwards)
+            }
         )
         setBoth(
             Input.Keys.A,
             "Left",
-            { controlComponent.remove(Direction.Left) },
-            { controlComponent.add(Direction.Left) }
+            {
+                controlComponent.remove(Direction.Left)
+            },
+            {
+                controlComponent.add(Direction.Left)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StrafeLeft)
+
+            }
         )
         setBoth(
             Input.Keys.D,
             "Right",
             { controlComponent.remove(Direction.Right) },
-            { controlComponent.add(Direction.Right) }
+            {
+                controlComponent.add(Direction.Right)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StrafeRight)
+            }
         )
         setDown(Input.Keys.UP, "zOom in") {
             camera.zoom /= 1.1f
@@ -95,22 +112,12 @@ class BulletCharacterControlSystem :
             info { "far: ${camera.far}" }
             camera.update()
         }
-        var needsAnimInit = true
-        val animKeys = mutableListOf<String>()
-        var currentAnimIndex = 0
-        var maxIndex = 0
-        setDown(Input.Keys.SPACE, "Toggle Animation") {
-            if (needsAnimInit) {
-                needsAnimInit = false
-                animKeys.addAll(Animation3dComponent.get(controlledEntity).animations.map { it.id })
-                maxIndex = animKeys.lastIndex
-                currentAnimIndex = animKeys.indexOf(animationController.current.animation.id)
+        setDown(Input.Keys.CONTROL_LEFT, "Toggle Crawl") {
+            if (characterStateMachineComponent.currentState == CharacterState.LowCrawling) {
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            } else {
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StartLowCrawl)
             }
-            currentAnimIndex++
-            if (currentAnimIndex > maxIndex) {
-                currentAnimIndex = 0
-            }
-            animationController.setAnimation(animKeys[currentAnimIndex], -1, 0.75f, null)
         }
     }
 
@@ -180,7 +187,7 @@ class BulletCharacterControlSystem :
 
         rigidBody.worldTransform = scene.modelInstance.transform
 
-        if(rotate) {
+        if (rotate) {
             val currentRotation = otherNeckNode.rotation.cpy()
             if (currentRotation.pitch > 45f || currentRotation.pitch < -45f)
                 angle = -angle
