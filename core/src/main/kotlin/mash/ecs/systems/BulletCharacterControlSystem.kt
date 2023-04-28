@@ -5,15 +5,20 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Intersector
+import com.badlogic.gdx.math.Plane
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.Ray
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.log.info
 import ktx.math.vec3
 import threedee.ecs.components.*
+import threedee.ecs.systems.inXZPlane
 import threedee.ecs.systems.plus
 import threedee.general.Direction
 import threedee.general.DirectionControl
+import twodee.core.world
 import twodee.injection.InjectionContext.Companion.inject
 import twodee.input.KeyPress
 import twodee.input.command
@@ -66,6 +71,7 @@ class BulletCharacterControlSystem :
             "Left",
             {
                 controlComponent.remove(Direction.Left)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
             },
             {
                 controlComponent.add(Direction.Left)
@@ -76,7 +82,10 @@ class BulletCharacterControlSystem :
         setBoth(
             Input.Keys.D,
             "Right",
-            { controlComponent.remove(Direction.Right) },
+            {
+                controlComponent.remove(Direction.Right)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            },
             {
                 controlComponent.add(Direction.Right)
                 characterStateMachineComponent.acceptEvent(CharacterEvent.StrafeRight)
@@ -166,6 +175,13 @@ class BulletCharacterControlSystem :
         directionVector.nor()
     }
 
+    /***
+     *
+     * Ah, directions are moore complex than I thought. First off,
+     * if the direction control has forwards or backwards, that means we are moving in those
+     * directions, but the rotation direction is TOWARDS mouse.
+     * This method sets the direction vector to a vector that is in 90 degree increments
+     */
     private val rotate = false
     private val otherNeckNode by lazy { scene.modelInstance.getNode("mixamorig:LeftUpLeg") }
 
@@ -173,29 +189,53 @@ class BulletCharacterControlSystem :
     private val rotationDirection = Vector3.X.cpy()
     private val towardsCameraVector = vec3(-1f, 0f, 1f)
     private var angle = 1f
+    private var logCooldown = 1f
+
+    private val ray = Ray(vec3(), vec3())
+    private val plane = Plane(vec3(0f, 1f, 0f), 0f)
+    private var intersection = vec3()
+        get() {
+            if(Intersector.intersectRayPlane(ray, plane, field))
+                return field
+            return Vector3.Zero
+        }
+
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        setDirectionVector(controlComponent.directionControl)
-        if (directionVector.isZero) {
-            rotationDirection.lerp(towardsCameraVector, 0.5f)
-        } else {
-            rotationDirection.lerp(directionVector, 0.2f)
-        }
-        scene.modelInstance.transform.getTranslation(worldPosition)
-        worldPosition.lerp((worldPosition + directionVector), 0.1f)
-        scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
-        scene.modelInstance.transform.rotateTowardDirection(rotationDirection, Vector3.Y)
+        logCooldown -= deltaTime
 
-        rigidBody.worldTransform = scene.modelInstance.transform
+        val msComponent = MotionStateComponent.get(entity)
+        worldPosition.set(msComponent.position)
+        ray.set(mousePosition, camera.direction)
+//        plane.set(msComponent.position, Vector3.Y)
 
-        if (rotate) {
-            val currentRotation = otherNeckNode.rotation.cpy()
-            if (currentRotation.pitch > 45f || currentRotation.pitch < -45f)
-                angle = -angle
-            currentRotation.setEulerAngles(currentRotation.yaw, currentRotation.pitch + angle, currentRotation.roll)
-            info { currentRotation.pitch.toString() }
-            otherNeckNode.rotation.set(currentRotation)
-            scene.modelInstance.calculateTransforms()
+        rotationDirection.set(intersection).sub(worldPosition).nor()
+
+        if (logCooldown < 0f) {
+            logCooldown = 1f
+            info { "worldPosition: ${worldPosition.inXZPlane()} \n" }
+            info { "mousePosition: ${mousePosition.inXZPlane()} \n" }
+            info { "rotationDirection: $rotationDirection\n" }
         }
+
+        scene.modelInstance.transform.rotateTowardDirection(rotationDirection.inXZPlane(), Vector3.Y)
+//        scene.modelInstance.transform.rotate(worldPosition, mousePosition)
+
+        //rotate directionVector to in rotation direction I guess?
+
+//        worldPosition.lerp((worldPosition + directionVector), 0.1f)
+//        scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
+
+//        rigidBody.worldTransform = scene.modelInstance.transform
+
+//        if (rotate) {
+//            val currentRotation = otherNeckNode.rotation.cpy()
+//            if (currentRotation.pitch > 45f || currentRotation.pitch < -45f)
+//                angle = -angle
+//            currentRotation.setEulerAngles(currentRotation.yaw, currentRotation.pitch + angle, currentRotation.roll)
+//            info { currentRotation.pitch.toString() }
+//            otherNeckNode.rotation.set(currentRotation)
+//            scene.modelInstance.calculateTransforms()
+//        }
 
     }
 }
