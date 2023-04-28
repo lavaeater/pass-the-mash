@@ -194,15 +194,10 @@ class BulletGhostObjectControlSystem :
     val rotationVector = Vector3.Z.cpy()
     override fun processEntity(entity: Entity, deltaTime: Float) {
 
-//        val msComponent = MotionStateComponent.get(entity)
         scene.modelInstance.transform.getTranslation(worldPosition)
         ray.set(mousePosition, camera.direction)
-//        plane.set(worldPosition, Vector3.Y)
 
-        controlComponent.lookDirection.set(intersection.cpy().sub(worldPosition)).nor()
 
-        rotationVector.lerp(controlComponent.lookDirection.inXZPlane(), 0.1f).nor()
-
-        scene.modelInstance.transform.rotateTowardDirection(rotationVector.inXZPlane(), Vector3.Y)
+        scene.modelInstance.transform.rotateTowardTarget(intersection, Vector3.Y)
     }
 }
