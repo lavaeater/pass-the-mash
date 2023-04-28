@@ -13,10 +13,12 @@ import com.badlogic.gdx.math.collision.Ray
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.log.info
+import ktx.math.times
 import ktx.math.unaryMinus
 import ktx.math.vec3
 import threedee.ecs.components.*
 import threedee.ecs.systems.inXZPlane
+import threedee.ecs.systems.plus
 import threedee.general.Direction
 import threedee.general.DirectionControl
 import twodee.injection.InjectionContext.Companion.inject
@@ -206,9 +208,13 @@ class BulletGhostObjectControlSystem :
         val kc = KeyboardControlComponent.get(entity)
         kc.lookDirection.set(intersect).sub(worldPosition).nor()
         kc.intersection.set(intersect)
-        scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
 
+        worldPosition.lerp(worldPosition + kc.forward * kc.thrust * 0.1f, 0.5f)
+        worldPosition.lerp(worldPosition + kc.left * kc.strafe * 0.1f, 0.5f)
+
+        scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
         scene.modelInstance.transform.rotateTowardDirection(kc.lookDirection, Vector3.Y)
 
+        ghostBody.worldTransform = scene.modelInstance.transform
     }
 }

@@ -112,31 +112,19 @@ class GirlSceneLoader : SceneLoader() {
             transform.setTranslation(boundingBox.getCenter(vec3()))
             addChildShape(transform, boundingBox.getBoxShape())
         }
-//        val localInertia = vec3()
-//        val mass = 1f
-//        girlShape.calculateLocalInertia(mass, localInertia)
-        val ms = MotionState(girlScene.modelInstance.transform)
-//
-//        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
         val girlBody = btGhostObject().apply {
             collisionShape = girlShape
         }
 
         dynamicsWorld.addCollisionObject(girlBody)
 
-
-//            btRigidBody(bodyInfo).apply {
-//        }.alsoRegister()
-//        dynamicsWorld.addRigidBody(girlBody)
-
-        createCharacterEntity(girlScene, sceneManager, girlBody, ms)
+        createCharacterEntity(girlScene, sceneManager, girlBody)
     }
 
     private fun createCharacterEntity(
         characterScene: Scene,
         sceneManager: SceneManager,
-        characterBody: btGhostObject,
-        motionState: MotionState
+        characterBody: btGhostObject
     ) {
         engine().entity {
             with<VisibleComponent>()
@@ -153,9 +141,6 @@ class GirlSceneLoader : SceneLoader() {
             with<Player>()
             with<IsometricCameraFollowComponent>()
             with<KeyboardControlComponent>()
-            with<MotionStateComponent> {
-                this.motionState = motionState
-            }
         }
     }
 

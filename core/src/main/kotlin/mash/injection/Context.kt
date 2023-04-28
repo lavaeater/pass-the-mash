@@ -118,16 +118,13 @@ object Context : InjectionContext() {
     private fun getEngine(): Engine {
         return PooledEngine().apply {
             addSystem(RemoveEntitySystem())
-//            addSystem(VehicleControlSystem())
             addSystem(BulletUpdateSystem(inject()))
-//            addSystem(KeepCarFromFlippingSystem())
-//            addSystem(UpdatePerspectiveCameraSystem(inject()))
             addSystem(BulletGhostObjectControlSystem())
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())
             addSystem(RenderSystem3d(inject()))
-            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }
 }
