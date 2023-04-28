@@ -7,11 +7,13 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Plane
+import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.Ray
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.log.info
+import ktx.math.unaryMinus
 import ktx.math.vec3
 import threedee.ecs.components.*
 import threedee.ecs.systems.inXZPlane
@@ -184,10 +186,14 @@ class BulletGhostObjectControlSystem :
 
     private val ray = Ray(vec3(), vec3())
     private val plane = Plane(vec3(0f, 1f, 0f), 0f)
-    private var intersection = vec3()
+    private val lastIntersection = vec3()
+    private val tempIntersection = vec3()
+    private val intersect: Vector3
         get() {
-            Intersector.intersectRayPlane(ray, plane, field)
-            return field
+            if (Intersector.intersectRayPlane(ray, plane, tempIntersection)) {
+                lastIntersection.set(tempIntersection)
+            }
+            return lastIntersection
         }
 
     val worldPosition = vec3()
@@ -197,7 +203,12 @@ class BulletGhostObjectControlSystem :
         scene.modelInstance.transform.getTranslation(worldPosition)
         ray.set(mousePosition, camera.direction)
 
+        val kc = KeyboardControlComponent.get(entity)
+        kc.lookDirection.set(intersect).sub(worldPosition).nor()
+        kc.intersection.set(intersect)
+        scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
 
-        scene.modelInstance.transform.rotateTowardTarget(intersection, Vector3.Y)
+        scene.modelInstance.transform.rotateTowardDirection(kc.lookDirection, Vector3.Y)
+
     }
 }

@@ -153,9 +153,9 @@ class GirlSceneLoader : SceneLoader() {
             with<Player>()
             with<IsometricCameraFollowComponent>()
             with<KeyboardControlComponent>()
-//            with<MotionStateComponent> {
-//                this.motionState = motionState
-//            }
+            with<MotionStateComponent> {
+                this.motionState = motionState
+            }
         }
     }
 
