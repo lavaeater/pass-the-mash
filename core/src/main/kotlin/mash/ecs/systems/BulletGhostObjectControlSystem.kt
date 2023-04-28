@@ -7,17 +7,14 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Plane
-import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.Ray
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.log.info
 import ktx.math.times
-import ktx.math.unaryMinus
 import ktx.math.vec3
 import threedee.ecs.components.*
-import threedee.ecs.systems.inXZPlane
 import threedee.ecs.systems.plus
 import threedee.general.Direction
 import threedee.general.DirectionControl
@@ -49,7 +46,9 @@ class BulletGhostObjectControlSystem :
             "WalkForward",
             {
                 controlComponent.remove(Direction.Forward)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                if(controlComponent.hasNoDirection) {
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                }
             },
             {
                 controlComponent.add(Direction.Forward)
@@ -61,7 +60,9 @@ class BulletGhostObjectControlSystem :
             "Brake",
             {
                 controlComponent.remove(Direction.Reverse)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                if(controlComponent.hasNoDirection) {
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                }
             },
             {
                 controlComponent.add(Direction.Reverse)
@@ -73,7 +74,9 @@ class BulletGhostObjectControlSystem :
             "Left",
             {
                 controlComponent.remove(Direction.Left)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                if(controlComponent.hasNoDirection) {
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                }
             },
             {
                 controlComponent.add(Direction.Left)
@@ -86,7 +89,9 @@ class BulletGhostObjectControlSystem :
             "Right",
             {
                 controlComponent.remove(Direction.Right)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                if(controlComponent.hasNoDirection) {
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                }
             },
             {
                 controlComponent.add(Direction.Right)
@@ -125,9 +130,14 @@ class BulletGhostObjectControlSystem :
         }
         setDown(Input.Keys.CONTROL_LEFT, "Toggle Crawl") {
             if (characterStateMachineComponent.currentState == CharacterState.LowCrawling) {
+                if(controlComponent.hasNoDirection) {
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                } else {
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.MoveForwards)
+                }
                 characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
             } else {
-                characterStateMachineComponent.acceptEvent(CharacterEvent.StartLowCrawl)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StartCrawling)
             }
         }
     }
@@ -209,8 +219,8 @@ class BulletGhostObjectControlSystem :
         kc.lookDirection.set(intersect).sub(worldPosition).nor()
         kc.intersection.set(intersect)
 
-        worldPosition.lerp(worldPosition + kc.forward * kc.thrust * 0.1f, 0.5f)
-        worldPosition.lerp(worldPosition + kc.left * kc.strafe * 0.1f, 0.5f)
+        worldPosition.lerp(worldPosition + kc.forward * kc.thrust * 0.2f, 0.5f)
+        worldPosition.lerp(worldPosition + kc.left * kc.strafe * 0.2f, 0.5f)
 
         scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
         scene.modelInstance.transform.rotateTowardDirection(kc.lookDirection, Vector3.Y)

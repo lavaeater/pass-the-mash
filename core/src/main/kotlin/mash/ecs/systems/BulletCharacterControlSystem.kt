@@ -122,9 +122,12 @@ class BulletCharacterControlSystem :
         }
         setDown(Input.Keys.CONTROL_LEFT, "Toggle Crawl") {
             if (characterStateMachineComponent.currentState == CharacterState.LowCrawling) {
-                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                if(controlComponent.hasNoDirection)
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+                else
+                    characterStateMachineComponent.acceptEvent(CharacterEvent.StopCrawlingKeepWalking)
             } else {
-                characterStateMachineComponent.acceptEvent(CharacterEvent.StartLowCrawl)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StartCrawling)
             }
         }
     }
