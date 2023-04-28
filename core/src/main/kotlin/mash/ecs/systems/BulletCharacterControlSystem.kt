@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Plane
+import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.Ray
 import ktx.app.KtxInputAdapter
@@ -15,10 +16,8 @@ import ktx.log.info
 import ktx.math.vec3
 import threedee.ecs.components.*
 import threedee.ecs.systems.inXZPlane
-import threedee.ecs.systems.plus
 import threedee.general.Direction
 import threedee.general.DirectionControl
-import twodee.core.world
 import twodee.injection.InjectionContext.Companion.inject
 import twodee.input.KeyPress
 import twodee.input.command
@@ -200,15 +199,24 @@ class BulletCharacterControlSystem :
             return Vector3.Zero
         }
 
+    val desiredOrientation = Quaternion()
+    val torque = Quaternion()
+    val torqueMagnitude = 10f
+
     override fun processEntity(entity: Entity, deltaTime: Float) {
         logCooldown -= deltaTime
 
         val msComponent = MotionStateComponent.get(entity)
         worldPosition.set(msComponent.position)
         ray.set(mousePosition, camera.direction)
-//        plane.set(msComponent.position, Vector3.Y)
+        plane.set(msComponent.position, Vector3.Y)
 
         rotationDirection.set(intersection).sub(worldPosition).nor()
+        desiredOrientation.setFromCross(msComponent.forward, rotationDirection.inXZPlane()).nor()
+
+        torque.set(desiredOrientation).mulLeft(msComponent.motionState.currentOrientation.conjugate()).nor()
+
+        rigidBody.applyTorque(vec3(torque.x * torqueMagnitude, torque.y * torqueMagnitude, torque.z * torqueMagnitude))
 
         if (logCooldown < 0f) {
             logCooldown = 1f
@@ -217,7 +225,14 @@ class BulletCharacterControlSystem :
             info { "rotationDirection: $rotationDirection\n" }
         }
 
-        scene.modelInstance.transform.rotateTowardDirection(rotationDirection.inXZPlane(), Vector3.Y)
+//        rigidBody.worldTransform.rotateTowardDirection(rotationDirection.inXZPlane(), Vector3.Y)
+
+        //scene.modelInstance.transform.rotateTowardDirection(rotationDirection, Vector3.Y)
+
+
+
+
+
 //        scene.modelInstance.transform.rotate(worldPosition, mousePosition)
 
         //rotate directionVector to in rotation direction I guess?
