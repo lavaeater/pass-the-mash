@@ -5,13 +5,16 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Intersector
+import com.badlogic.gdx.math.Plane
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.collision.Ray
 import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import ktx.log.info
 import ktx.math.vec3
 import threedee.ecs.components.*
-import threedee.ecs.systems.plus
+import threedee.ecs.systems.inXZPlane
 import threedee.general.Direction
 import threedee.general.DirectionControl
 import twodee.injection.InjectionContext.Companion.inject
@@ -32,35 +35,59 @@ class BulletGhostObjectControlSystem :
     private val controlComponent by lazy { KeyboardControlComponent.get(controlledEntity) }
     private val scene by lazy { SceneComponent.get(controlledEntity).scene }
     private val camera by lazy { inject<OrthographicCamera>() }
-    private val animationController by lazy { Animation3dComponent.get(controlledEntity).animationController }
+    private val characterStateMachineComponent by lazy { CharacterAnimationStateComponent.get(controlledEntity) }
     private val ghostComponent by lazy { BulletGhostObject.get(controlledEntity) }
-    private val ghostObject by lazy { ghostComponent.ghostObject }
-    private val motionStateComponent by lazy { MotionStateComponent.get(controlledEntity) }
+    private val ghostBody by lazy { ghostComponent.ghostObject }
 
     private val controlMap = command("Controoool") {
         setBoth(
             Input.Keys.W,
-            "Throttle",
-            { controlComponent.remove(Direction.Forward) },
-            { controlComponent.add(Direction.Forward) }
+            "WalkForward",
+            {
+                controlComponent.remove(Direction.Forward)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            },
+            {
+                controlComponent.add(Direction.Forward)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.MoveForwards)
+            }
         )
         setBoth(
             Input.Keys.S,
             "Brake",
-            { controlComponent.remove(Direction.Reverse) },
-            { controlComponent.add(Direction.Reverse) }
+            {
+                controlComponent.remove(Direction.Reverse)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            },
+            {
+                controlComponent.add(Direction.Reverse)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.MoveBackwards)
+            }
         )
         setBoth(
             Input.Keys.A,
             "Left",
-            { controlComponent.remove(Direction.Left) },
-            { controlComponent.add(Direction.Left) }
+            {
+                controlComponent.remove(Direction.Left)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            },
+            {
+                controlComponent.add(Direction.Left)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StrafeLeft)
+
+            }
         )
         setBoth(
             Input.Keys.D,
             "Right",
-            { controlComponent.remove(Direction.Right) },
-            { controlComponent.add(Direction.Right) }
+            {
+                controlComponent.remove(Direction.Right)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            },
+            {
+                controlComponent.add(Direction.Right)
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StrafeRight)
+            }
         )
         setDown(Input.Keys.UP, "zOom in") {
             camera.zoom /= 1.1f
@@ -92,47 +119,13 @@ class BulletGhostObjectControlSystem :
             info { "far: ${camera.far}" }
             camera.update()
         }
-        var needsAnimInit = true
-        val animKeys = mutableListOf<String>()
-        var currentAnimIndex = 0
-        var maxIndex = 0
-        setDown(Input.Keys.SPACE, "Toggle Animation") {
-            if (needsAnimInit) {
-                needsAnimInit = false
-                animKeys.addAll(Animation3dComponent.get(controlledEntity).animations.map { it.id })
-                maxIndex = animKeys.lastIndex
-                currentAnimIndex = animKeys.indexOf(animationController.current.animation.id)
+        setDown(Input.Keys.CONTROL_LEFT, "Toggle Crawl") {
+            if (characterStateMachineComponent.currentState == CharacterState.LowCrawling) {
+                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
+            } else {
+                characterStateMachineComponent.acceptEvent(CharacterEvent.StartLowCrawl)
             }
-            currentAnimIndex++
-            if (currentAnimIndex > maxIndex) {
-                currentAnimIndex = 0
-            }
-            animationController.setAnimation(animKeys[currentAnimIndex], -1, 0.75f, null)
         }
-//        setBoth(
-//            Input.Keys.UP,
-//            "Up",
-//            { },
-//            { cameraFollowComponent.offsetY += 0.1f }
-//        )
-//        setBoth(
-//            Input.Keys.DOWN,
-//            "Down",
-//            { },
-//            { cameraFollowComponent.offsetY -= 0.1f }
-//        )
-//        setBoth(
-//            Input.Keys.LEFT,
-//            "Up",
-//            { },
-//            { cameraFollowComponent.offsetXZ.rotateDeg(5f) }
-//        )
-//        setBoth(
-//            Input.Keys.RIGHT,
-//            "Down",
-//            { },
-//            { cameraFollowComponent.offsetXZ.rotateDeg(-5f) }
-//        )
     }
 
     override fun keyDown(keycode: Int): Boolean {
@@ -143,9 +136,23 @@ class BulletGhostObjectControlSystem :
         return controlMap.execute(keycode, KeyPress.Up)
     }
 
+    var mouseScreenPosition = vec3()
+        get() {
+            field.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
+            return field
+        }
+        private set
+
+    var mousePosition = vec3()
+        get() {
+            field.set(mouseScreenPosition)
+            return camera.unproject(field)
+        }
+        private set
 
     override fun update(deltaTime: Float) {
         Gdx.input.inputProcessor = this
+        controlComponent.mouseWorldPosition.set(mousePosition)
         super.update(deltaTime)
     }
 
@@ -157,6 +164,7 @@ class BulletGhostObjectControlSystem :
     )
 
     private val directionVector = vec3()
+
     private fun setDirectionVector(directionControl: DirectionControl) {
         if (directionControl.orthogonal.isEmpty()) {
             directionVector.setZero()
@@ -166,23 +174,35 @@ class BulletGhostObjectControlSystem :
         directionVector.nor()
     }
 
+    /***
+     *
+     * Ah, directions are moore complex than I thought. First off,
+     * if the direction control has forwards or backwards, that means we are moving in those
+     * directions, but the rotation direction is TOWARDS mouse.
+     * This method sets the direction vector to a vector that is in 90 degree increments
+     */
+
+    private val ray = Ray(vec3(), vec3())
+    private val plane = Plane(vec3(0f, 1f, 0f), 0f)
+    private var intersection = vec3()
+        get() {
+            Intersector.intersectRayPlane(ray, plane, field)
+            return field
+        }
 
     val worldPosition = vec3()
-    val rotationDirection = Vector3.X
-    val towardsCameraVector = vec3(-1f, 0f, 1f)
+    val rotationVector = Vector3.Z.cpy()
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        setDirectionVector(controlComponent.directionControl)
-        if (directionVector.isZero) {
-            rotationDirection.lerp(towardsCameraVector, 0.5f)
-        } else {
-            rotationDirection.lerp(directionVector, 0.2f)
-        }
-        scene.modelInstance.transform.getTranslation(worldPosition)
-        worldPosition.lerp((worldPosition + directionVector), 0.1f)
-        scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
-        scene.modelInstance.transform.rotateTowardDirection(rotationDirection, Vector3.Y)
 
-        ghostObject.worldTransform = scene.modelInstance.transform
-        motionStateComponent.motionState.setWorldTransform(scene.modelInstance.transform)
+//        val msComponent = MotionStateComponent.get(entity)
+        scene.modelInstance.transform.getTranslation(worldPosition)
+        ray.set(mousePosition, camera.direction)
+//        plane.set(worldPosition, Vector3.Y)
+
+        controlComponent.lookDirection.set(intersection.cpy().sub(worldPosition)).nor()
+
+        rotationVector.lerp(controlComponent.lookDirection.inXZPlane(), 0.1f).nor()
+
+        scene.modelInstance.transform.rotateTowardDirection(rotationVector.inXZPlane(), Vector3.Y)
     }
 }

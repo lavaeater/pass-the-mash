@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
 import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape
+import com.badlogic.gdx.physics.bullet.collision.btGhostObject
 import com.badlogic.gdx.physics.bullet.collision.btShapeHull
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
@@ -111,23 +112,56 @@ class GirlSceneLoader : SceneLoader() {
             transform.setTranslation(boundingBox.getCenter(vec3()))
             addChildShape(transform, boundingBox.getBoxShape())
         }
-        val localInertia = vec3()
-        val mass = 1f
-        girlShape.calculateLocalInertia(mass, localInertia)
+//        val localInertia = vec3()
+//        val mass = 1f
+//        girlShape.calculateLocalInertia(mass, localInertia)
         val ms = MotionState(girlScene.modelInstance.transform)
+//
+//        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
+        val girlBody = btGhostObject().apply {
+            collisionShape = girlShape
+        }
 
-        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, localInertia)
-        val girlBody = btRigidBody(bodyInfo).apply {
-        }.alsoRegister()
-        dynamicsWorld.addRigidBody(girlBody)
+        dynamicsWorld.addCollisionObject(girlBody)
 
-        createCharacterEntity(girlScene, sceneManager, girlAsset, girlBody, ms)
+
+//            btRigidBody(bodyInfo).apply {
+//        }.alsoRegister()
+//        dynamicsWorld.addRigidBody(girlBody)
+
+        createCharacterEntity(girlScene, sceneManager, girlBody, ms)
     }
 
     private fun createCharacterEntity(
         characterScene: Scene,
         sceneManager: SceneManager,
-        characterAsset: SceneAsset,
+        characterBody: btGhostObject,
+        motionState: MotionState
+    ) {
+        engine().entity {
+            with<VisibleComponent>()
+            with<SceneComponent> {
+                scene = characterScene
+                sceneManager.addScene(characterScene)
+            }
+            with<CharacterAnimationStateComponent> {
+                stateMachine = CharacterStateMachine(characterScene.animationController)
+            }
+            with<BulletGhostObject> {
+                ghostObject = characterBody
+            }
+            with<Player>()
+            with<IsometricCameraFollowComponent>()
+            with<KeyboardControlComponent>()
+//            with<MotionStateComponent> {
+//                this.motionState = motionState
+//            }
+        }
+    }
+
+    private fun createCharacterEntity(
+        characterScene: Scene,
+        sceneManager: SceneManager,
         characterBody: btRigidBody,
         motionState: MotionState
     ) {

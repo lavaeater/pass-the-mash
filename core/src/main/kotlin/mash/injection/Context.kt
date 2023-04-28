@@ -122,7 +122,7 @@ object Context : InjectionContext() {
             addSystem(BulletUpdateSystem(inject()))
 //            addSystem(KeepCarFromFlippingSystem())
 //            addSystem(UpdatePerspectiveCameraSystem(inject()))
-            addSystem(BulletCharacterControlSystem())
+            addSystem(BulletGhostObjectControlSystem())
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())
