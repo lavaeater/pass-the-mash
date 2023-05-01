@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
+import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
@@ -11,12 +13,13 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
 import com.badlogic.gdx.physics.bullet.softbody.btSoftRigidDynamicsWorld
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.crashinvaders.vfx.VfxManager
+import com.crashinvaders.vfx.effects.CrtEffect
 import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
-import mash.ecs.systems.BulletCharacterControlSystem
 import mash.ecs.systems.BulletGhostObjectControlSystem
 import mash.factories.GirlSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
@@ -42,6 +45,9 @@ object Context : InjectionContext() {
         buildContext {
             val gameSettings = GameSettings()
             bindSingleton(gameSettings)
+            bindSingleton(VfxManager(Pixmap.Format.RGBA8888).apply {
+                addEffect(CrtEffect())
+            })
             bindSingleton(game)
             bindSingleton(PerspectiveCamera().apply {
                 fieldOfView = gameSettings.fieldOfView
@@ -52,7 +58,7 @@ object Context : InjectionContext() {
             })
             bindSingleton(OrthographicCamera().apply {
                 setToOrtho(false)
-                position.set(1f,1f, 1f)
+                position.set(1f, 1f, 1f)
                 near = -25f
                 far = 100f
                 rotate(Vector3.X, -30f)
@@ -71,11 +77,12 @@ object Context : InjectionContext() {
             //            bindSingleton(TrackGenerator())
             bindSingleton(
                 GameScreen(
-                GirlSceneLoader(),
-                inject(),
-                inject(),
-                inject()
-            )
+                    GirlSceneLoader(),
+                    inject(),
+                    inject(),
+                    inject(),
+                    inject()
+                )
             )
         }
     }
@@ -86,11 +93,12 @@ object Context : InjectionContext() {
         config.numBones = 60
         config.numDirectionalLights = 1
         config.numPointLights = 5
-        config.fragmentShader = "shaders/test.fragment.glsl".toInternalFile().readString()
-        config.vertexShader = "shaders/test.vertex.glsl".toInternalFile().readString()
+//        config.fragmentShader = "shaders/pixelart/pixel.glsl".toInternalFile().readString()
+//        config.fragmentShader = "shaders/test.fragment.glsl".toInternalFile().readString()
+//        config.vertexShader = "shaders/test.vertex.glsl".toInternalFile().readString()
 
-//        config.fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
-//        config.vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
+        config.fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
+        config.vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
 
 
         val depthConfig = PBRShaderProvider.createDefaultDepthConfig()
@@ -115,9 +123,10 @@ object Context : InjectionContext() {
                     inject(),
                     inject(),
                     inject(),
-                    inject()).apply {
-                gravity = vec3(0f, -10f, 0f)
-            })
+                    inject()
+                ).apply {
+                    gravity = vec3(0f, -10f, 0f)
+                })
 
         }
     }
@@ -130,7 +139,11 @@ object Context : InjectionContext() {
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())
-            addSystem(RenderSystem3d(inject()))
+            addSystem(
+                RenderSystem3d(
+                    inject(),
+                )
+            )
 //            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }

@@ -62,7 +62,9 @@ varying float v_alphaTest;
 #endif //alphaTestFlag
 #endif //blendedFlag
 
+#ifdef textureFlag
 varying MED vec2 v_texCoord0;
+#endif // textureFlag
 
 #ifdef textureCoord1Flag
 varying MED vec2 v_texCoord1;
@@ -417,8 +419,6 @@ void main() {
 #else
 	out_FragColor.a = 1.0;
 #endif
-
-out_FragColor = vec4(v_texCoord0, 0.0, 1.0);
 }
 
 #else
@@ -661,8 +661,6 @@ void main() {
 #else
 	out_FragColor.a = 1.0;
 #endif
-
-out_FragColor = vec4(v_texCoord0, 0.0, 1.0);
 
 }
 

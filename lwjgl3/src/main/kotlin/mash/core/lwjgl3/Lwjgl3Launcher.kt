@@ -12,7 +12,7 @@ import mash.tester.bullet.VehicleTest
 fun main() {
     Lwjgl3Application(PassTheMash(), Lwjgl3ApplicationConfiguration().apply {
         setTitle("pass-the-mash")
-        setWindowedMode(1920, 1080)
+        setWindowedMode(320, 180)
         setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))
     })
 }

@@ -2,17 +2,14 @@ package mash.core
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import ktx.ashley.entity
-import ktx.ashley.with
+import com.crashinvaders.vfx.VfxManager
+import mash.factories.SceneLoader
 import twodee.core.MainGame
 import twodee.injection.InjectionContext.Companion.inject
-import mash.factories.SceneLoader
-import threedee.ecs.components.CameraComponent
-import threedee.ecs.components.KeyboardControlComponent
-import twodee.core.engine
 
 class GameScreen(
     private val sceneLoader: SceneLoader,
+    private val vfxManager: VfxManager,
     game: MainGame,
     engine: Engine,
     viewport: ExtendViewport
@@ -27,6 +24,11 @@ class GameScreen(
         }
     }
 
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        vfxManager.resize(width, height)
+    }
 
     override fun dispose() {
         super.dispose()

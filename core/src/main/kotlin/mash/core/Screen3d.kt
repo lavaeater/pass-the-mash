@@ -9,10 +9,10 @@ import ktx.app.clearScreen
 
 open class Screen3d(
     protected val game: MainGame,
-    private val engine: Engine,
+    protected val engine: Engine,
     protected val viewport: ExtendViewport
 ) : KtxScreen {
-    private val bgColor = "000022".toColor()
+    protected val bgColor = "000022".toColor()
     override fun render(delta: Float) {
         clearScreen(bgColor.r, bgColor.g, bgColor.b)
         engine.update(delta)

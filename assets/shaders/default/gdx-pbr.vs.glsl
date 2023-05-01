@@ -132,9 +132,12 @@ varying vec3 v_normal;
 attribute vec4 a_tangent;
 #endif
 
+
+#ifdef textureFlag
 attribute vec2 a_texCoord0;
 varying vec2 v_texCoord0;
 uniform mat3 u_texCoord0Transform;
+#endif // textureFlag
 
 #ifdef textureCoord1Flag
 attribute vec2 a_texCoord1;
@@ -401,6 +404,5 @@ void main() {
 			v_normal = normalize(vec3(u_normalMatrix * normal.xyz));
 		#endif
 	#endif // normalFlag
-	v_texCoord0 = a_texCoord0;
-	gl_Position = u_projViewTrans * u_worldTrans * vec4(a_position, 1.0);
+	
 }
