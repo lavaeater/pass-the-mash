@@ -22,6 +22,7 @@ import ktx.log.info
 import ktx.math.vec3
 import mash.core.getBoxShape
 import mash.core.loadModel
+import mash.shaders.ToonShaderFlag
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRFlagAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
@@ -83,7 +84,7 @@ class GirlSceneLoader : SceneLoader() {
         }
 
         girlAsset.scene.model.materials.forEach {
-            it.set(PBRFlagAttribute(PBRFlagAttribute.Unlit))
+            it.set(ToonShaderFlag(ToonShaderFlag.ToonShaderFlag))
         }
 
         girlAsset.animations.first().id = "walking"

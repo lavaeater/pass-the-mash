@@ -22,6 +22,7 @@ import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.BulletGhostObjectControlSystem
 import mash.factories.GirlSceneLoader
+import mash.shaders.CustomShaderProvider
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider
@@ -94,14 +95,14 @@ object Context : InjectionContext() {
         config.numDirectionalLights = 1
         config.numPointLights = 5
 
-        config.fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
-        config.vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
+//        config.fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
+//        config.vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
 
 
         val depthConfig = PBRShaderProvider.createDefaultDepthConfig()
         depthConfig.numBones = 60
 
-        val sceneManager = SceneManager(PBRShaderProvider(config), PBRDepthShaderProvider(depthConfig)).apply {
+        val sceneManager = SceneManager(CustomShaderProvider(config), PBRDepthShaderProvider(depthConfig)).apply {
             setCamera(inject<OrthographicCamera>())
         }
         sceneManager.environment.apply {

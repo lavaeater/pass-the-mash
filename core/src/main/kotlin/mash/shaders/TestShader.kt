@@ -1,28 +1,40 @@
 package mash.shaders
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.Shader
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.assets.toInternalFile
 
 
-class TestShader : Shader {
-    private lateinit var context: RenderContext
-    private lateinit var camera: Camera
-    private lateinit var program: ShaderProgram
-    override fun dispose() {
-        program.dispose()
-    }
+class TestShader(
+    renderable: Renderable,
+    config: Config,
+    vertPath: String,
+    fragPath: String
+) : DefaultShader(
+    renderable,
+    config,
+    createPrefix(
+        renderable,
+        config
+    ),
+    vertPath
+        .toInternalFile()
+        .readString(),
+    fragPath
+        .toInternalFile()
+        .readString()
+) {
 
     override fun init() {
 
-        val vert = "data/test.vertext.glsl".toInternalFile().readString()
-        val frag = "data/test.fragment.glsl".toInternalFile().readString()
+        val vert = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
+        val frag = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
         program = ShaderProgram(vert, frag)
         if (!program.isCompiled) throw GdxRuntimeException(program.log)
     }
