@@ -15,8 +15,16 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
         return super.createShader(renderable)
     }
 
-    private fun createToonShader(config: DefaultShader.Config, renderable: Renderable): Shader {
-        return TestShader()
+    private fun createToonShader(
+        config: DefaultShader.Config,
+        renderable: Renderable
+    ): Shader {
+        return TestShader(
+            renderable,
+            config,
+            "shaders/modified_default/gdx-pbr.vs.glsl",
+            "shaders/modified_default/gdx-pbr.fs.glsl"
+        )
     }
 }
 

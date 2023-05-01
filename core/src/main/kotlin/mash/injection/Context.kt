@@ -92,12 +92,6 @@ object Context : InjectionContext() {
 
         val config = PBRShaderProvider.createDefaultConfig()
         config.numBones = 60
-        config.numDirectionalLights = 1
-        config.numPointLights = 5
-
-//        config.fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
-//        config.vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
-
 
         val depthConfig = PBRShaderProvider.createDefaultDepthConfig()
         depthConfig.numBones = 60
