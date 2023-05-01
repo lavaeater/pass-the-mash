@@ -86,8 +86,8 @@ object Context : InjectionContext() {
         config.numBones = 60
         config.numDirectionalLights = 1
         config.numPointLights = 5
-//        config.fragmentShader = "shaders/test.fragment.glsl".toInternalFile().readString()
-//        config.vertexShader = "shaders/test.vertex.glsl".toInternalFile().readString()
+        config.fragmentShader = "shaders/test.fragment.glsl".toInternalFile().readString()
+        config.vertexShader = "shaders/test.vertex.glsl".toInternalFile().readString()
 
 //        config.fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
 //        config.vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
