@@ -23,10 +23,10 @@ import ktx.math.vec3
 import mash.core.getBoxShape
 import mash.core.loadModel
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
+import net.mgsx.gltf.scene3d.attributes.PBRFlagAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
-import net.mgsx.gltf.scene3d.scene.SceneAsset
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
@@ -80,6 +80,10 @@ class GirlSceneLoader : SceneLoader() {
 
         girlAsset.scene.model.nodes.forEach {
             printNode(it)
+        }
+
+        girlAsset.scene.model.materials.forEach {
+            it.set(PBRFlagAttribute(PBRFlagAttribute.Unlit))
         }
 
         girlAsset.animations.first().id = "walking"
