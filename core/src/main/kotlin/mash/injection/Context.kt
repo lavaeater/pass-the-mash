@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 import com.badlogic.gdx.physics.bullet.softbody.btSoftRigidDynamicsWorld
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import ktx.assets.disposeSafely
+import ktx.assets.toInternalFile
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
@@ -85,6 +86,12 @@ object Context : InjectionContext() {
         config.numBones = 60
         config.numDirectionalLights = 1
         config.numPointLights = 5
+//        config.fragmentShader = "shaders/test.fragment.glsl".toInternalFile().readString()
+//        config.vertexShader = "shaders/test.vertex.glsl".toInternalFile().readString()
+
+//        config.fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
+//        config.vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
+
 
         val depthConfig = PBRShaderProvider.createDefaultDepthConfig()
         depthConfig.numBones = 60
