@@ -1,20 +1,18 @@
 package mash.shaders
 
-import com.badlogic.gdx.graphics.g3d.Attribute
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 
-class ToonShaderFlag(type: Long) : Attribute(type) {
 
-    override fun copy(): Attribute {
-        return ToonShaderFlag(type)
-    }
-
-    override fun compareTo(other: Attribute): Int {
-        return (type - other.type).toInt()
-    }
+class CustomColorTypes : ColorAttribute(0) {
 
     companion object {
-        val ToonShaderFlagAlias = "toonshaderflag"
-        val ToonShaderFlag = register(ToonShaderFlagAlias)
-    }
+        const val ToonColorAlias = "ToonColor" // step 1: name the type
+        val ToonColor: Long = register(ToonColorAlias) // step 2: register the type
 
+        init {
+            Mask = Mask or ToonColor // step 3: Make ColorAttribute accept the type
+        }
+    }
 }
+
+

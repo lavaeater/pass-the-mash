@@ -9,7 +9,7 @@ import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider
 class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) {
 
     override fun createShader(renderable: Renderable): Shader {
-        if (renderable.material.has(ToonShaderFlag.ToonShaderFlag)) {
+        if (renderable.material.has(CustomColorTypes.ToonColor)) {
             return createToonShader(config, renderable)
         }
         return super.createShader(renderable)

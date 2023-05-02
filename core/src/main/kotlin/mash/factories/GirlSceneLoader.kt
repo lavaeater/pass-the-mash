@@ -2,8 +2,11 @@ package mash.factories
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Model
+import com.badlogic.gdx.graphics.g3d.Renderable
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
@@ -14,6 +17,8 @@ import com.badlogic.gdx.physics.bullet.collision.btGhostObject
 import com.badlogic.gdx.physics.bullet.collision.btShapeHull
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
+import com.badlogic.gdx.utils.Array
+import com.badlogic.gdx.utils.FlushablePool
 import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.assets.disposeSafely
@@ -22,9 +27,8 @@ import ktx.log.info
 import ktx.math.vec3
 import mash.core.getBoxShape
 import mash.core.loadModel
-import mash.shaders.ToonShaderFlag
+import mash.shaders.CustomColorTypes
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
-import net.mgsx.gltf.scene3d.attributes.PBRFlagAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
@@ -35,6 +39,23 @@ import threedee.bullet.MotionState
 import threedee.ecs.components.*
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
+
+
+class MyRenderablePool : FlushablePool<Renderable>() {
+    override fun newObject(): Renderable {
+        return Renderable()
+    }
+
+    override fun obtain(): Renderable {
+        val renderable = super.obtain()
+        renderable.environment = null
+        renderable.material = null
+        renderable.meshPart["", null, 0, 0] = 0
+        renderable.shader = null
+        renderable.userData = null
+        return renderable
+    }
+}
 
 
 class GirlSceneLoader : SceneLoader() {
@@ -84,7 +105,7 @@ class GirlSceneLoader : SceneLoader() {
         }
 
         girlAsset.scene.model.materials.forEach {
-            it.set(ToonShaderFlag(ToonShaderFlag.ToonShaderFlag))
+            it.set(ColorAttribute(CustomColorTypes.ToonColor, Color.RED))
         }
 
         girlAsset.animations.first().id = "walking"
