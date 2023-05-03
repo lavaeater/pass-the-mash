@@ -17,7 +17,8 @@ import ktx.math.vec3
 import threedee.ecs.components.*
 import threedee.ecs.systems.plus
 import threedee.general.Direction
-import threedee.general.DirectionControl
+import threedee.general.CharacterControl
+import threedee.general.Modifier
 import twodee.injection.InjectionContext.Companion.inject
 import twodee.input.KeyPress
 import twodee.input.command
@@ -26,17 +27,16 @@ class BulletGhostObjectControlSystem :
     IteratingSystem(
         allOf(
             IsometricCameraFollowComponent::class,
-            KeyboardControlComponent::class,
+            CharacterControlComponent::class,
             SceneComponent::class,
             BulletGhostObject::class
         ).get()
     ),
     KtxInputAdapter {
     private val controlledEntity by lazy { entities.first() }
-    private val controlComponent by lazy { KeyboardControlComponent.get(controlledEntity) }
+    private val controlComponent by lazy { CharacterControlComponent.get(controlledEntity) }
     private val scene by lazy { SceneComponent.get(controlledEntity).scene }
     private val camera by lazy { inject<OrthographicCamera>() }
-    private val characterStateMachineComponent by lazy { CharacterAnimationStateComponent.get(controlledEntity) }
     private val ghostComponent by lazy { BulletGhostObject.get(controlledEntity) }
     private val ghostBody by lazy { ghostComponent.ghostObject }
 
@@ -54,7 +54,12 @@ class BulletGhostObjectControlSystem :
      * Make it sooo
      */
     private val mouseButtonCommandMap = command("Mousebuttons") {
-        setBoth(Input.Buttons.RIGHT, "Start Aiming", {}, {})
+        setBoth(Input.Buttons.RIGHT, "Start Aiming",
+            {
+                controlComponent.remove(Modifier.Aiming)
+            }, {
+                controlComponent.add(Modifier.Aiming)
+            })
     }
 
     private val keyboardControlMap = command("Controoool") {
@@ -63,13 +68,9 @@ class BulletGhostObjectControlSystem :
             "WalkForward",
             {
                 controlComponent.remove(Direction.Forward)
-                if (controlComponent.hasNoDirection) {
-                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
-                }
             },
             {
                 controlComponent.add(Direction.Forward)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.MoveForwards)
             }
         )
         setBoth(
@@ -77,13 +78,9 @@ class BulletGhostObjectControlSystem :
             "Brake",
             {
                 controlComponent.remove(Direction.Reverse)
-                if (controlComponent.hasNoDirection) {
-                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
-                }
             },
             {
                 controlComponent.add(Direction.Reverse)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.MoveBackwards)
             }
         )
         setBoth(
@@ -91,14 +88,9 @@ class BulletGhostObjectControlSystem :
             "Left",
             {
                 controlComponent.remove(Direction.Left)
-                if (controlComponent.hasNoDirection) {
-                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
-                }
             },
             {
                 controlComponent.add(Direction.Left)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.StrafeLeft)
-
             }
         )
         setBoth(
@@ -106,13 +98,9 @@ class BulletGhostObjectControlSystem :
             "Right",
             {
                 controlComponent.remove(Direction.Right)
-                if (controlComponent.hasNoDirection) {
-                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
-                }
             },
             {
                 controlComponent.add(Direction.Right)
-                characterStateMachineComponent.acceptEvent(CharacterEvent.StrafeRight)
             }
         )
         setDown(Input.Keys.UP, "zOom in") {
@@ -146,16 +134,7 @@ class BulletGhostObjectControlSystem :
             camera.update()
         }
         setDown(Input.Keys.CONTROL_LEFT, "Toggle Crawl") {
-            if (characterStateMachineComponent.currentState == CharacterState.LowCrawling) {
-                if (controlComponent.hasNoDirection) {
-                    characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
-                } else {
-                    characterStateMachineComponent.acceptEvent(CharacterEvent.MoveForwards)
-                }
-                characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
-            } else {
-                characterStateMachineComponent.acceptEvent(CharacterEvent.StartCrawling)
-            }
+            controlComponent.toggle(Modifier.Crawling)
         }
     }
 
@@ -168,19 +147,11 @@ class BulletGhostObjectControlSystem :
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return if (button == Input.Buttons.RIGHT) {
-
-            true
-        } else
-            super.touchDown(screenX, screenY, pointer, button)
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        return super.touchDragged(screenX, screenY, pointer)
+        return mouseButtonCommandMap.execute(button, KeyPress.Down)
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return super.touchUp(screenX, screenY, pointer, button)
+        return mouseButtonCommandMap.execute(button, KeyPress.Up)
     }
 
     var mouseScreenPosition = vec3()
@@ -212,12 +183,12 @@ class BulletGhostObjectControlSystem :
 
     private val directionVector = vec3()
 
-    private fun setDirectionVector(directionControl: DirectionControl) {
-        if (directionControl.orthogonal.isEmpty()) {
+    private fun setDirectionVector(characterControl: CharacterControl) {
+        if (characterControl.orthogonal.isEmpty()) {
             directionVector.setZero()
             return
         }
-        directionControl.orthogonal.forEach { directionVector.add(directionToVector[it]!!) }
+        characterControl.orthogonal.forEach { directionVector.add(directionToVector[it]!!) }
         directionVector.nor()
     }
 
@@ -248,7 +219,7 @@ class BulletGhostObjectControlSystem :
         scene.modelInstance.transform.getTranslation(worldPosition)
         ray.set(mousePosition, camera.direction)
 
-        val kc = KeyboardControlComponent.get(entity)
+        val kc = CharacterControlComponent.get(entity)
         kc.lookDirection.set(intersect).sub(worldPosition).nor()
         kc.intersection.set(intersect)
 

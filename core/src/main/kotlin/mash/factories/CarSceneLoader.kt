@@ -115,7 +115,7 @@ class CarSceneLoader(val trackGenerator: TrackGenerator) : SceneLoader() {
             with<BulletVehicleComponent> {
                 bulletVehicle = bv
             }
-            with<KeyboardControlComponent>()
+            with<CharacterControlComponent>()
             with<MotionStateComponent> {
                 val ms = MotionState(carScene.modelInstance.transform)
                 motionState = ms

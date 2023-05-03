@@ -17,17 +17,17 @@ import threedee.general.Rotation
 class EntityControlSystem :
     IteratingSystem(
         allOf(
-            KeyboardControlComponent::class,
+            CharacterControlComponent::class,
             MotionStateComponent::class,
             SceneComponent::class
         ).get()
     ),
     KtxInputAdapter {
-    private val family = allOf(KeyboardControlComponent::class).get()
+    private val family = allOf(CharacterControlComponent::class).get()
 
     private val controlledEntity get() = engine.getEntitiesFor(family).first()
 
-    private val controlComponent get() = KeyboardControlComponent.get(controlledEntity)
+    private val controlComponent get() = CharacterControlComponent.get(controlledEntity)
     private val cameraFollowComponent get() = Camera3dFollowComponent.get(controlledEntity)
 
     private val controlMap = command("Controoool") {

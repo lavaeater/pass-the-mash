@@ -17,7 +17,7 @@ import ktx.math.vec3
 import threedee.ecs.components.*
 import threedee.ecs.systems.inXZPlane
 import threedee.general.Direction
-import threedee.general.DirectionControl
+import threedee.general.CharacterControl
 import twodee.injection.InjectionContext.Companion.inject
 import twodee.input.KeyPress
 import twodee.input.command
@@ -26,14 +26,14 @@ class BulletCharacterControlSystem :
     IteratingSystem(
         allOf(
             IsometricCameraFollowComponent::class,
-            KeyboardControlComponent::class,
+            CharacterControlComponent::class,
             SceneComponent::class,
             BulletRigidBody::class
         ).get()
     ),
     KtxInputAdapter {
     private val controlledEntity by lazy { entities.first() }
-    private val controlComponent by lazy { KeyboardControlComponent.get(controlledEntity) }
+    private val controlComponent by lazy { CharacterControlComponent.get(controlledEntity) }
     private val scene by lazy { SceneComponent.get(controlledEntity).scene }
     private val camera by lazy { inject<OrthographicCamera>() }
     private val characterStateMachineComponent by lazy { CharacterAnimationStateComponent.get(controlledEntity) }
@@ -168,12 +168,12 @@ class BulletCharacterControlSystem :
     )
 
     private val directionVector = vec3()
-    private fun setDirectionVector(directionControl: DirectionControl) {
-        if (directionControl.orthogonal.isEmpty()) {
+    private fun setDirectionVector(characterControl: CharacterControl) {
+        if (characterControl.orthogonal.isEmpty()) {
             directionVector.setZero()
             return
         }
-        directionControl.orthogonal.forEach { directionVector.add(directionToVector[it]!!) }
+        characterControl.orthogonal.forEach { directionVector.add(directionToVector[it]!!) }
         directionVector.nor()
     }
 

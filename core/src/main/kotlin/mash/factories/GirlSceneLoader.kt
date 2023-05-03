@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.Renderable
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
@@ -28,13 +27,11 @@ import mash.core.getBoxShape
 import mash.core.loadModel
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
-import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
-import net.mgsx.gltf.scene3d.shaders.PBRCommon
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
 import threedee.bullet.MotionState
 import threedee.ecs.components.*
@@ -161,15 +158,15 @@ class GirlSceneLoader : SceneLoader() {
                 scene = characterScene
                 sceneManager.addScene(characterScene)
             }
-            with<CharacterAnimationStateComponent> {
-                stateMachine = CharacterStateMachine(characterScene.animationController)
+            with<CharacterAnimationComponent> {
+                characterAnimationState = CharacterAnimationState(characterScene.animationController)
             }
             with<BulletGhostObject> {
                 ghostObject = characterBody
             }
             with<Player>()
             with<IsometricCameraFollowComponent>()
-            with<KeyboardControlComponent>()
+            with<CharacterControlComponent>()
         }
     }
 
@@ -196,7 +193,7 @@ class GirlSceneLoader : SceneLoader() {
             }
             with<Player>()
             with<IsometricCameraFollowComponent>()
-            with<KeyboardControlComponent>()
+            with<CharacterControlComponent>()
             with<MotionStateComponent> {
                 this.motionState = motionState
                 characterBody.motionState = motionState

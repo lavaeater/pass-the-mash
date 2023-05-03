@@ -11,7 +11,7 @@ import ktx.app.KtxInputAdapter
 import ktx.ashley.allOf
 import threedee.ecs.components.BulletVehicleComponent
 import threedee.ecs.components.Camera3dFollowComponent
-import threedee.ecs.components.KeyboardControlComponent
+import threedee.ecs.components.CharacterControlComponent
 import threedee.general.Direction
 import threedee.general.Rotation
 
@@ -19,16 +19,16 @@ import threedee.general.Rotation
 class VehicleControlSystem :
     IteratingSystem(
         allOf(
-            KeyboardControlComponent::class,
+            CharacterControlComponent::class,
             BulletVehicleComponent::class
         ).get()
     ),
     KtxInputAdapter {
-    private val family = allOf(KeyboardControlComponent::class).get()
+    private val family = allOf(CharacterControlComponent::class).get()
 
     private val controlledEntity get() = engine.getEntitiesFor(family).first()
 
-    private val controlComponent get() = KeyboardControlComponent.get(controlledEntity)
+    private val controlComponent get() = CharacterControlComponent.get(controlledEntity)
     private val cameraFollowComponent get() = Camera3dFollowComponent.get(controlledEntity)
 
     private val controlMap = command("Controoool") {

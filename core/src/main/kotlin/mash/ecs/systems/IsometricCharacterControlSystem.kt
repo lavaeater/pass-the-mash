@@ -12,11 +12,11 @@ import ktx.log.info
 import ktx.math.vec3
 import threedee.ecs.components.Animation3dComponent
 import threedee.ecs.components.IsometricCameraFollowComponent
-import threedee.ecs.components.KeyboardControlComponent
+import threedee.ecs.components.CharacterControlComponent
 import threedee.ecs.components.SceneComponent
 import threedee.ecs.systems.plus
 import threedee.general.Direction
-import threedee.general.DirectionControl
+import threedee.general.CharacterControl
 import twodee.injection.InjectionContext.Companion.inject
 import twodee.input.KeyPress
 import twodee.input.command
@@ -25,13 +25,13 @@ class IsometricCharacterControlSystem :
     IteratingSystem(
         allOf(
             IsometricCameraFollowComponent::class,
-            KeyboardControlComponent::class,
+            CharacterControlComponent::class,
             SceneComponent::class
         ).get()
     ),
     KtxInputAdapter {
     private val controlledEntity by lazy { entities.first() }
-    private val controlComponent by lazy { KeyboardControlComponent.get(controlledEntity) }
+    private val controlComponent by lazy { CharacterControlComponent.get(controlledEntity) }
     private val scene by lazy { SceneComponent.get(controlledEntity).scene }
     private val camera by lazy { inject<OrthographicCamera>() }
     private val animationController by lazy { Animation3dComponent.get(controlledEntity).animationController }
@@ -156,12 +156,12 @@ class IsometricCharacterControlSystem :
     )
 
     private val directionVector = vec3()
-    private fun setDirectionVector(directionControl: DirectionControl) {
-        if (directionControl.orthogonal.isEmpty()) {
+    private fun setDirectionVector(characterControl: CharacterControl) {
+        if (characterControl.orthogonal.isEmpty()) {
             directionVector.setZero()
             return
         }
-        directionControl.orthogonal.forEach { directionVector.add(directionToVector[it]!!) }
+        characterControl.orthogonal.forEach { directionVector.add(directionToVector[it]!!) }
         directionVector.nor()
     }
 
@@ -170,7 +170,7 @@ class IsometricCharacterControlSystem :
     val rotationDirection = Vector3.X
     override fun processEntity(entity: Entity, deltaTime: Float) {
         scene.modelInstance.transform.getTranslation(worldPosition)
-        setDirectionVector(controlComponent.directionControl)
+        setDirectionVector(controlComponent.characterControl)
         worldPosition.lerp((worldPosition + directionVector), 0.1f)
         scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
         rotationDirection.lerp(directionVector, 0.2f)
