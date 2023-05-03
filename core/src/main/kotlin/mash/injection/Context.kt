@@ -5,7 +5,9 @@ import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
+import com.badlogic.gdx.graphics.g3d.shaders.DepthShader
 import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider
+import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
@@ -96,9 +98,42 @@ object Context : InjectionContext() {
         val depthConfig = PBRShaderProvider.createDefaultDepthConfig()
         depthConfig.numBones = 60
 
-        val sceneManager = SceneManager(CustomShaderProvider(config), PBRDepthShaderProvider(depthConfig)).apply {
-            setCamera(inject<OrthographicCamera>())
-        }
+//        val sceneManager =
+//            SceneManager(
+//                PBRShaderProvider(config),
+//                PBRDepthShaderProvider(depthConfig)
+//            ).apply {
+//                setCamera(inject<OrthographicCamera>())
+//            }
+
+        val sceneManager =
+            SceneManager(
+                CustomShaderProvider(config),
+                PBRDepthShaderProvider(depthConfig)
+            ).apply {
+                setCamera(inject<OrthographicCamera>())
+            }
+
+
+//        val sceneManager =
+//            SceneManager(
+//                DefaultShaderProvider(
+//                    DefaultShader
+//                        .Config()
+//                        .apply {
+//                            numBones = 60
+//                        }
+//                ),
+//                DepthShaderProvider(
+//                    DepthShader
+//                        .Config()
+//                        .apply {
+//                            numBones = 60
+//                        }
+//                )
+//            ).apply {
+//                setCamera(inject<OrthographicCamera>())
+//            }
         sceneManager.environment.apply {
             return sceneManager
         }

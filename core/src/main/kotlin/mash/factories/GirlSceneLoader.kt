@@ -26,12 +26,15 @@ import ktx.log.info
 import ktx.math.vec3
 import mash.core.getBoxShape
 import mash.core.loadModel
+import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
+import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
+import net.mgsx.gltf.scene3d.shaders.PBRCommon
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
 import threedee.bullet.MotionState
 import threedee.ecs.components.*
@@ -102,9 +105,10 @@ class GirlSceneLoader : SceneLoader() {
             printNode(it)
         }
 
-//        girlAsset.scene.model.materials.forEach {
-//            it.set(ColorAttribute.createFog(Color.BLACK))
-//        }
+        girlAsset.scene.model.materials.forEach {
+            it.set(PBRColorAttribute.createFog(Color.GREEN))
+//            it.remove(PBRFloatAttribute.Metallic or PBRFloatAttribute.Roughness)
+        }
 
         girlAsset.animations.first().id = "walking"
 
@@ -123,6 +127,7 @@ class GirlSceneLoader : SceneLoader() {
 
         val girlScene = Scene(girlAsset.scene)
             .apply {
+//                this.modelInstance.userData = 1
                 this.modelInstance.transform.setToWorld(
                     vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
                 )

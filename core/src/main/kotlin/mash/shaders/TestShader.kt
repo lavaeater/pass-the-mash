@@ -8,26 +8,16 @@ import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import ktx.assets.toInternalFile
+import net.mgsx.gltf.scene3d.shaders.PBRShader
 
 
 class TestShader(
     renderable: Renderable,
     config: Config,
-    vertPath: String,
-    fragPath: String
-) : DefaultShader(
+    prefix: String
+) : PBRShader(
     renderable,
-    config,
-    createPrefix(
-        renderable,
-        config
-    ),
-    vertPath
-        .toInternalFile()
-        .readString(),
-    fragPath
-        .toInternalFile()
-        .readString()
+    config,prefix
 ) {
     override fun equals(other: Any?): Boolean {
         return super.equals(other)
