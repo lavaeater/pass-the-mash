@@ -40,13 +40,30 @@ class BulletGhostObjectControlSystem :
     private val ghostComponent by lazy { BulletGhostObject.get(controlledEntity) }
     private val ghostBody by lazy { ghostComponent.ghostObject }
 
-    private val controlMap = command("Controoool") {
+    /**
+     * This exemplifies the complexities of the animation state.
+     *
+     * It should really be more like a set of stuff that the character
+     * HAS that in turn tell us what animation to play.
+     *
+     * Like, it has the "crouch" modifier, the we walk in some direction, but
+     * crouched.
+     *
+     * It has "aim" modifier, well, then it moves and crouces at the same time.
+     *
+     * Make it sooo
+     */
+    private val mouseButtonCommandMap = command("Mousebuttons") {
+        setBoth(Input.Buttons.RIGHT, "Start Aiming", {}, {})
+    }
+
+    private val keyboardControlMap = command("Controoool") {
         setBoth(
             Input.Keys.W,
             "WalkForward",
             {
                 controlComponent.remove(Direction.Forward)
-                if(controlComponent.hasNoDirection) {
+                if (controlComponent.hasNoDirection) {
                     characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
                 }
             },
@@ -60,7 +77,7 @@ class BulletGhostObjectControlSystem :
             "Brake",
             {
                 controlComponent.remove(Direction.Reverse)
-                if(controlComponent.hasNoDirection) {
+                if (controlComponent.hasNoDirection) {
                     characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
                 }
             },
@@ -74,7 +91,7 @@ class BulletGhostObjectControlSystem :
             "Left",
             {
                 controlComponent.remove(Direction.Left)
-                if(controlComponent.hasNoDirection) {
+                if (controlComponent.hasNoDirection) {
                     characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
                 }
             },
@@ -89,7 +106,7 @@ class BulletGhostObjectControlSystem :
             "Right",
             {
                 controlComponent.remove(Direction.Right)
-                if(controlComponent.hasNoDirection) {
+                if (controlComponent.hasNoDirection) {
                     characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
                 }
             },
@@ -130,7 +147,7 @@ class BulletGhostObjectControlSystem :
         }
         setDown(Input.Keys.CONTROL_LEFT, "Toggle Crawl") {
             if (characterStateMachineComponent.currentState == CharacterState.LowCrawling) {
-                if(controlComponent.hasNoDirection) {
+                if (controlComponent.hasNoDirection) {
                     characterStateMachineComponent.acceptEvent(CharacterEvent.Stop)
                 } else {
                     characterStateMachineComponent.acceptEvent(CharacterEvent.MoveForwards)
@@ -143,11 +160,27 @@ class BulletGhostObjectControlSystem :
     }
 
     override fun keyDown(keycode: Int): Boolean {
-        return controlMap.execute(keycode, KeyPress.Down)
+        return keyboardControlMap.execute(keycode, KeyPress.Down)
     }
 
     override fun keyUp(keycode: Int): Boolean {
-        return controlMap.execute(keycode, KeyPress.Up)
+        return keyboardControlMap.execute(keycode, KeyPress.Up)
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return if (button == Input.Buttons.RIGHT) {
+
+            true
+        } else
+            super.touchDown(screenX, screenY, pointer, button)
+    }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+        return super.touchDragged(screenX, screenY, pointer)
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        return super.touchUp(screenX, screenY, pointer, button)
     }
 
     var mouseScreenPosition = vec3()
