@@ -171,7 +171,7 @@ object Context : InjectionContext() {
                     inject(),
                 )
             )
-//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }
 }

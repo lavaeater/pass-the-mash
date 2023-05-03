@@ -131,7 +131,7 @@ class GirlSceneLoader : SceneLoader() {
             }
 
         val boundingBox = girlScene.modelInstance.calculateBoundingBox(BoundingBox()) //BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
-        boundingBox.mul(girlScene.modelInstance.transform)
+        boundingBox.mul(Matrix4().scl(0.5f,1f,1f))
         boundingBox.update()
         val girlShape = btCompoundShape().apply {
             val transform = Matrix4()
