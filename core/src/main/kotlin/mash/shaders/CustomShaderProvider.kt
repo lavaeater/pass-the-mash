@@ -143,32 +143,32 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
         // multi UVs
         var maxUVIndex = -1
 
-            var attribute = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Diffuse)
-            if (attribute != null) {
-                prefix += "#define v_diffuseUV v_texCoord" + attribute.uvIndex + "\n"
-                maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
-            }
-            attribute = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Emissive)
-            if (attribute != null) {
-                prefix += "#define v_emissiveUV v_texCoord" + attribute.uvIndex + "\n"
-                maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
-            }
-            attribute = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Normal)
-            if (attribute != null) {
-                prefix += "#define v_normalUV v_texCoord" + attribute.uvIndex + "\n"
-                maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
-            }
-            attribute =
-                renderable.material.get(TextureAttribute::class.java, PBRTextureAttribute.MetallicRoughnessTexture)
-            if (attribute != null) {
-                prefix += "#define v_metallicRoughnessUV v_texCoord" + attribute.uvIndex + "\n"
-                maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
-            }
-            attribute = renderable.material.get(TextureAttribute::class.java, PBRTextureAttribute.OcclusionTexture)
-            if (attribute != null) {
-                prefix += "#define v_occlusionUV v_texCoord" + attribute.uvIndex + "\n"
-                maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
-            }
+        var attribute = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Diffuse)
+        if (attribute != null) {
+            prefix += "#define v_diffuseUV v_texCoord" + attribute.uvIndex + "\n"
+            maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
+        }
+        attribute = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Emissive)
+        if (attribute != null) {
+            prefix += "#define v_emissiveUV v_texCoord" + attribute.uvIndex + "\n"
+            maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
+        }
+        attribute = renderable.material.get(TextureAttribute::class.java, TextureAttribute.Normal)
+        if (attribute != null) {
+            prefix += "#define v_normalUV v_texCoord" + attribute.uvIndex + "\n"
+            maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
+        }
+        attribute =
+            renderable.material.get(TextureAttribute::class.java, PBRTextureAttribute.MetallicRoughnessTexture)
+        if (attribute != null) {
+            prefix += "#define v_metallicRoughnessUV v_texCoord" + attribute.uvIndex + "\n"
+            maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
+        }
+        attribute = renderable.material.get(TextureAttribute::class.java, PBRTextureAttribute.OcclusionTexture)
+        if (attribute != null) {
+            prefix += "#define v_occlusionUV v_texCoord" + attribute.uvIndex + "\n"
+            maxUVIndex = Math.max(maxUVIndex, attribute.uvIndex)
+        }
 
         if (maxUVIndex >= 0) {
             prefix += "#define textureFlag\n"
@@ -276,7 +276,8 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
         return TestShader(
             renderable,
             toonShaderConfig,
-            createPrefix(renderable, toonShaderConfig))
+            createPrefix(renderable, toonShaderConfig)
+        )
 
 //        return DefaultShader(renderable, config, DefaultShader.createPrefix(renderable, defaultShaderProviderConfig))
 
