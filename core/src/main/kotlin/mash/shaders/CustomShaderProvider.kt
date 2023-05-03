@@ -266,8 +266,8 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
 
     private val toonShaderConfig = PBRShaderConfig().apply {
         numBones = 60
-        vertexShader = "shaders/default/gdx-pbr.vs.glsl".toInternalFile().readString()
-        fragmentShader = "shaders/default/gdx-pbr.fs.glsl".toInternalFile().readString()
+        vertexShader = "shaders/modified_default/gdx-pbr.vs.glsl".toInternalFile().readString()
+        fragmentShader = "shaders/modified_default/gdx-pbr.fs.glsl".toInternalFile().readString()
     }
 
     private fun createToonShader(
