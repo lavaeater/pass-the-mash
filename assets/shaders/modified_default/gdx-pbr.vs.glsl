@@ -229,6 +229,15 @@ varying vec3 v_shadowMapUv;
 #endif //shadowMapFlag
 
 void main() {
+
+	#ifdef textureFlag
+		v_texCoord0 = (u_texCoord0Transform * vec3(a_texCoord0, 1.0)).xy;
+	#endif
+
+	#ifdef textureCoord1Flag
+		v_texCoord1 = (u_texCoord1Transform * vec3(a_texCoord1, 1.0)).xy;
+	#endif
+
 	#if defined(colorFlag)
 		v_color = a_color;
 	#endif // colorFlag

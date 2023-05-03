@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.assets.toInternalFile
 import net.mgsx.gltf.scene3d.attributes.*
 import net.mgsx.gltf.scene3d.shaders.PBRCommon
-import net.mgsx.gltf.scene3d.shaders.PBRShader
 import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider
 import net.mgsx.gltf.scene3d.utils.LightUtils
@@ -27,7 +26,6 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
     }
 
     val defaultShaderProvider = DefaultShaderProvider(defaultShaderProviderConfig)
-
 
     fun useToonShader(renderable: Renderable): Boolean {
         return (
@@ -180,16 +178,9 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
         }
 
         // Fog
-
-
-        // Fog
         if (renderable.environment != null && renderable.environment.has(FogAttribute.FogEquation)) {
             prefix += "#define fogEquationFlag\n"
         }
-
-
-        // colors
-
 
         // colors
         for (attribute in renderable.meshPart.mesh.vertexAttributes) {
@@ -198,10 +189,6 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
             }
         }
 
-        //
-
-
-        //
         var numBoneInfluence = 0
         var numMorphTarget = 0
         var numColor = 0
@@ -217,7 +204,6 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
                 numBoneInfluence = Math.max(numBoneInfluence, attribute.unit + 1)
             }
         }
-
 
         PBRCommon.checkVertexAttributes(renderable)
 
@@ -278,17 +264,6 @@ class CustomShaderProvider(config: PBRShaderConfig) : PBRShaderProvider(config) 
             toonShaderConfig,
             createPrefix(renderable, toonShaderConfig)
         )
-
-//        return DefaultShader(renderable, config, DefaultShader.createPrefix(renderable, defaultShaderProviderConfig))
-
-//
-//        return DefaultShader(renderable, config)
-//        return TestShader(
-//            renderable,
-//            config,
-//            "shaders/default/gdx-pbr.vs.glsl",
-//            "shaders/default/gdx-pbr.fs.glsl"
-//        )
     }
 
     companion object {
