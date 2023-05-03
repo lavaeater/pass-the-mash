@@ -17,7 +17,6 @@ import com.badlogic.gdx.physics.bullet.collision.btGhostObject
 import com.badlogic.gdx.physics.bullet.collision.btShapeHull
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
-import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.FlushablePool
 import ktx.ashley.entity
 import ktx.ashley.with
@@ -27,7 +26,6 @@ import ktx.log.info
 import ktx.math.vec3
 import mash.core.getBoxShape
 import mash.core.loadModel
-import mash.shaders.CustomColorTypes
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
@@ -104,9 +102,9 @@ class GirlSceneLoader : SceneLoader() {
             printNode(it)
         }
 
-        girlAsset.scene.model.materials.forEach {
-            it.set(ColorAttribute(CustomColorTypes.ToonColor, Color.RED))
-        }
+//        girlAsset.scene.model.materials.forEach {
+//            it.set(ColorAttribute.createFog(Color.BLACK))
+//        }
 
         girlAsset.animations.first().id = "walking"
 
