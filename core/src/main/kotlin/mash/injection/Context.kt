@@ -150,9 +150,11 @@ object Context : InjectionContext() {
 
         val config = PBRShaderProvider.createDefaultConfig()
         config.numBones = 60
+        config.numSpotLights = 4
 
         val depthConfig = PBRShaderProvider.createDefaultDepthConfig()
         depthConfig.numBones = 60
+        depthConfig.numSpotLights = 4
 
         val sceneManager =
             SceneManager(
@@ -195,6 +197,7 @@ object Context : InjectionContext() {
             addSystem(KinematicObjectControlSystem())
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
+            addSystem(UpdateSpotLightSystem())
             addSystem(Animation3dSystem())
             addSystem(
                 RenderSystem3d(

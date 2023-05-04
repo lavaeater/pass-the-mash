@@ -41,21 +41,23 @@ object BulletStuffCreator {
 //                setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge)
             }
             material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture).apply {
-//                this.rotationUV = 0f
                 this.scaleU = uScale
                 this.scaleV = vScale
                 textureDescription.uWrap = Texture.TextureWrap.Repeat
                 textureDescription.vWrap = Texture.TextureWrap.Repeat
             })
-//            material.set(PBRTextureAttribute.createNormalTexture(normalTexture).apply {
-//                this.rotationUV = 90f
-//                textureDescription.uWrap = Texture.TextureWrap.ClampToEdge
-//                textureDescription.vWrap = Texture.TextureWrap.ClampToEdge
-//            })
-//            material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture).apply {
-//                textureDescription.uWrap = Texture.TextureWrap.ClampToEdge
-//                textureDescription.vWrap = Texture.TextureWrap.ClampToEdge
-//            })
+            material.set(PBRTextureAttribute.createNormalTexture(normalTexture).apply {
+                this.scaleU = uScale
+                this.scaleV = vScale
+                textureDescription.uWrap = Texture.TextureWrap.Repeat
+                textureDescription.vWrap = Texture.TextureWrap.Repeat
+            })
+            material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture).apply {
+                this.scaleU = uScale
+                this.scaleV = vScale
+                textureDescription.uWrap = Texture.TextureWrap.Repeat
+                textureDescription.vWrap = Texture.TextureWrap.Repeat
+            })
             materials[name] = material
         }
         return materials[name]!!
@@ -72,7 +74,7 @@ object BulletStuffCreator {
         mask: Int
     ) {
         val widthHeightFactor = width / height
-        val material = createMaterial("space-cruiser-panels2", "png", 4f, 4f / widthHeightFactor)
+        val material = createMaterial("space-cruiser-panels2", "png", 1f, 1f / widthHeightFactor)
         createBox(
             "wall",
             material,
@@ -132,8 +134,8 @@ object BulletStuffCreator {
         mb.begin()
         val attributes = VertexAttributes(
             VertexAttribute.Position(),
-//            VertexAttribute.Normal(),
-//            VertexAttribute(Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
+            VertexAttribute.Normal(),
+            VertexAttribute(Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
             VertexAttribute.TexCoords(0)
         )
         val mpb = mb.part(
@@ -147,7 +149,7 @@ object BulletStuffCreator {
         val box = mb.end()
 
         box.meshes.forEach { mesh ->
-//            MeshTangentSpaceGenerator.computeTangentSpace(mesh, material, true, true)
+            MeshTangentSpaceGenerator.computeTangentSpace(mesh, material, true, true)
         }
         val boxInstance = ModelInstance(box)
         boxInstance.transform.setToWorld(position, Vector3.Z, Vector3.Y)

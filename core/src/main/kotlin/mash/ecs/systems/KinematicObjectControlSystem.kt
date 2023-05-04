@@ -15,6 +15,7 @@ import ktx.log.info
 import ktx.math.times
 import ktx.math.vec3
 import mash.injection.MyContactListener
+import threedee.bullet.MotionState
 import threedee.ecs.components.*
 import threedee.ecs.systems.plus
 import threedee.general.Direction
@@ -216,8 +217,6 @@ class KinematicObjectControlSystem :
     val worldPosition = vec3()
     val rotationVector = Vector3.Z.cpy()
 
-
-
     override fun processEntity(entity: Entity, deltaTime: Float) {
 
         scene.modelInstance.transform.getTranslation(worldPosition)
@@ -233,6 +232,8 @@ class KinematicObjectControlSystem :
         scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
         scene.modelInstance.transform.rotateTowardDirection(kc.lookDirection, Vector3.Y)
 
-        //kinematicBody.worldTransform = scene.modelInstance.transform
+        MotionStateComponent.get(entity).motionState.setWorldTransform(scene.modelInstance.transform)
+
+//        kinematicBody.worldTransform = scene.modelInstance.transform
     }
 }
