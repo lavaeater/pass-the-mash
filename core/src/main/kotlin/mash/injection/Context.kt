@@ -1,15 +1,17 @@
 package mash.injection
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.bullet.Bullet
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
-import com.badlogic.gdx.physics.bullet.softbody.btSoftRigidDynamicsWorld
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.crashinvaders.vfx.VfxManager
 import com.crashinvaders.vfx.effects.CrtEffect
@@ -19,30 +21,177 @@ import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.KinematicObjectControlSystem
 import mash.factories.GirlSceneLoader
-import mash.factories.BulletInstances
 import mash.shaders.CustomShaderProvider
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider
+import threedee.ecs.components.KinematicObject
 import threedee.ecs.systems.*
 import twodee.core.MainGame
 import twodee.ecs.ashley.systems.RemoveEntitySystem
 import twodee.injection.InjectionContext
+import twodee.injection.InjectionContext.Companion.inject
 
-class MyContactListener: ContactListener() {
+class MyContactListener : ContactListener() {
+//    override fun onContactAdded(
+//        cp: btManifoldPoint?,
+//        colObj0Wrap: btCollisionObjectWrapper?,
+//        partId0: Int,
+//        index0: Int,
+//        colObj1Wrap: btCollisionObjectWrapper?,
+//        partId1: Int,
+//        index1: Int
+//    ): Boolean {
+//        return super.onContactAdded(cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1)
+//    }
+
     override fun onContactAdded(
-        userValue0: Int,
+        cp: btManifoldPoint,
+        colObj0: btCollisionObject,
         partId0: Int,
         index0: Int,
-        match0: Boolean,
-        userValue1: Int,
+        colObj1: btCollisionObject,
         partId1: Int,
-        index1: Int,
-        match1: Boolean
+        index1: Int
     ): Boolean {
-        val body0 = BulletInstances.getInstance(index0)
-        val body1 = BulletInstances.getInstance(index1)
-        return true
+        val someTempVector = vec3()
+        return if (colObj0.userData != null || colObj1.userData != null) {
+
+            val userIndex0 = index0
+            val userIndex1 = index1
+
+            val entity0 = colObj0.userData as Entity?
+            val entity1 = colObj1.userData as Entity?
+
+            if(entity0 != null) {
+                val kBody = KinematicObject.get(entity0)
+                cp.getNormalWorldOnB(someTempVector)
+
+                // If the contact normal is pointing in the opposite direction of the kinematic body's velocity, stop the body
+                if (someTempVector.dot(kBody.kinematicBody.linearVelocity) < 0f) {
+                    kBody.kinematicBody.linearVelocity = Vector3.Zero
+                }
+            }
+
+            if(entity1 != null) {
+                val kBody = KinematicObject.get(entity1)
+                cp.getNormalWorldOnB(someTempVector)
+
+                // If the contact normal is pointing in the opposite direction of the kinematic body's velocity, stop the body
+                if (someTempVector.dot(kBody.kinematicBody.linearVelocity) < 0f) {
+                    kBody.kinematicBody.linearVelocity = Vector3.Zero
+                }
+            }
+
+
+            true
+        } else {
+            false
+        }
+    }
+
+    companion object {
+        val instance by lazy { inject<MyContactListener>() }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
+    override fun toString(): String {
+        return super.toString()
+    }
+
+    override fun dispose() {
+        super.dispose()
+    }
+
+    override fun obtain() {
+        super.obtain()
+    }
+
+    override fun release() {
+        super.release()
+    }
+
+    override fun isObtained(): Boolean {
+        return super.isObtained()
+    }
+
+    override fun construct() {
+        super.construct()
+    }
+
+    override fun reset(cPtr: Long, cMemoryOwn: Boolean) {
+        super.reset(cPtr, cMemoryOwn)
+    }
+
+    override fun getCPointer(): Long {
+        return super.getCPointer()
+    }
+
+    override fun takeOwnership() {
+        super.takeOwnership()
+    }
+
+    override fun releaseOwnership() {
+        super.releaseOwnership()
+    }
+
+    override fun hasOwnership(): Boolean {
+        return super.hasOwnership()
+    }
+
+    override fun delete() {
+        super.delete()
+    }
+
+    override fun isDisposed(): Boolean {
+        return super.isDisposed()
+    }
+
+    override fun destroy() {
+        super.destroy()
+    }
+
+    override fun finalize() {
+        super.finalize()
+    }
+
+    override fun swigDirectorDisconnect() {
+        super.swigDirectorDisconnect()
+    }
+
+    override fun swigReleaseOwnership() {
+        super.swigReleaseOwnership()
+    }
+
+    override fun swigTakeOwnership() {
+        super.swigTakeOwnership()
+    }
+
+    override fun enable() {
+        super.enable()
+    }
+
+    override fun disable() {
+        super.disable()
+    }
+
+    override fun enableOnAdded() {
+        super.enableOnAdded()
+    }
+
+    override fun disableOnAdded() {
+        super.disableOnAdded()
+    }
+
+    override fun isOnAddedEnabled(): Boolean {
+        return super.isOnAddedEnabled()
     }
 }
 
@@ -124,14 +273,14 @@ object Context : InjectionContext() {
     }
 
     private fun setupBullet(context: Context) {
+        Bullet.init()
         context.apply {
-            bindSingleton(MyContactListener())
             bindSingleton<btCollisionConfiguration>(btDefaultCollisionConfiguration())
             bindSingleton<btDispatcher>(btCollisionDispatcher(inject()))
             bindSingleton<btBroadphaseInterface>(btDbvtBroadphase())
             bindSingleton<btConstraintSolver>(btSequentialImpulseConstraintSolver())
             bindSingleton<btDynamicsWorld>(
-                btSoftRigidDynamicsWorld(
+                btDiscreteDynamicsWorld(
                     inject(),
                     inject(),
                     inject(),
@@ -139,6 +288,8 @@ object Context : InjectionContext() {
                 ).apply {
                     gravity = vec3(0f, -10f, 0f)
                 })
+            bindSingleton(MyContactListener())
+
         }
     }
 

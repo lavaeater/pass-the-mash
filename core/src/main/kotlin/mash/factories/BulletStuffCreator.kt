@@ -11,15 +11,11 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_STATIC_OBJECT
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
-import com.kotcrab.vis.ui.widget.HorizontalCollapsibleWidget
 import ktx.assets.toInternalFile
-import ktx.math.amid
 import net.mgsx.gltf.loaders.shared.geometry.MeshTangentSpaceGenerator
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.scene.Scene
@@ -129,11 +125,11 @@ object BulletStuffCreator {
 
         val info = btRigidBody.btRigidBodyConstructionInfo(0f, null, btBoxShape, Vector3.Zero)
         val body = btRigidBody(info).apply {
-            collisionFlags = collisionFlags or CF_CUSTOM_MATERIAL_CALLBACK or cFlags
+            collisionFlags = collisionFlags or CF_CUSTOM_MATERIAL_CALLBACK or CF_STATIC_OBJECT
         }
         body.worldTransform = floorInstance.transform
         sceneManager.addScene(Scene(floorInstance))
-        dynamicsWorld.addRigidBody(body)
+        dynamicsWorld.addRigidBody(body, group, mask)
         BulletInstances.addInstance(body)
     }
 

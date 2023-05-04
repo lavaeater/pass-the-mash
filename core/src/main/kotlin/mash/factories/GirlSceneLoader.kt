@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.collision.Collision
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
@@ -37,20 +36,33 @@ import threedee.ecs.components.*
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 
-object CollisionFlags {
-    const val CHARACTER = 1 shl 8
-    const val WALL = 1 shl 9
-    const val FLOOR = 1 shl 10
-    const val ALL = -1
-}
-
 class GirlSceneLoader : SceneLoader() {
     val anims = listOf("idle", "walking-backwards", "lowcrawl", "pistol-walk", "rifle-walk")
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
-        BulletStuffCreator.createTiledFloor(25f, 1f, 25f, vec3(0f, -1f, 0f), sceneManager, dynamicsWorld, CollisionFlags.FLOOR, CollisionFlags.ALL)
-        BulletStuffCreator.createWall(1f, 5f, 25f, vec3(5f, 2f, 5f), sceneManager, dynamicsWorld, CollisionFlags.WALL, CollisionFlags.CHARACTER)
+        BulletStuffCreator
+            .createTiledFloor(
+                25f,
+                1f,
+                25f,
+                vec3(0f, -1f, 0f),
+                sceneManager,
+                dynamicsWorld,
+                CollisionFlags.FLOOR,
+                CollisionFlags.ALL
+            )
+        BulletStuffCreator
+            .createWall(
+                1f,
+                5f,
+                25f,
+                vec3(5f, 2f, 5f),
+                sceneManager,
+                dynamicsWorld,
+                CollisionFlags.WALL,
+                CollisionFlags.ALL
+            )
         loadGirlKinematic(sceneManager, dynamicsWorld)
     }
 
@@ -125,12 +137,12 @@ class GirlSceneLoader : SceneLoader() {
 
         dynamicsWorld.addRigidBody(girlBody.apply {
             this.motionState = motionState
-        }, CollisionFlags.CHARACTER, CollisionFlags.WALL)
+        }, CollisionFlags.CHARACTER, CollisionFlags.ALL)
 
         createCharacterEntityWithKinematicComponent(girlScene, sceneManager, girlBody)
     }
 
-    private fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
+    private fun loadGirlWithGhostBody(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         val girlAsset = "models/girl-walking.glb".loadModel().alsoRegister()
 
         girlAsset.scene.model.nodes.forEach {
@@ -190,25 +202,25 @@ class GirlSceneLoader : SceneLoader() {
         characterBody: btRigidBody
     ) {
         BulletInstances.addEntity(characterBody,
-        engine().entity {
-            with<VisibleComponent>()
-            with<SceneComponent> {
-                scene = characterScene
-                sceneManager.addScene(characterScene)
-            }
-            with<CharacterAnimationComponent> {
-                characterAnimationState = CharacterAnimationState(characterScene.animationController)
-            }
-            with<KinematicObject> {
-                kinematicBody = characterBody
-            }
-            with<MotionStateComponent> {
-                motionState = characterBody.motionState as MotionState
-            }
-            with<Player>()
-            with<IsometricCameraFollowComponent>()
-            with<CharacterControlComponent>()
-        })
+            engine().entity {
+                with<VisibleComponent>()
+                with<SceneComponent> {
+                    scene = characterScene
+                    sceneManager.addScene(characterScene)
+                }
+                with<CharacterAnimationComponent> {
+                    characterAnimationState = CharacterAnimationState(characterScene.animationController)
+                }
+                with<KinematicObject> {
+                    kinematicBody = characterBody
+                }
+                with<MotionStateComponent> {
+                    motionState = characterBody.motionState as MotionState
+                }
+                with<Player>()
+                with<IsometricCameraFollowComponent>()
+                with<CharacterControlComponent>()
+            })
     }
 
     private fun createCharacterEntity(
@@ -248,9 +260,6 @@ class GirlSceneLoader : SceneLoader() {
             }
             with<CharacterAnimationStateComponent> {
                 stateMachine = CharacterStateMachine(characterScene.animationController)
-//                animations = characterAsset.animations
-//                animationController = characterScene.animationController
-//                animationController.setAnimation("walking", -1, 0.75f, null)
             }
             with<BulletRigidBody> {
                 rigidBody = characterBody

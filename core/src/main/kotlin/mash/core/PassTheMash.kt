@@ -25,7 +25,6 @@ class PassTheMash : MainGame() {
 
     override fun create() {
         KtxAsync.initiate()
-        Bullet.init()
         Context.initialize(this)
 
         addScreen(
