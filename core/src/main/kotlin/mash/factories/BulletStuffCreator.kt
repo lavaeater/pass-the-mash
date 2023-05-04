@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.VertexAttribute
 import com.badlogic.gdx.graphics.VertexAttributes
+import com.badlogic.gdx.graphics.VertexAttributes.Usage.*
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
@@ -16,6 +17,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlag
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.assets.toInternalFile
+import net.mgsx.gltf.data.material.GLTFMaterial
 import net.mgsx.gltf.loaders.shared.geometry.MeshTangentSpaceGenerator
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
 import net.mgsx.gltf.scene3d.scene.Scene
@@ -24,16 +26,36 @@ import net.mgsx.gltf.scene3d.scene.SceneManager
 object BulletStuffCreator {
     val materials = mutableMapOf<String, Material>()
 
-    fun createMaterial(name: String, textureFileExtension: String = "png") : Material {
+    fun createMaterial(name: String, textureFileExtension: String = "png", uScale: Float = 1f, vScale:Float = 1f): Material {
         if (!materials.containsKey(name)) {
             val material = Material()
 
-            val diffuseTexture = Texture("textures/$name/${name}_albedo.$textureFileExtension".toInternalFile(), true)
-            val normalTexture = Texture("textures/$name/${name}_normal-ogl.$textureFileExtension".toInternalFile(), true)
-            val mrTexture = Texture("textures/$name/${name}_roughness.$textureFileExtension".toInternalFile(), true)
-            material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture))
-            material.set(PBRTextureAttribute.createNormalTexture(normalTexture))
-            material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture))
+            val diffuseTexture = Texture("textures/$name/${name}_albedo.$textureFileExtension".toInternalFile(), true).apply {
+//                setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge)
+            }
+            val normalTexture =
+                Texture("textures/$name/${name}_normal-ogl.$textureFileExtension".toInternalFile(), true).apply {
+//                    setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge)
+                }
+            val mrTexture = Texture("textures/$name/${name}_roughness.$textureFileExtension".toInternalFile(), true).apply {
+//                setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge)
+            }
+            material.set(PBRTextureAttribute.createBaseColorTexture(diffuseTexture).apply {
+//                this.rotationUV = 0f
+                this.scaleU = uScale
+                this.scaleV = vScale
+                textureDescription.uWrap = Texture.TextureWrap.Repeat
+                textureDescription.vWrap = Texture.TextureWrap.Repeat
+            })
+//            material.set(PBRTextureAttribute.createNormalTexture(normalTexture).apply {
+//                this.rotationUV = 90f
+//                textureDescription.uWrap = Texture.TextureWrap.ClampToEdge
+//                textureDescription.vWrap = Texture.TextureWrap.ClampToEdge
+//            })
+//            material.set(PBRTextureAttribute.createMetallicRoughnessTexture(mrTexture).apply {
+//                textureDescription.uWrap = Texture.TextureWrap.ClampToEdge
+//                textureDescription.vWrap = Texture.TextureWrap.ClampToEdge
+//            })
             materials[name] = material
         }
         return materials[name]!!
@@ -49,7 +71,8 @@ object BulletStuffCreator {
         group: Int,
         mask: Int
     ) {
-        val material = createMaterial("red-bricks", "jpg")
+        val widthHeightFactor = width / height
+        val material = createMaterial("space-cruiser-panels2", "png", 4f, 4f / widthHeightFactor)
         createBox(
             "wall",
             material,
@@ -103,32 +126,38 @@ object BulletStuffCreator {
         sceneManager: SceneManager,
         dynamicsWorld: btDynamicsWorld,
         group: Int,
-        mask: Int) {
+        mask: Int
+    ) {
         val mb = ModelBuilder()
         mb.begin()
         val attributes = VertexAttributes(
             VertexAttribute.Position(),
-            VertexAttribute.Normal(),
-            VertexAttribute(VertexAttributes.Usage.Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
+//            VertexAttribute.Normal(),
+//            VertexAttribute(Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
             VertexAttribute.TexCoords(0)
         )
-        val mpb = mb.part(id, GL20.GL_TRIANGLES, attributes, material)
+        val mpb = mb.part(
+            id,
+            GL20.GL_TRIANGLES,
+            attributes,
+            material
+        )
         BoxShapeBuilder.build(mpb, width, height, depth)
         val btBoxShape = btBoxShape(Vector3(width / 2f, height / 2f, depth / 2f))
-        val floor = mb.end()
+        val box = mb.end()
 
-        floor.meshes.forEach { mesh ->
-            MeshTangentSpaceGenerator.computeTangentSpace(mesh, material, false, true)
+        box.meshes.forEach { mesh ->
+//            MeshTangentSpaceGenerator.computeTangentSpace(mesh, material, true, true)
         }
-        val floorInstance = ModelInstance(floor)
-        floorInstance.transform.setToWorld(position, Vector3.Z, Vector3.Y)
+        val boxInstance = ModelInstance(box)
+        boxInstance.transform.setToWorld(position, Vector3.Z, Vector3.Y)
 
         val info = btRigidBody.btRigidBodyConstructionInfo(0f, null, btBoxShape, Vector3.Zero)
         val body = btRigidBody(info).apply {
             collisionFlags = collisionFlags or CF_CUSTOM_MATERIAL_CALLBACK or CF_STATIC_OBJECT
         }
-        body.worldTransform = floorInstance.transform
-        sceneManager.addScene(Scene(floorInstance))
+        body.worldTransform = boxInstance.transform
+        sceneManager.addScene(Scene(boxInstance))
         dynamicsWorld.addRigidBody(body, group, mask)
         BulletInstances.addInstance(body)
     }

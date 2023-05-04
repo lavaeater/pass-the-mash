@@ -55,8 +55,8 @@ class GirlSceneLoader : SceneLoader() {
         BulletStuffCreator
             .createWall(
                 1f,
-                5f,
-                25f,
+                6f,
+                24f,
                 vec3(5f, 2f, 5f),
                 sceneManager,
                 dynamicsWorld,
