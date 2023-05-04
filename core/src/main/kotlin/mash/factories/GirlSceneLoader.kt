@@ -1,6 +1,5 @@
 package mash.factories
 
-import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Color
@@ -9,7 +8,10 @@ import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
-import com.badlogic.gdx.physics.bullet.collision.*
+import com.badlogic.gdx.physics.bullet.collision.Collision
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
+import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
+import com.badlogic.gdx.physics.bullet.collision.btGhostObject
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.ashley.entity
@@ -33,19 +35,6 @@ import threedee.ecs.components.*
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 
-object Instances {
-    fun addEntity(obj: btCollisionObject, entity: Entity) :Int {
-        val lastIndex = instances.lastIndex
-        obj.userIndex = lastIndex + 1
-        instances.add(entity)
-        return obj.userIndex
-    }
-
-    fun getEntity(index: Int) = instances[index]
-
-    private val instances = mutableListOf<Entity>()
-}
-
 class GirlSceneLoader : SceneLoader() {
     val anims = listOf("idle", "walking-backwards", "lowcrawl", "pistol-walk", "rifle-walk")
 
@@ -58,9 +47,9 @@ class GirlSceneLoader : SceneLoader() {
 
     private fun printNode(node: Node, level: Int = 0) {
         val tabs = (0..level).joinToString("") { " " }
-        info { "$tabs${node.id} ${node.isAnimated} ${node.childCount}"  }
+        info { "$tabs${node.id} ${node.isAnimated} ${node.childCount}" }
 
-        if(node.hasChildren()) {
+        if (node.hasChildren()) {
             info { "${tabs}Children: " }
             node.children.forEach {
                 printNode(it, level + 1)
@@ -102,8 +91,9 @@ class GirlSceneLoader : SceneLoader() {
                 )
             }
 
-        val boundingBox = girlScene.modelInstance.calculateBoundingBox(BoundingBox()) //BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
-        boundingBox.mul(Matrix4().scl(0.5f,1f,1f))
+        val boundingBox =
+            girlScene.modelInstance.calculateBoundingBox(BoundingBox()) //BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
+        boundingBox.mul(Matrix4().scl(0.5f, 1f, 1f))
         boundingBox.update()
         val girlShape = btCompoundShape().apply {
             val transform = Matrix4()
@@ -166,8 +156,9 @@ class GirlSceneLoader : SceneLoader() {
                 )
             }
 
-        val boundingBox = girlScene.modelInstance.calculateBoundingBox(BoundingBox()) //BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
-        boundingBox.mul(Matrix4().scl(0.5f,1f,1f))
+        val boundingBox =
+            girlScene.modelInstance.calculateBoundingBox(BoundingBox()) //BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
+        boundingBox.mul(Matrix4().scl(0.5f, 1f, 1f))
         boundingBox.update()
         val girlShape = btCompoundShape().apply {
             val transform = Matrix4()
@@ -189,6 +180,7 @@ class GirlSceneLoader : SceneLoader() {
         sceneManager: SceneManager,
         characterBody: btRigidBody
     ) {
+        BulletInstances.addEntity(characterBody,
         engine().entity {
             with<VisibleComponent>()
             with<SceneComponent> {
@@ -207,7 +199,7 @@ class GirlSceneLoader : SceneLoader() {
             with<Player>()
             with<IsometricCameraFollowComponent>()
             with<CharacterControlComponent>()
-        }
+        })
     }
 
     private fun createCharacterEntity(

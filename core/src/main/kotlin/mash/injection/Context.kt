@@ -4,10 +4,6 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
-import com.badlogic.gdx.graphics.g3d.shaders.DepthShader
-import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider
-import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
@@ -18,14 +14,12 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.crashinvaders.vfx.VfxManager
 import com.crashinvaders.vfx.effects.CrtEffect
 import ktx.assets.disposeSafely
-import ktx.assets.toInternalFile
 import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
-import mash.ecs.systems.BulletGhostObjectControlSystem
 import mash.ecs.systems.KinematicObjectControlSystem
 import mash.factories.GirlSceneLoader
-import mash.factories.Instances
+import mash.factories.BulletInstances
 import mash.shaders.CustomShaderProvider
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
@@ -46,8 +40,8 @@ class MyContactListener: ContactListener() {
         index1: Int,
         match1: Boolean
     ): Boolean {
-        val entity0 = Instances.getEntity(index0)
-        val entity1 = Instances.getEntity(index1)
+        val body0 = BulletInstances.getInstance(index0)
+        val body1 = BulletInstances.getInstance(index1)
         return true
     }
 }
@@ -144,7 +138,7 @@ object Context : InjectionContext() {
                 ).apply {
                     gravity = vec3(0f, -10f, 0f)
                 })
-
+            bindSingleton(MyContactListener())
         }
     }
 

@@ -123,6 +123,7 @@ object BulletStuffCreator {
         body.worldTransform = floorInstance.transform
         sceneManager.addScene(Scene(floorInstance))
         dynamicsWorld.addRigidBody(body)
+        BulletInstances.addInstance(body)
     }
 
 }
