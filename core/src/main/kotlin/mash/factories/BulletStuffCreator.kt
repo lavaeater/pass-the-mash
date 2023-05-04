@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_STATIC_OBJECT
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
@@ -48,7 +49,9 @@ object BulletStuffCreator {
         depth: Float,
         position: Vector3,
         sceneManager: SceneManager,
-        dynamicsWorld: btDynamicsWorld
+        dynamicsWorld: btDynamicsWorld,
+        group: Int,
+        mask: Int
     ) {
         val material = createMaterial("red-bricks", "jpg")
         createBox(
@@ -60,7 +63,9 @@ object BulletStuffCreator {
             position,
             CF_STATIC_OBJECT,
             sceneManager,
-            dynamicsWorld
+            dynamicsWorld,
+            group,
+            mask
         )
     }
 
@@ -70,7 +75,9 @@ object BulletStuffCreator {
         depth: Float,
         position: Vector3,
         sceneManager: SceneManager,
-        dynamicsWorld: btDynamicsWorld
+        dynamicsWorld: btDynamicsWorld,
+        group: Int,
+        mask: Int
     ) {
 
         val material = createMaterial("shades-tile")
@@ -83,7 +90,9 @@ object BulletStuffCreator {
             position,
             CF_STATIC_OBJECT,
             sceneManager,
-            dynamicsWorld
+            dynamicsWorld,
+            group,
+            mask
         )
     }
 
@@ -96,7 +105,9 @@ object BulletStuffCreator {
         position: Vector3,
         cFlags: Int,
         sceneManager: SceneManager,
-        dynamicsWorld: btDynamicsWorld) {
+        dynamicsWorld: btDynamicsWorld,
+        group: Int,
+        mask: Int) {
         val mb = ModelBuilder()
         mb.begin()
         val attributes = VertexAttributes(
@@ -118,7 +129,7 @@ object BulletStuffCreator {
 
         val info = btRigidBody.btRigidBodyConstructionInfo(0f, null, btBoxShape, Vector3.Zero)
         val body = btRigidBody(info).apply {
-            collisionFlags = collisionFlags or cFlags
+            collisionFlags = collisionFlags or CF_CUSTOM_MATERIAL_CALLBACK or cFlags
         }
         body.worldTransform = floorInstance.transform
         sceneManager.addScene(Scene(floorInstance))

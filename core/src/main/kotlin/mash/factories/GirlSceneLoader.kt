@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
 import com.badlogic.gdx.physics.bullet.collision.btGhostObject
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
@@ -35,13 +37,20 @@ import threedee.ecs.components.*
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 
+object CollisionFlags {
+    const val CHARACTER = 1 shl 8
+    const val WALL = 1 shl 9
+    const val FLOOR = 1 shl 10
+    const val ALL = -1
+}
+
 class GirlSceneLoader : SceneLoader() {
     val anims = listOf("idle", "walking-backwards", "lowcrawl", "pistol-walk", "rifle-walk")
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
-        BulletStuffCreator.createTiledFloor(25f, 1f, 25f, vec3(0f, -1f, 0f), sceneManager, dynamicsWorld)
-        BulletStuffCreator.createWall(1f, 5f, 25f, vec3(5f, 2f, 5f), sceneManager, dynamicsWorld)
+        BulletStuffCreator.createTiledFloor(25f, 1f, 25f, vec3(0f, -1f, 0f), sceneManager, dynamicsWorld, CollisionFlags.FLOOR, CollisionFlags.ALL)
+        BulletStuffCreator.createWall(1f, 5f, 25f, vec3(5f, 2f, 5f), sceneManager, dynamicsWorld, CollisionFlags.WALL, CollisionFlags.CHARACTER)
         loadGirlKinematic(sceneManager, dynamicsWorld)
     }
 
@@ -109,14 +118,14 @@ class GirlSceneLoader : SceneLoader() {
             .apply {
                 activationState = Collision.DISABLE_DEACTIVATION
                 angularFactor = Vector3.Y
-                collisionFlags = collisionFlags or btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT
+                collisionFlags = collisionFlags or CF_KINEMATIC_OBJECT or CF_CUSTOM_MATERIAL_CALLBACK
             }
 
         val motionState = MotionState(girlScene.modelInstance.transform)
 
         dynamicsWorld.addRigidBody(girlBody.apply {
             this.motionState = motionState
-        })
+        }, CollisionFlags.CHARACTER, CollisionFlags.WALL)
 
         createCharacterEntityWithKinematicComponent(girlScene, sceneManager, girlBody)
     }

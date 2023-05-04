@@ -125,6 +125,7 @@ object Context : InjectionContext() {
 
     private fun setupBullet(context: Context) {
         context.apply {
+            bindSingleton(MyContactListener())
             bindSingleton<btCollisionConfiguration>(btDefaultCollisionConfiguration())
             bindSingleton<btDispatcher>(btCollisionDispatcher(inject()))
             bindSingleton<btBroadphaseInterface>(btDbvtBroadphase())
@@ -138,7 +139,6 @@ object Context : InjectionContext() {
                 ).apply {
                     gravity = vec3(0f, -10f, 0f)
                 })
-            bindSingleton(MyContactListener())
         }
     }
 
