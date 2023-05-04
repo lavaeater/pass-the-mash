@@ -118,7 +118,7 @@ object BulletStuffCreator {
 
         val info = btRigidBody.btRigidBodyConstructionInfo(0f, null, btBoxShape, Vector3.Zero)
         val body = btRigidBody(info).apply {
-            collisionFlags = cFlags
+            collisionFlags = collisionFlags or cFlags
         }
         body.worldTransform = floorInstance.transform
         sceneManager.addScene(Scene(floorInstance))

@@ -23,7 +23,9 @@ import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.BulletGhostObjectControlSystem
+import mash.ecs.systems.KinematicObjectControlSystem
 import mash.factories.GirlSceneLoader
+import mash.factories.Instances
 import mash.shaders.CustomShaderProvider
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
@@ -33,6 +35,22 @@ import twodee.core.MainGame
 import twodee.ecs.ashley.systems.RemoveEntitySystem
 import twodee.injection.InjectionContext
 
+class MyContactListener: ContactListener() {
+    override fun onContactAdded(
+        userValue0: Int,
+        partId0: Int,
+        index0: Int,
+        match0: Boolean,
+        userValue1: Int,
+        partId1: Int,
+        index1: Int,
+        match1: Boolean
+    ): Boolean {
+        val entity0 = Instances.getEntity(index0)
+        val entity1 = Instances.getEntity(index1)
+        return true
+    }
+}
 
 object Context : InjectionContext() {
     private val shapeDrawerRegion: TextureRegion by lazy {
@@ -98,14 +116,6 @@ object Context : InjectionContext() {
         val depthConfig = PBRShaderProvider.createDefaultDepthConfig()
         depthConfig.numBones = 60
 
-//        val sceneManager =
-//            SceneManager(
-//                PBRShaderProvider(config),
-//                PBRDepthShaderProvider(depthConfig)
-//            ).apply {
-//                setCamera(inject<OrthographicCamera>())
-//            }
-
         val sceneManager =
             SceneManager(
                 CustomShaderProvider(config),
@@ -114,26 +124,6 @@ object Context : InjectionContext() {
                 setCamera(inject<OrthographicCamera>())
             }
 
-
-//        val sceneManager =
-//            SceneManager(
-//                DefaultShaderProvider(
-//                    DefaultShader
-//                        .Config()
-//                        .apply {
-//                            numBones = 60
-//                        }
-//                ),
-//                DepthShaderProvider(
-//                    DepthShader
-//                        .Config()
-//                        .apply {
-//                            numBones = 60
-//                        }
-//                )
-//            ).apply {
-//                setCamera(inject<OrthographicCamera>())
-//            }
         sceneManager.environment.apply {
             return sceneManager
         }
@@ -162,7 +152,7 @@ object Context : InjectionContext() {
         return PooledEngine().apply {
             addSystem(RemoveEntitySystem())
             addSystem(BulletUpdateSystem(inject()))
-            addSystem(BulletGhostObjectControlSystem())
+            addSystem(KinematicObjectControlSystem())
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(Animation3dSystem())

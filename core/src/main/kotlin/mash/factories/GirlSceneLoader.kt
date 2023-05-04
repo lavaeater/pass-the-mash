@@ -1,22 +1,17 @@
 package mash.factories
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g3d.Model
-import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
-import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
-import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape
-import com.badlogic.gdx.physics.bullet.collision.btGhostObject
-import com.badlogic.gdx.physics.bullet.collision.btShapeHull
+import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
-import com.badlogic.gdx.utils.FlushablePool
 import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.assets.disposeSafely
@@ -38,49 +33,27 @@ import threedee.ecs.components.*
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 
-
-class MyRenderablePool : FlushablePool<Renderable>() {
-    override fun newObject(): Renderable {
-        return Renderable()
+object Instances {
+    fun addEntity(obj: btCollisionObject, entity: Entity) :Int {
+        val lastIndex = instances.lastIndex
+        obj.userIndex = lastIndex + 1
+        instances.add(entity)
+        return obj.userIndex
     }
 
-    override fun obtain(): Renderable {
-        val renderable = super.obtain()
-        renderable.environment = null
-        renderable.material = null
-        renderable.meshPart["", null, 0, 0] = 0
-        renderable.shader = null
-        renderable.userData = null
-        return renderable
-    }
+    fun getEntity(index: Int) = instances[index]
+
+    private val instances = mutableListOf<Entity>()
 }
-
 
 class GirlSceneLoader : SceneLoader() {
     val anims = listOf("idle", "walking-backwards", "lowcrawl", "pistol-walk", "rifle-walk")
-
-    fun createConvexHullShape(model: Model, optimize: Boolean): btConvexHullShape {
-        val mesh = model.meshes[0]
-        val shape = btConvexHullShape(
-            mesh.verticesBuffer, mesh.numVertices,
-            mesh.vertexSize
-        )
-        if (!optimize) return shape
-        // now optimize the shape
-        val hull = btShapeHull(shape)
-        hull.buildHull(shape.margin)
-        val result = btConvexHullShape(hull)
-        // delete the temporary shape
-        shape.dispose()
-        hull.dispose()
-        return result
-    }
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
         BulletStuffCreator.createTiledFloor(25f, 1f, 25f, vec3(0f, -1f, 0f), sceneManager, dynamicsWorld)
         BulletStuffCreator.createWall(1f, 5f, 25f, vec3(5f, 2f, 5f), sceneManager, dynamicsWorld)
-        loadGirl(sceneManager, dynamicsWorld)
+        loadGirlKinematic(sceneManager, dynamicsWorld)
     }
 
     private fun printNode(node: Node, level: Int = 0) {
@@ -93,6 +66,69 @@ class GirlSceneLoader : SceneLoader() {
                 printNode(it, level + 1)
             }
         }
+    }
+
+    private fun loadGirlKinematic(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
+        val girlAsset = "models/girl-walking.glb".loadModel().alsoRegister()
+
+        girlAsset.scene.model.nodes.forEach {
+            printNode(it)
+        }
+
+        girlAsset.scene.model.materials.forEach {
+            it.set(PBRColorAttribute.createFog(Color.GREEN))
+        }
+
+        girlAsset.animations.first().id = "walking"
+
+        val loadedAnims = anims.map {
+            val m = "models/girl-$it.glb".loadModel()
+
+            val s = m.animations.toList()
+            s.forEach { animation ->
+                animation.id = it
+            }
+            s
+        }.flatten().toGdxArray()
+
+        girlAsset.scene.model.animations.addAll(loadedAnims)
+        girlAsset.animations.addAll(loadedAnims)
+
+        val girlScene = Scene(girlAsset.scene)
+            .apply {
+//                this.modelInstance.userData = 1
+                this.modelInstance.transform.setToWorld(
+                    vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
+                )
+            }
+
+        val boundingBox = girlScene.modelInstance.calculateBoundingBox(BoundingBox()) //BoundingBox(vec3(0f,0f,0f), vec3(1f,2.5f,1f))
+        boundingBox.mul(Matrix4().scl(0.5f,1f,1f))
+        boundingBox.update()
+        val girlShape = btCompoundShape().apply {
+            val transform = Matrix4()
+            transform.setTranslation(boundingBox.getCenter(vec3()))
+            addChildShape(transform, boundingBox.getBoxShape())
+        }
+        val inertiaVector = vec3()
+        val mass = 0f
+        girlShape.calculateLocalInertia(mass, inertiaVector)
+
+        val bodyInfo = btRigidBody.btRigidBodyConstructionInfo(mass, null, girlShape, inertiaVector)
+        val girlBody = btRigidBody(bodyInfo)
+            .apply {
+                activationState = Collision.DISABLE_DEACTIVATION
+                angularFactor = Vector3.Y
+                collisionFlags = collisionFlags or btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT
+            }
+
+        val motionState = MotionState(girlScene.modelInstance.transform)
+
+        dynamicsWorld.addRigidBody(girlBody.apply {
+            this.motionState = motionState
+        })
+
+        createCharacterEntityWithKinematicComponent(girlScene, sceneManager, girlBody)
     }
 
     private fun loadGirl(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
@@ -138,6 +174,7 @@ class GirlSceneLoader : SceneLoader() {
             transform.setTranslation(boundingBox.getCenter(vec3()))
             addChildShape(transform, boundingBox.getBoxShape())
         }
+
         val girlBody = btGhostObject().apply {
             collisionShape = girlShape
         }
@@ -145,6 +182,32 @@ class GirlSceneLoader : SceneLoader() {
         dynamicsWorld.addCollisionObject(girlBody)
 
         createCharacterEntity(girlScene, sceneManager, girlBody)
+    }
+
+    private fun createCharacterEntityWithKinematicComponent(
+        characterScene: Scene,
+        sceneManager: SceneManager,
+        characterBody: btRigidBody
+    ) {
+        engine().entity {
+            with<VisibleComponent>()
+            with<SceneComponent> {
+                scene = characterScene
+                sceneManager.addScene(characterScene)
+            }
+            with<CharacterAnimationComponent> {
+                characterAnimationState = CharacterAnimationState(characterScene.animationController)
+            }
+            with<KinematicObject> {
+                kinematicBody = characterBody
+            }
+            with<MotionStateComponent> {
+                motionState = characterBody.motionState as MotionState
+            }
+            with<Player>()
+            with<IsometricCameraFollowComponent>()
+            with<CharacterControlComponent>()
+        }
     }
 
     private fun createCharacterEntity(
