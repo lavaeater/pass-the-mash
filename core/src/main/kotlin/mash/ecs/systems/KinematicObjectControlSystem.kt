@@ -233,6 +233,6 @@ class KinematicObjectControlSystem :
         scene.modelInstance.transform.setToWorld(worldPosition, Vector3.Z, Vector3.Y)
         scene.modelInstance.transform.rotateTowardDirection(kc.lookDirection, Vector3.Y)
 
-        kinematicBody.worldTransform = scene.modelInstance.transform
+        //kinematicBody.worldTransform = scene.modelInstance.transform
     }
 }

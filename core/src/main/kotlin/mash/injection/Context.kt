@@ -25,6 +25,7 @@ import mash.shaders.CustomShaderProvider
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider
+import threedee.ecs.components.CharacterControlComponent
 import threedee.ecs.components.KinematicObject
 import threedee.ecs.systems.*
 import twodee.core.MainGame
@@ -33,17 +34,6 @@ import twodee.injection.InjectionContext
 import twodee.injection.InjectionContext.Companion.inject
 
 class MyContactListener : ContactListener() {
-//    override fun onContactAdded(
-//        cp: btManifoldPoint?,
-//        colObj0Wrap: btCollisionObjectWrapper?,
-//        partId0: Int,
-//        index0: Int,
-//        colObj1Wrap: btCollisionObjectWrapper?,
-//        partId1: Int,
-//        index1: Int
-//    ): Boolean {
-//        return super.onContactAdded(cp, colObj0Wrap, partId0, index0, colObj1Wrap, partId1, index1)
-//    }
 
     override fun onContactAdded(
         cp: btManifoldPoint,
@@ -64,6 +54,11 @@ class MyContactListener : ContactListener() {
             val entity1 = colObj1.userData as Entity?
 
             if(entity0 != null) {
+                if(CharacterControlComponent.has(entity0)) {
+                    val ccc = CharacterControlComponent.get(entity0)
+                    ccc.clearDirections()
+                }
+
                 val kBody = KinematicObject.get(entity0)
                 cp.getNormalWorldOnB(someTempVector)
 
@@ -92,106 +87,6 @@ class MyContactListener : ContactListener() {
 
     companion object {
         val instance by lazy { inject<MyContactListener>() }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
-
-    override fun toString(): String {
-        return super.toString()
-    }
-
-    override fun dispose() {
-        super.dispose()
-    }
-
-    override fun obtain() {
-        super.obtain()
-    }
-
-    override fun release() {
-        super.release()
-    }
-
-    override fun isObtained(): Boolean {
-        return super.isObtained()
-    }
-
-    override fun construct() {
-        super.construct()
-    }
-
-    override fun reset(cPtr: Long, cMemoryOwn: Boolean) {
-        super.reset(cPtr, cMemoryOwn)
-    }
-
-    override fun getCPointer(): Long {
-        return super.getCPointer()
-    }
-
-    override fun takeOwnership() {
-        super.takeOwnership()
-    }
-
-    override fun releaseOwnership() {
-        super.releaseOwnership()
-    }
-
-    override fun hasOwnership(): Boolean {
-        return super.hasOwnership()
-    }
-
-    override fun delete() {
-        super.delete()
-    }
-
-    override fun isDisposed(): Boolean {
-        return super.isDisposed()
-    }
-
-    override fun destroy() {
-        super.destroy()
-    }
-
-    override fun finalize() {
-        super.finalize()
-    }
-
-    override fun swigDirectorDisconnect() {
-        super.swigDirectorDisconnect()
-    }
-
-    override fun swigReleaseOwnership() {
-        super.swigReleaseOwnership()
-    }
-
-    override fun swigTakeOwnership() {
-        super.swigTakeOwnership()
-    }
-
-    override fun enable() {
-        super.enable()
-    }
-
-    override fun disable() {
-        super.disable()
-    }
-
-    override fun enableOnAdded() {
-        super.enableOnAdded()
-    }
-
-    override fun disableOnAdded() {
-        super.disableOnAdded()
-    }
-
-    override fun isOnAddedEnabled(): Boolean {
-        return super.isOnAddedEnabled()
     }
 }
 
