@@ -12,7 +12,6 @@ import com.badlogic.gdx.physics.bullet.collision.Collision
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape
-import com.badlogic.gdx.physics.bullet.collision.btGhostObject
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import ktx.ashley.entity
@@ -23,14 +22,15 @@ import ktx.log.info
 import ktx.math.vec3
 import mash.core.getBoxShape
 import mash.core.loadModel
+import threedee.ecs.components.AttachedNodesComponent
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
-import net.mgsx.gltf.scene3d.lights.DirectionalShadowLight
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
 import net.mgsx.gltf.scene3d.utils.EnvironmentUtil
+import threedee.bullet.AttachedNode
 import threedee.bullet.MotionState
 import threedee.ecs.components.*
 import twodee.core.engine
@@ -81,9 +81,20 @@ class GirlSceneLoader : SceneLoader() {
     private fun loadGirlKinematic(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         val girlAsset = "models/girl-walking.glb".loadModel().alsoRegister()
 
-        girlAsset.scene.model.nodes.forEach {
-            printNode(it)
+        val attachedNodes = mutableListOf<AttachedNode>()
+//        girlAsset.scene.model.nodes.forEach {
+//            if(it.id.contains("Hand")) {
+//                attachedNodes.add(AttachedNode(it))
+//            }
+//            printNode(it)
+//        }
+
+        girlAsset.scene.model.getNode("mixamorig:RightHand")?.apply {
+            info { "Found right hand" }
+            this.addChild(BulletStuffCreator.createBullshit(1f, 1f, 1f, vec3(0f, 0f, 0f),sceneManager).modelInstance.nodes.first())
         }
+
+
 
         girlAsset.scene.model.materials.forEach {
             it.set(PBRColorAttribute.createFog(Color.GREEN))
@@ -106,10 +117,13 @@ class GirlSceneLoader : SceneLoader() {
 
         val girlScene = Scene(girlAsset.scene)
             .apply {
-//                this.modelInstance.userData = 1
                 this.modelInstance.transform.setToWorld(
                     vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
                 )
+                this.modelInstance.getNode("mixamorig:LeftHand")?.apply {
+                    info { "Found left hand" }
+                    attachedNodes.add(AttachedNode(this))
+                }
             }
 
         val boundingBox =
@@ -139,13 +153,14 @@ class GirlSceneLoader : SceneLoader() {
             this.motionState = motionState
         }, CollisionFlags.CHARACTER, CollisionFlags.ALL)
 
-        createCharacterEntityWithKinematicComponent(girlScene, sceneManager, girlBody)
+        createCharacterEntityWithKinematicComponent(girlScene, sceneManager, girlBody, attachedNodes)
     }
 
     private fun createCharacterEntityWithKinematicComponent(
         characterScene: Scene,
         sceneManager: SceneManager,
-        characterBody: btRigidBody
+        characterBody: btRigidBody,
+        attachedNodes: MutableList<AttachedNode>
     ) {
         BulletInstances.addEntity(characterBody,
             engine().entity {
@@ -172,6 +187,9 @@ class GirlSceneLoader : SceneLoader() {
                     motionState = characterBody.motionState as MotionState
                 }
                 with<Player>()
+                with<AttachedNodesComponent> {
+                    this.attachedNodes.addAll(attachedNodes)
+                }
                 with<IsometricCameraFollowComponent>()
                 with<CharacterControlComponent>()
             })

@@ -20,6 +20,7 @@ import ktx.inject.Context
 import ktx.math.vec3
 import mash.core.GameScreen
 import mash.ecs.systems.KinematicObjectControlSystem
+import threedee.ecs.systems.UpdateAttachedNodesSystem
 import mash.factories.GirlSceneLoader
 import mash.shaders.CustomShaderProvider
 import net.mgsx.gltf.scene3d.scene.SceneManager
@@ -199,12 +200,13 @@ object Context : InjectionContext() {
             addSystem(UpdatePointLightSystem())
             addSystem(UpdateSpotLightSystem())
             addSystem(Animation3dSystem())
+            addSystem(UpdateAttachedNodesSystem())
             addSystem(
                 RenderSystem3d(
                     inject(),
                 )
             )
-//            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
+            addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
         }
     }
 }

@@ -90,6 +90,48 @@ object BulletStuffCreator {
         )
     }
 
+    fun createBullshit(
+        width: Float,
+        height: Float,
+        depth: Float,
+        position: Vector3,
+        sceneManager: SceneManager
+    ): Scene {
+        val mb = ModelBuilder()
+        mb.begin()
+        val attributes = VertexAttributes(
+            VertexAttribute.Position(),
+            VertexAttribute.Normal(),
+            VertexAttribute(Tangent, 4, ShaderProgram.TANGENT_ATTRIBUTE),
+            VertexAttribute.TexCoords(0)
+        )
+        val material = createMaterial("shades-tile")
+        val mpb = mb.part(
+            "bullshit",
+            GL20.GL_TRIANGLES,
+            attributes,
+            material
+        )
+        BoxShapeBuilder.build(mpb, width, height, depth)
+        val btBoxShape = btBoxShape(Vector3(width / 2f, height / 2f, depth / 2f))
+        val box = mb.end()
+
+        box.meshes.forEach { mesh ->
+            MeshTangentSpaceGenerator.computeTangentSpace(mesh, material, true, true)
+        }
+        val boxInstance = ModelInstance(box)
+        boxInstance.transform.setToWorld(position, Vector3.Z, Vector3.Y)
+
+//        val info = btRigidBody.btRigidBodyConstructionInfo(0f, null, btBoxShape, Vector3.Zero)
+//        val body = btRigidBody(info).apply {
+//            collisionFlags = collisionFlags or CF_CUSTOM_MATERIAL_CALLBACK or CF_STATIC_OBJECT
+//        }
+//        body.worldTransform = boxInstance.transform
+        val scene = Scene(boxInstance)
+        sceneManager.addScene(scene)
+        return scene
+    }
+
     fun createTiledFloor(
         width: Float,
         height: Float,
