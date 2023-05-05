@@ -192,7 +192,7 @@ class GirlSceneLoader : SceneLoader() {
         ).alsoRegister()
         val brdfLUT = Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png")).alsoRegister()
 
-        sceneManager.setAmbientLight(0.001f)
+        sceneManager.setAmbientLight(0.1f)
         sceneManager.environment.set(PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT))
         sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularCubemap))
         sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap))
