@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
@@ -22,7 +23,6 @@ import ktx.log.info
 import ktx.math.vec3
 import mash.core.getBoxShape
 import mash.core.loadModel
-import threedee.ecs.components.AttachedNodesComponent
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
@@ -81,6 +81,8 @@ class GirlSceneLoader : SceneLoader() {
     private fun loadGirlKinematic(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         val girlAsset = "models/girl-walking.glb".loadModel().alsoRegister()
 
+        val pistolAsset = "models/weapons/pistol.glb".loadModel().alsoRegister()
+
         val attachedNodes = mutableListOf<AttachedNode>()
 //        girlAsset.scene.model.nodes.forEach {
 //            if(it.id.contains("Hand")) {
@@ -91,7 +93,20 @@ class GirlSceneLoader : SceneLoader() {
 
         girlAsset.scene.model.getNode("mixamorig:RightHand")?.apply {
             info { "Found right hand" }
-            this.addChild(BulletStuffCreator.createBullshit(1f, 1f, 1f, vec3(0f, 0f, 0f),sceneManager).modelInstance.nodes.first())
+            val nodesToAdd = pistolAsset.scene.model.nodes.map { it.copy() }
+            for (node in nodesToAdd)
+                node.detach()
+
+            val gun = pistolAsset.scene.model.nodes.get(0).copy()
+            gun.detach()
+
+            gun.scale.set(15f, 15f, 15f)
+
+            val gun2 = pistolAsset.scene.model.nodes.get(1).copy()
+            gun2.detach()
+
+            gun.addChild(gun2)
+            this.addChild(gun)
         }
 
 
@@ -120,10 +135,6 @@ class GirlSceneLoader : SceneLoader() {
                 this.modelInstance.transform.setToWorld(
                     vec3(0f, 0f, 0f), Vector3.Z, Vector3.Y
                 )
-                this.modelInstance.getNode("mixamorig:LeftHand")?.apply {
-                    info { "Found left hand" }
-                    attachedNodes.add(AttachedNode(this))
-                }
             }
 
         val boundingBox =
@@ -173,7 +184,7 @@ class GirlSceneLoader : SceneLoader() {
                     spotLightEx.setConeDeg(45f, 15f)
                     spotLightEx.range = 5f
                     spotLightEx.intensity = 100f
-                    spotLightEx.setColor(Color.PINK)
+                    spotLightEx.setColor(Color.YELLOW)
                     offset.set(0f, 50f, 0.5f)
                     sceneManager.environment.add(spotLightEx)
                 }
@@ -210,7 +221,7 @@ class GirlSceneLoader : SceneLoader() {
         ).alsoRegister()
         val brdfLUT = Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png")).alsoRegister()
 
-        sceneManager.setAmbientLight(0.1f)
+        sceneManager.setAmbientLight(0.5f)
         sceneManager.environment.set(PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT))
         sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularCubemap))
         sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap))
