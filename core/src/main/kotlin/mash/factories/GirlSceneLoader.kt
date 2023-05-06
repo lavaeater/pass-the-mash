@@ -26,6 +26,7 @@ import mash.core.loadModel
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute
+import net.mgsx.gltf.scene3d.model.NodePlus
 import net.mgsx.gltf.scene3d.scene.Scene
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.scene.SceneSkybox
@@ -93,20 +94,22 @@ class GirlSceneLoader : SceneLoader() {
 
         girlAsset.scene.model.getNode("mixamorig:RightHand")?.apply {
             info { "Found right hand" }
-            val nodesToAdd = pistolAsset.scene.model.nodes.map { it.copy() }
-            for (node in nodesToAdd)
-                node.detach()
 
             val gun = pistolAsset.scene.model.nodes.get(0).copy()
             gun.detach()
-
-            gun.scale.set(15f, 15f, 15f)
 
             val gun2 = pistolAsset.scene.model.nodes.get(1).copy()
             gun2.detach()
 
             gun.addChild(gun2)
-            this.addChild(gun)
+            val totalGunNode = NodePlus().apply {
+                id = "gun-node"
+                addChild(gun)
+                scale.set(15f, 15f, 15f)
+                translation.set(0f, 0f, -.5f)
+                rotation.setEulerAngles(0f, -90f, -90f)
+            }
+            this.addChild(totalGunNode)
         }
 
 
