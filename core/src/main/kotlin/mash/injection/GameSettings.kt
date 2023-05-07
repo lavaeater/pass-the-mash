@@ -1,7 +1,7 @@
 package mash.injection
 
 class GameSettings(
-    val gameWidth: Float = 6f, aspectRatio: Float = 16f / 9f, val pixelsPerMeter: Float = 4f,
+    val gameWidth: Float = 3f, aspectRatio: Float = 16f / 9f, val pixelsPerMeter: Float = 4f,
     val timeStep: Float = 1 / 60f, val velocityIterations: Int = 16, val positionIterations: Int = 6
 ) {
     val fieldOfView = 60f
