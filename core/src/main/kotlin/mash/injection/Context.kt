@@ -159,7 +159,7 @@ object Context : InjectionContext() {
 
         val sceneManager =
             SceneManager(
-                CustomShaderProvider(config),
+                PBRShaderProvider(config),
                 PBRDepthShaderProvider(depthConfig)
             ).apply {
                 setCamera(inject<OrthographicCamera>())

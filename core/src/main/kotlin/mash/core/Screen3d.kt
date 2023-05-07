@@ -12,7 +12,7 @@ open class Screen3d(
     protected val engine: Engine,
     protected val viewport: ExtendViewport
 ) : KtxScreen {
-    protected val bgColor = "000022".toColor()
+    protected val bgColor = "000000".toColor()
     override fun render(delta: Float) {
         clearScreen(bgColor.r, bgColor.g, bgColor.b)
         engine.update(delta)
