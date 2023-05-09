@@ -1,10 +1,9 @@
 package mash.core
 
-import com.badlogic.gdx.physics.bullet.Bullet
+import ktx.async.KtxAsync
 import mash.injection.Context
 import twodee.core.MainGame
 import twodee.injection.InjectionContext.Companion.inject
-import ktx.async.KtxAsync
 
 class PassTheMash : MainGame() {
     override fun goToGameSelect() {

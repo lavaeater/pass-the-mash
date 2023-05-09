@@ -54,6 +54,7 @@ dependencies {
 	api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 	api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 	api "space.earlygrey:shapedrawer:$shapeDrawerVersion"
+	api 'com.github.lyze237:gdx-FlexBox:425149b588'
 	implementation project(":gdx-lava")
 	implementation project(":gdx-lava-3d")
 }
