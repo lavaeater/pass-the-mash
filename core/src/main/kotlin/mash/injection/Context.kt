@@ -108,7 +108,7 @@ object Context : InjectionContext() {
     }
 
     fun initialize(game: MainGame) {
-        Scene2DSkin.defaultSkin = Skin("skins/my-skin/uiskin.json".toInternalFile())
+        Scene2DSkin.defaultSkin = Skin("ui/uiskin.json".toInternalFile())
         buildContext {
             val gameSettings = GameSettings()
             bindSingleton(gameSettings)
@@ -143,11 +143,9 @@ object Context : InjectionContext() {
             bindSingleton(getEngine())
             //            bindSingleton(TrackGenerator())
             bindSingleton(PolygonSpriteBatch())
-            bindSingleton(ToolHud(inject()))
             bindSingleton(
                 GameScreen(
                     GirlSceneLoader(),
-                    inject(),
                     inject(),
                     inject(),
                     inject(),

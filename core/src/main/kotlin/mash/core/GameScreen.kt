@@ -11,12 +11,14 @@ import twodee.injection.InjectionContext.Companion.inject
 class GameScreen(
     private val sceneLoader: SceneLoader,
     private val vfxManager: VfxManager,
-    private val hud: ToolHud,
     game: MainGame,
     engine: Engine,
     viewport: ExtendViewport
 ) : Screen3d(game, engine, viewport) {
     private var needsInit = true
+    private val hud: ToolHud by lazy {
+        ToolHud(inject())
+    }
     override fun show() {
         super.show()
         if (needsInit) {
