@@ -3,7 +3,9 @@ package mash.injection
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.PooledEngine
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.Bullet
@@ -12,17 +14,21 @@ import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.crashinvaders.vfx.VfxManager
 import com.crashinvaders.vfx.effects.CrtEffect
 import ktx.assets.disposeSafely
+import ktx.assets.toInternalFile
 import ktx.inject.Context
 import ktx.math.vec3
+import ktx.scene2d.Scene2DSkin
 import mash.core.GameScreen
 import mash.ecs.systems.KinematicObjectControlSystem
 import threedee.ecs.systems.UpdateAttachedNodesSystem
 import mash.factories.GirlSceneLoader
 import mash.shaders.CustomShaderProvider
+import mash.ui.ToolHud
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider
@@ -102,6 +108,7 @@ object Context : InjectionContext() {
     }
 
     fun initialize(game: MainGame) {
+        Scene2DSkin.defaultSkin = Skin("skins/my-skin/uiskin.json".toInternalFile())
         buildContext {
             val gameSettings = GameSettings()
             bindSingleton(gameSettings)
@@ -135,9 +142,12 @@ object Context : InjectionContext() {
             setupBullet(this)
             bindSingleton(getEngine())
             //            bindSingleton(TrackGenerator())
+            bindSingleton(PolygonSpriteBatch())
+            bindSingleton(ToolHud(inject()))
             bindSingleton(
                 GameScreen(
                     GirlSceneLoader(),
+                    inject(),
                     inject(),
                     inject(),
                     inject(),
