@@ -1,5 +1,6 @@
 package mash.ui
 
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -14,7 +15,7 @@ import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 import twodee.ui.LavaHud
 
-class ToolHud(batch: PolygonSpriteBatch) : LavaHud(batch) {
+class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMultiplexer) : LavaHud(batch) {
     private val playerFamily by lazy { allOf(SceneComponent::class, Player::class).get() }
     private val playerEntity by lazy {
         engine()
@@ -47,12 +48,13 @@ class ToolHud(batch: PolygonSpriteBatch) : LavaHud(batch) {
                     tree {
                         label("root") {
                             createNodeHierarchy(getPlayerNodes(), it)
-                            it.expandAll()
+//                            it.expandAll()
                         }
                     }
 
                 }
             }
+            inputMultiplexer.addProcessor(this)
         }
     }
 }

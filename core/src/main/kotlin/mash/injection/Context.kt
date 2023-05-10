@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -140,6 +141,9 @@ object Context : InjectionContext() {
             )
             bindSingleton(createSceneManager())
             setupBullet(this)
+            bindSingleton(InputMultiplexer().apply {
+                Gdx.input.inputProcessor = this
+            })
             bindSingleton(getEngine())
             //            bindSingleton(TrackGenerator())
             bindSingleton(PolygonSpriteBatch())
@@ -203,7 +207,7 @@ object Context : InjectionContext() {
         return PooledEngine().apply {
             addSystem(RemoveEntitySystem())
             addSystem(BulletUpdateSystem(inject()))
-            addSystem(KinematicObjectControlSystem())
+            addSystem(KinematicObjectControlSystem(inject()))
             addSystem(UpdateOrthographicCameraSystem(inject()))
             addSystem(UpdatePointLightSystem())
             addSystem(UpdateSpotLightSystem())
