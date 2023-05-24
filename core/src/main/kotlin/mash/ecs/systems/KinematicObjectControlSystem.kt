@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Plane
@@ -25,7 +26,7 @@ import twodee.injection.InjectionContext.Companion.inject
 import twodee.input.KeyPress
 import twodee.input.command
 
-class KinematicObjectControlSystem :
+class KinematicObjectControlSystem(inputMultiplexer: InputMultiplexer) :
     IteratingSystem(
         allOf(
             IsometricCameraFollowComponent::class,
@@ -35,6 +36,11 @@ class KinematicObjectControlSystem :
         ).get()
     ),
     KtxInputAdapter {
+
+        init {
+            inputMultiplexer.addProcessor(this)
+        }
+
     private val controlledEntity by lazy { entities.first() }
     private val controlComponent by lazy { CharacterControlComponent.get(controlledEntity) }
     private val scene by lazy { SceneComponent.get(controlledEntity).scene }
@@ -171,7 +177,6 @@ class KinematicObjectControlSystem :
         private set
 
     override fun update(deltaTime: Float) {
-        Gdx.input.inputProcessor = this
         controlComponent.mouseWorldPosition.set(mousePosition)
         super.update(deltaTime)
     }

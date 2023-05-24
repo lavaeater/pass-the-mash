@@ -1,6 +1,7 @@
 package mash.core
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.crashinvaders.vfx.VfxManager
 import mash.factories.SceneLoader
@@ -17,7 +18,7 @@ class GameScreen(
 ) : Screen3d(game, engine, viewport) {
     private var needsInit = true
     private val hud: ToolHud by lazy {
-        ToolHud(inject())
+        ToolHud(inject(),inject())
     }
     override fun show() {
         super.show()
