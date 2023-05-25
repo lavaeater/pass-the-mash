@@ -4,16 +4,19 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.Array
+import ktx.actors.onClick
 import ktx.ashley.allOf
 import ktx.collections.GdxArray
 import ktx.collections.toGdxArray
 import ktx.scene2d.*
-import net.mgsx.gltf.scene3d.scene.Scene
 import threedee.ecs.components.SceneComponent
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 import twodee.ui.LavaHud
+
+object Share3dDebugData {
+    val selectedNodes = mutableSetOf<Node>()
+}
 
 class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMultiplexer) : LavaHud(batch) {
     private val playerFamily by lazy { allOf(SceneComponent::class, Player::class).get() }
@@ -27,9 +30,17 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
         return SceneComponent.get(playerEntity).scene.modelInstance.nodes
     }
 
+
+
     private fun createNodeHierarchy(nodes: GdxArray<Node>, parentNode: KNode<*>) {
         for (node in nodes) {
-            parentNode.label(node.id) {
+            parentNode.label(node.id.replace("mixamorig", "")) {
+                onClick {
+                    if(Share3dDebugData.selectedNodes.contains(node))
+                        Share3dDebugData.selectedNodes.remove(node)
+                    else
+                        Share3dDebugData.selectedNodes.add(node)
+                }
                 createNodeHierarchy(node.children.toGdxArray(), it)
             }
         }
@@ -48,10 +59,8 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                     tree {
                         label("root") {
                             createNodeHierarchy(getPlayerNodes(), it)
-//                            it.expandAll()
                         }
                     }
-
                 }
             }
             inputMultiplexer.addProcessor(this)
