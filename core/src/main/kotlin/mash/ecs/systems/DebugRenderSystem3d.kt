@@ -63,15 +63,17 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
     }
 
     private fun drawDebugNodes() {
-        for(uiNode in Share3dDebugData.selectedNodes) {
-            drawUiNode(uiNode)
-        }
+//        for(uiNode in Share3dDebugData.selectedNodes) {
+//            drawUiNode(uiNode)
+//        }
+        drawUiNode(Share3dDebugData.selectedNode)
     }
 
     private fun drawUiNode(uiNode: UiNode) {
         when(uiNode) {
             is UiNode.SpotLightNode -> {}
             is UiNode.ThreeDNode -> draw3dNode(uiNode.node, uiNode.parent)
+            UiNode.EmptyNode -> {}
         }
     }
 
