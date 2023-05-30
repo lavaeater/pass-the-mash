@@ -75,28 +75,59 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
         }
     }
 
+    private val nodeWorldPosition = vec3()
+    private val nodeParentWorldPosition = vec3()
+    private val forward = vec3()
+    private val up = vec3()
+    private val right = vec3()
+
     private fun draw3dNode(node: Node, parent: Node?) {
-        TODO("Not yet implemented")
+        node.globalTransform.getTranslation(nodeWorldPosition)
+
+        nodeWorldPosition.mul(modelTransform)
+        if(parent != null) {
+            parent.globalTransform.getTranslation(nodeParentWorldPosition)
+            nodeParentWorldPosition.mul(modelTransform)
+            debugDrawer.drawLine(nodeWorldPosition, nodeParentWorldPosition, vec3(1f, 1f, 0f))
+        }
+
+        forward.set(Vector3.Z)
+        up.set(Vector3.Y)
+        forward.rot(node.globalTransform).rot(modelTransform).nor()
+        up.rot(node.globalTransform).rot(modelTransform).nor()
+        right.set(forward)
+        right.rotate(up, -90f)
+        drawOrientation(nodeWorldPosition, forward, up, right)
     }
 
     private val rotationDirection = vec3()
+    private val modelTransform = Matrix4()
 
     private val someTempVector = vec3()
     private val currentRotation = Quaternion()
+
+    private fun drawOrientation(worldPosition: Vector3, motionState: MotionStateComponent) {
+        drawOrientation(worldPosition, motionState.forward, motionState.up, motionState.right)
+    }
+
+    private fun drawOrientation(worldPosition: Vector3, forward:Vector3, up: Vector3, right: Vector3) {
+        debugDrawer.drawLine(worldPosition, worldPosition + forward, forwardColor)
+        debugDrawer.drawLine(worldPosition, worldPosition + up, upColor)
+        debugDrawer.drawLine(worldPosition, worldPosition + right, rightColor)
+    }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val motionState = MotionStateComponent.get(entity)
         //Draw the normals!
         if (SceneComponent.has(entity)) {
             val scene = SceneComponent.get(entity).scene
-            drawSkeleton(scene)
+//            drawSkeleton(scene)
             scene.modelInstance.transform.getTranslation(sceneWorldPosition)
             scene.modelInstance.transform.getRotation(currentRotation)
+            modelTransform.set(scene.modelInstance.transform)
         }
 
-        debugDrawer.drawLine(sceneWorldPosition, sceneWorldPosition + motionState.forward.cpy().scl(2f), forwardColor)
-        debugDrawer.drawLine(sceneWorldPosition, sceneWorldPosition + motionState.up.cpy().scl(2f), upColor)
-        debugDrawer.drawLine(sceneWorldPosition, sceneWorldPosition + motionState.right.cpy().scl(2f), rightColor)
+        drawOrientation(sceneWorldPosition, motionState)
 
         debugDrawer.drawSphere(controlComponent.intersection, 0.1f, vec3(1f, 1f, 1f))
         debugDrawer.drawLine(
