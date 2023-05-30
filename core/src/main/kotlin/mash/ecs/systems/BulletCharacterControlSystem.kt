@@ -15,7 +15,7 @@ import ktx.ashley.allOf
 import ktx.log.info
 import ktx.math.vec3
 import threedee.ecs.components.*
-import threedee.ecs.systems.inXZPlane
+import mash.ecs.systems.inXZPlane
 import threedee.general.Direction
 import threedee.general.CharacterControl
 import twodee.injection.InjectionContext.Companion.inject

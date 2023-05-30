@@ -9,6 +9,7 @@ import ktx.ashley.allOf
 import ktx.collections.GdxArray
 import ktx.collections.toGdxArray
 import ktx.scene2d.*
+import net.mgsx.gltf.scene3d.lights.SpotLightEx
 import threedee.ecs.components.SceneComponent
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
@@ -16,6 +17,11 @@ import twodee.ui.LavaHud
 
 object Share3dDebugData {
     val selectedNodes = mutableSetOf<Node>()
+}
+
+sealed class UiNode(var selected: Boolean = false) {
+    class ThreeDNode(val node: Node) : UiNode()
+    class SpotLightNode(val spotLightEx: SpotLightEx) : UiNode()
 }
 
 class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMultiplexer) : LavaHud(batch) {
@@ -34,7 +40,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
 
     private fun createNodeHierarchy(nodes: GdxArray<Node>, parentNode: KNode<*>) {
         for (node in nodes) {
-            parentNode.label(node.id.replace("mixamorig", "")) {
+            parentNode.label(node.id.replace("mixamorig:", "")) {
                 onClick {
                     if(Share3dDebugData.selectedNodes.contains(node))
                         Share3dDebugData.selectedNodes.remove(node)

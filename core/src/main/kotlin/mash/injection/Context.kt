@@ -25,6 +25,7 @@ import ktx.inject.Context
 import ktx.math.vec3
 import ktx.scene2d.Scene2DSkin
 import mash.core.GameScreen
+import mash.ecs.systems.DebugRenderSystem3d
 import mash.ecs.systems.KinematicObjectControlSystem
 import threedee.ecs.systems.UpdateAttachedNodesSystem
 import mash.factories.GirlSceneLoader
