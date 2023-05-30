@@ -12,6 +12,7 @@ import ktx.scene2d.*
 import net.mgsx.gltf.scene3d.lights.SpotLightEx
 import threedee.ecs.components.SceneComponent
 import twodee.core.engine
+import twodee.core.selectedItemListOf
 import twodee.ecs.ashley.components.Player
 import twodee.ui.LavaHud
 
