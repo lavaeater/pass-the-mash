@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.ashley.allOf
 import ktx.math.plus
 import ktx.math.vec3
+import mash.ui.Share3dDebugData
+import mash.ui.UiNode
 import net.mgsx.gltf.scene3d.scene.Scene
 import threedee.ecs.components.CharacterControlComponent
 import threedee.ecs.components.MotionStateComponent
@@ -61,7 +63,20 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
     }
 
     private fun drawDebugNodes() {
+        for(uiNode in Share3dDebugData.selectedNodes) {
+            drawUiNode(uiNode)
+        }
+    }
 
+    private fun drawUiNode(uiNode: UiNode) {
+        when(uiNode) {
+            is UiNode.SpotLightNode -> {}
+            is UiNode.ThreeDNode -> draw3dNode(uiNode.node, uiNode.parent)
+        }
+    }
+
+    private fun draw3dNode(node: Node, parent: Node?) {
+        TODO("Not yet implemented")
     }
 
     private val rotationDirection = vec3()

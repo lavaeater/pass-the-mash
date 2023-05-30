@@ -29,8 +29,6 @@ import mash.ecs.systems.DebugRenderSystem3d
 import mash.ecs.systems.KinematicObjectControlSystem
 import threedee.ecs.systems.UpdateAttachedNodesSystem
 import mash.factories.GirlSceneLoader
-import mash.shaders.CustomShaderProvider
-import mash.ui.ToolHud
 import net.mgsx.gltf.scene3d.scene.SceneManager
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider

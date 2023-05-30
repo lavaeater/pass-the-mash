@@ -16,11 +16,21 @@ import twodee.ecs.ashley.components.Player
 import twodee.ui.LavaHud
 
 object Share3dDebugData {
-    val selectedNodes = mutableSetOf<Node>()
+    val selectedNodes = mutableSetOf<UiNode>()
 }
 
 sealed class UiNode(var selected: Boolean = false) {
-    class ThreeDNode(val node: Node) : UiNode()
+    open var name: String = ""
+    class ThreeDNode(val node: Node, val parent: Node?) : UiNode() {
+        init {
+            node.id = node.id.replace("mixamorig:", "")
+        }
+        override var name: String
+            get() = node.id
+            set(value) {
+                node.id = value
+            }
+    }
     class SpotLightNode(val spotLightEx: SpotLightEx) : UiNode()
 }
 
@@ -38,16 +48,17 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
 
 
 
-    private fun createNodeHierarchy(nodes: GdxArray<Node>, parentNode: KNode<*>) {
-        for (node in nodes) {
-            parentNode.label(node.id.replace("mixamorig:", "")) {
+    private fun createNodeHierarchy(parent3dNode: Node?, nodes: GdxArray<Node>, parentNode: KNode<*>) {
+        nodes.forEach { node ->
+            val uiNode = UiNode.ThreeDNode(node, parent3dNode)
+            parentNode.label(uiNode.name) {
                 onClick {
-                    if(Share3dDebugData.selectedNodes.contains(node))
-                        Share3dDebugData.selectedNodes.remove(node)
+                    if(Share3dDebugData.selectedNodes.contains(uiNode))
+                        Share3dDebugData.selectedNodes.remove(uiNode)
                     else
-                        Share3dDebugData.selectedNodes.add(node)
+                        Share3dDebugData.selectedNodes.add(uiNode)
                 }
-                createNodeHierarchy(node.children.toGdxArray(), it)
+                createNodeHierarchy(node, node.children.toGdxArray(), it)
             }
         }
     }
@@ -64,7 +75,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                     label("Hello World!")
                     tree {
                         label("root") {
-                            createNodeHierarchy(getPlayerNodes(), it)
+                            createNodeHierarchy(null, getPlayerNodes(), it)
                         }
                     }
                 }
