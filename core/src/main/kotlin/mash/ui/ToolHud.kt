@@ -83,25 +83,68 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
      */
     override val stage by lazy {
         Stage(hudViewPort, batch).apply {
+            isDebugAll = true
             actors {
                 table {
                     setFillParent(true)
-                    top()
-                    label("Hello World!")
-                    tree {
-                        label("root") {
-                            createNodeHierarchy(null, getPlayerNodes(), it)
-                        }
-                        expandAll()
+                    table {
+                        top()
+                        label("Top Row")
                     }
-                    boundLabel({ Share3dDebugData.selectedNode.name })
-                    boundLabel({
-                        when(Share3dDebugData.selectedNode) {
-                            is UiNode.ThreeDNode -> (Share3dDebugData.selectedNode as UiNode.ThreeDNode).node.localTransform.getTranslation(translationVector).toString()
-                            is UiNode.SpotLightNode -> "spot light"
-                            is UiNode.EmptyNode -> "empty"
+                        .inCell
+                        .height(hudViewPort.worldHeight * 0.1f)
+                    row()
+                    table {
+                        verticalGroup {
+                            label("Left Column")
+                            label("Middle")
+                            label("Right Column")
                         }
-                    })
+                            .inCell
+                            .left()
+                            .fillY()
+                            .width(hudViewPort.worldWidth * 0.1f)
+                        table {
+
+                        }
+                            .inCell
+                            .fill()
+                            .expand()
+                        verticalGroup {
+                            label("Left Column")
+                            label("Middle")
+                            label("Right Column")
+                        }
+                            .inCell
+                            .right()
+                            .fillY()
+                            .width(hudViewPort.worldWidth * 0.1f)
+
+                    }
+                        .inCell
+                        .fill()
+                        .expand()
+                    row()
+                    table {
+                        label("Bottom Row")
+                    }
+                        .inCell
+                        .height(hudViewPort.worldHeight * 0.1f)
+
+//                    tree {
+//                        label("root") {
+//                            createNodeHierarchy(null, getPlayerNodes(), it)
+//                        }
+//                        expandAll()
+//                    }
+//                    boundLabel({ Share3dDebugData.selectedNode.name })
+//                    boundLabel({
+//                        when(Share3dDebugData.selectedNode) {
+//                            is UiNode.ThreeDNode -> (Share3dDebugData.selectedNode as UiNode.ThreeDNode).node.localTransform.getTranslation(translationVector).toString()
+//                            is UiNode.SpotLightNode -> "spot light"
+//                            is UiNode.EmptyNode -> "empty"
+//                        }
+//                    })
                 }
             }
             inputMultiplexer.addProcessor(this)
