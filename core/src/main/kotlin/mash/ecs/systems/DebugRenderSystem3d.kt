@@ -20,7 +20,10 @@ import threedee.ecs.components.CharacterControlComponent
 import threedee.ecs.components.MotionStateComponent
 import threedee.ecs.components.SceneComponent
 
-class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorld: btDynamicsWorld) : IteratingSystem(
+class DebugRenderSystem3d(
+    private val viewport: Viewport,
+    private val bulletWorld: btDynamicsWorld
+) : IteratingSystem(
     allOf(
         MotionStateComponent::class
     ).get()
@@ -56,16 +59,16 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
 
     override fun update(deltaTime: Float) {
         debugDrawer.begin(viewport)
-//        bulletWorld.debugDrawWorld()
+        if (Share3dDebugData.drawBulletDebug)
+            bulletWorld.debugDrawWorld()
         super.update(deltaTime)
-        drawDebugNodes()
+
+        if(Share3dDebugData.drawDebugNode)
+            drawDebugNodes()
         debugDrawer.end()
     }
 
     private fun drawDebugNodes() {
-//        for(uiNode in Share3dDebugData.selectedNodes) {
-//            drawUiNode(uiNode)
-//        }
         drawUiNode(Share3dDebugData.selectedNode)
     }
 
@@ -123,7 +126,9 @@ class DebugRenderSystem3d(private val viewport: Viewport, private val bulletWorl
         //Draw the normals!
         if (SceneComponent.has(entity)) {
             val scene = SceneComponent.get(entity).scene
-//            drawSkeleton(scene)
+            if(Share3dDebugData.drawSkeleton)
+                drawSkeleton(scene)
+
             scene.modelInstance.transform.getTranslation(sceneWorldPosition)
             scene.modelInstance.transform.getRotation(currentRotation)
             modelTransform.set(scene.modelInstance.transform)
