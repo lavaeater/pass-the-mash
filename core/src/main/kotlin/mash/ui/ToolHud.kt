@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g3d.model.Node
+import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import ktx.actors.onChange
 import ktx.actors.onClick
@@ -15,6 +16,7 @@ import ktx.scene2d.*
 import threedee.ecs.components.SceneComponent
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
+import twodee.extensions.boundLabel
 import twodee.ui.LavaHud
 
 class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMultiplexer) : LavaHud(batch) {
@@ -43,6 +45,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
     }
 
     val translationVector = vec3()
+    val rotation = Quaternion()
 
     /**
      * Now you need to flexbox this UI into something usable.
@@ -168,21 +171,40 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             .inCell
                             .top()
                             .center()
-                        row()
+                        table {
+                            boundLabel({ Share3dDebugData.selectedNode.name })
+                            table {
+                                label("X")
+                                label("Y")
+                                label("Z")
+                                row()
+                                textField {
+                                    text = Share3dDebugData.nodeTranslation.x.toString()
+                                }
+                                    .inCell
+                                    .center()
+                                textField {
+                                    text = Share3dDebugData.nodeTranslation.y.toString()
+                                }
+                                    .inCell
+                                    .center()
+                                textField {
+                                    text = Share3dDebugData.nodeTranslation.z.toString()
+                                    onChange {  }
+                                }
+                                    .inCell
+                                    .center()
+                            }
+                                .inCell
+                                .top()
+                                .center()
+                        }
+                            .inCell
+                            .left()
                     }
                         .inCell
                         .left()
                         .height(hudViewPort.worldHeight * 0.25f)
-
-
-//                    boundLabel({ Share3dDebugData.selectedNode.name })
-//                    boundLabel({
-//                        when(Share3dDebugData.selectedNode) {
-//                            is UiNode.ThreeDNode -> (Share3dDebugData.selectedNode as UiNode.ThreeDNode).node.localTransform.getTranslation(translationVector).toString()
-//                            is UiNode.SpotLightNode -> "spot light"
-//                            is UiNode.EmptyNode -> "empty"
-//                        }
-//                    })
                 }
             }
             inputMultiplexer.addProcessor(this)
