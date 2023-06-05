@@ -17,6 +17,7 @@ import threedee.ecs.components.SceneComponent
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 import twodee.extensions.boundLabel
+import twodee.extensions.boundTextField
 import twodee.ui.LavaHud
 
 class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMultiplexer) : LavaHud(batch) {
@@ -173,27 +174,87 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             .center()
                         table {
                             boundLabel({ Share3dDebugData.selectedNode.name })
+                                .inCell
+                                .top()
+                                .center()
+                            row()
                             table {
-                                label("X")
-                                label("Y")
-                                label("Z")
-                                row()
-                                textField {
-                                    text = Share3dDebugData.nodeTranslation.x.toString()
+                                verticalGroup {
+                                    label("X")
+                                    boundLabel({
+                                        Share3dDebugData.nodeTranslation.x.toString()
+                                    })
+                                    horizontalGroup {
+                                        button { label("X+") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.translation.add(0.1f, 0f, 0f)
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                        button { label("X-") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.translation.add(-0.1f, 0f, 0f)
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                    }
                                 }
                                     .inCell
-                                    .center()
-                                textField {
-                                    text = Share3dDebugData.nodeTranslation.y.toString()
+                                    .expand()
+                                    .fill()
+                                verticalGroup {
+                                    label("Y")
+                                    boundLabel({
+                                        Share3dDebugData.nodeTranslation.y.toString()
+                                    })
+                                    horizontalGroup {
+                                        button { label("Y+") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.translation.add(0f, 0.1f, 0f)
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                        button { label("Y-") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.translation.add(0f, -0.1f, 0f)
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                    }
                                 }
                                     .inCell
-                                    .center()
-                                textField {
-                                    text = Share3dDebugData.nodeTranslation.z.toString()
-                                    onChange {  }
+                                    .expand()
+                                    .fill()
+                                verticalGroup {
+                                    label("Z")
+                                    boundLabel({
+                                        Share3dDebugData.nodeTranslation.z.toString()
+                                    })
+                                    horizontalGroup {
+                                        button { label("Z+") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.translation.add(0f, 0f, 0.1f)
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                        button { label("Z-") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.translation.add(0f, 0f, -0.1f)
+                                                    this.node.calculateTransforms(true)
+                                                }
+
+                                            }
+                                    }
                                 }
                                     .inCell
-                                    .center()
+                                    .expand()
+                                    .fill()
                             }
                                 .inCell
                                 .top()
@@ -201,6 +262,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                         }
                             .inCell
                             .left()
+                            .width(hudViewPort.worldWidth * 0.25f)
                     }
                         .inCell
                         .left()
