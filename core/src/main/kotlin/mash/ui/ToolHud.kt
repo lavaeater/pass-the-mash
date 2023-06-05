@@ -56,7 +56,6 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
     override val stage by lazy {
         lateinit var nodeTree: KTreeWidget
         Stage(hudViewPort, batch).apply {
-            isDebugAll = true
             actors {
                 nodeTree = tree {
                     label("root") {
@@ -74,7 +73,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                         // TOP ROW
                         table {
                             // TREE TABLE
-                            label("TOP LEFT")
+//TOP LEFT
 
                         }
                             .inCell
@@ -84,7 +83,6 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             .expand()
                         table {
                             // CENTER TOP COLUMN
-                            label("CENTER TOP")
                             row()
                         }
                             .inCell
@@ -92,7 +90,6 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             .expand()
                         table {
                             // TOP RIGHT COLUMN
-                            label("TOP RIGHT")
                             row()
                         }
                             .inCell
@@ -107,7 +104,6 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                         // MIDDLE TABLE
                         verticalGroup {
                             // LEFT COLUMN
-                            label("Left Column")
                         }
                             .inCell
                             .left()
@@ -115,15 +111,12 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             .width(hudViewPort.worldWidth * 0.1f)
                         table {
                             // CENTER TABLE
-                            label("CENTER TABLE")
-                            row()
                         }
                             .inCell
                             .fill()
                             .expand()
                         verticalGroup {
                             // RIGHT COLUMN
-                            label("Right Column")
                         }
                             .inCell
                             .right()
@@ -188,22 +181,21 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                         button { label("X+") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
-                                                    this.node.translation.add(0.1f, 0f, 0f)
+                                                    this.node.translation.add(0.05f, 0f, 0f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
                                         button { label("X-") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
-                                                    this.node.translation.add(-0.1f, 0f, 0f)
+                                                    this.node.translation.add(-0.05f, 0f, 0f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
                                     }
                                 }
                                     .inCell
-                                    .expand()
-                                    .fill()
+                                    .grow()
                                 verticalGroup {
                                     label("Y")
                                     boundLabel({
@@ -213,14 +205,14 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                         button { label("Y+") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
-                                                    this.node.translation.add(0f, 0.1f, 0f)
+                                                    this.node.translation.add(0f, 0.05f, 0f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
                                         button { label("Y-") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
-                                                    this.node.translation.add(0f, -0.1f, 0f)
+                                                    this.node.translation.add(0f, -0.05f, 0f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
@@ -238,17 +230,123 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                         button { label("Z+") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
-                                                    this.node.translation.add(0f, 0f, 0.1f)
+                                                    this.node.translation.add(0f, 0f, 0.05f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
                                         button { label("Z-") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
-                                                    this.node.translation.add(0f, 0f, -0.1f)
+                                                    this.node.translation.add(0f, 0f, -0.05f)
                                                     this.node.calculateTransforms(true)
                                                 }
 
+                                            }
+                                    }
+                                }
+                                    .inCell
+                                    .expand()
+                                    .fill()
+                            }
+                                .inCell
+                                .top()
+                                .center()
+                            row()
+                            table {
+                                verticalGroup {
+                                    label("YAW")
+                                    boundLabel({
+                                        Share3dDebugData.nodeRotation.yaw.toString()
+                                    })
+                                    horizontalGroup {
+                                        button {
+                                            label("YAW+")
+                                        }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.rotation.setEulerAngles(
+                                                        this.node.rotation.yaw + 5f,
+                                                        this.node.rotation.pitch,
+                                                        this.node.rotation.roll
+                                                    )
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                        button { label("YAW-") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.rotation.setEulerAngles(
+                                                        this.node.rotation.yaw - 5f,
+                                                        this.node.rotation.pitch,
+                                                        this.node.rotation.roll
+                                                    )
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                    }
+                                }
+                                    .inCell
+                                    .grow()
+                                verticalGroup {
+                                    label("PITCH")
+                                    boundLabel({
+                                        Share3dDebugData.nodeRotation.pitch.toString()
+                                    })
+                                    horizontalGroup {
+                                        button { label("PITCH+") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.rotation.setEulerAngles(
+                                                        this.node.rotation.yaw,
+                                                        this.node.rotation.pitch + 5f,
+                                                        this.node.rotation.roll
+                                                    )
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                        button { label("PITCH-") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.rotation.setEulerAngles(
+                                                        this.node.rotation.yaw,
+                                                        this.node.rotation.pitch - 5f,
+                                                        this.node.rotation.roll
+                                                    )
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                    }
+                                }
+                                    .inCell
+                                    .expand()
+                                    .fill()
+                                verticalGroup {
+                                    label("ROLL")
+                                    boundLabel({
+                                        Share3dDebugData.nodeRotation.roll.toString()
+                                    })
+                                    horizontalGroup {
+                                        button { label("ROLL+") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.rotation.setEulerAngles(
+                                                        this.node.rotation.yaw,
+                                                        this.node.rotation.pitch,
+                                                        this.node.rotation.roll + 5f
+                                                    )
+                                                    this.node.calculateTransforms(true)
+                                                }
+                                            }
+                                        button { label("ROLL-") }
+                                            .onClick {
+                                                (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
+                                                    this.node.rotation.setEulerAngles(
+                                                        this.node.rotation.yaw,
+                                                        this.node.rotation.pitch,
+                                                        this.node.rotation.roll - 5f
+                                                    )
+                                                    this.node.calculateTransforms(true)
+                                                }
                                             }
                                     }
                                 }

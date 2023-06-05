@@ -106,7 +106,7 @@ class GirlSceneLoader : SceneLoader() {
                 id = "gun-node"
                 addChild(gun)
                 scale.set(15f, 15f, 15f)
-                translation.set(0f, 0f, -.5f)
+                translation.set(0f, 0.3f, 0.05f)
                 rotation.setEulerAngles(0f, -90f, -90f)
             }
             this.addChild(totalGunNode)
