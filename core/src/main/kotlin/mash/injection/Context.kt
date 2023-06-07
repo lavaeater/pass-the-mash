@@ -116,13 +116,6 @@ object Context : InjectionContext() {
                 addEffect(CrtEffect())
             })
             bindSingleton(game)
-            bindSingleton(PerspectiveCamera().apply {
-                fieldOfView = gameSettings.fieldOfView
-                near = gameSettings.cameraNear
-                far = gameSettings.cameraFar
-                position.set(10f, 10f, 10f)
-                lookAt(vec3())
-            })
             bindSingleton(OrthographicCamera().apply {
                 setToOrtho(false)
                 position.set(1f, 1f, 1f)
@@ -143,9 +136,9 @@ object Context : InjectionContext() {
             bindSingleton(InputMultiplexer().apply {
                 Gdx.input.inputProcessor = this
             })
+            bindSingleton(PolygonSpriteBatch())
             bindSingleton(getEngine())
             //            bindSingleton(TrackGenerator())
-            bindSingleton(PolygonSpriteBatch())
             bindSingleton(
                 GameScreen(
                     GirlSceneLoader(),
@@ -215,6 +208,7 @@ object Context : InjectionContext() {
             addSystem(
                 RenderSystem3d(
                     inject(),
+                    inject()
                 )
             )
             addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))
