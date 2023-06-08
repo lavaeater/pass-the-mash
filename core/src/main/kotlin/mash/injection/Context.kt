@@ -27,6 +27,8 @@ import ktx.scene2d.Scene2DSkin
 import mash.core.GameScreen
 import mash.ecs.systems.DebugRenderSystem3d
 import mash.ecs.systems.KinematicObjectControlSystem
+import mash.ecs.systems.RenderSystem3d
+import mash.ecs.systems.UpdateOrthographicCameraSystem
 import threedee.ecs.systems.UpdateAttachedNodesSystem
 import mash.factories.GirlSceneLoader
 import net.mgsx.gltf.scene3d.scene.SceneManager
@@ -118,16 +120,16 @@ object Context : InjectionContext() {
             bindSingleton(game)
             bindSingleton(OrthographicCamera().apply {
                 setToOrtho(false)
-                position.set(1f, 1f, 1f)
-                near = -25f
-                far = 100f
-                rotate(Vector3.X, -30f)
-                rotate(Vector3.Y, -45f)
+//                position.set(1f, 1f, 1f)
+                near = gameSettings.cameraNear
+                far = gameSettings.cameraFar
+//                rotate(Vector3.X, -30f)
+//                rotate(Vector3.Y, -45f)
             })
             bindSingleton(
                 ExtendViewport(
-                    gameSettings.gameWidth,
-                    gameSettings.gameHeight,
+                    gameSettings.viewPortWidth,
+                    gameSettings.viewPortHeight,
                     inject<OrthographicCamera>() as Camera
                 )
             )
@@ -208,7 +210,9 @@ object Context : InjectionContext() {
             addSystem(
                 RenderSystem3d(
                     inject(),
-                    inject()
+                    inject(),
+                    inject(),
+                    inject<OrthographicCamera>()
                 )
             )
             addSystem(DebugRenderSystem3d(inject<ExtendViewport>(), inject()))

@@ -1,10 +1,13 @@
 package mash.ui
 
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Quaternion
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import ktx.actors.onChange
 import ktx.actors.onClick
@@ -17,7 +20,7 @@ import threedee.ecs.components.SceneComponent
 import twodee.core.engine
 import twodee.ecs.ashley.components.Player
 import twodee.extensions.boundLabel
-import twodee.extensions.boundTextField
+import twodee.injection.InjectionContext.Companion.inject
 import twodee.ui.LavaHud
 
 class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMultiplexer) : LavaHud(batch) {
@@ -47,6 +50,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
 
     val translationVector = vec3()
     val rotation = Quaternion()
+    private val gameCamera by lazy { inject<OrthographicCamera>() }
 
     /**
      * Now you need to flexbox this UI into something usable.
@@ -101,7 +105,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                         .height(hudViewPort.worldHeight * 0.1f)
                     row()
                     table {
-                        // MIDDLE TABLE
+                        // MIDDLE TABLE / MAIN SCREEN BASICALLY
                         verticalGroup {
                             // LEFT COLUMN
                         }
@@ -173,19 +177,19 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             row()
                             table {
                                 verticalGroup {
-                                    label("X")
+                                    label("  X  ")
                                     boundLabel({
                                         Share3dDebugData.nodeTranslation.x.toString()
                                     })
                                     horizontalGroup {
-                                        button { label("X+") }
+                                        button { label("  X+  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.translation.add(0.05f, 0f, 0f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
-                                        button { label("X-") }
+                                        button { label("  X-  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.translation.add(-0.05f, 0f, 0f)
@@ -197,19 +201,19 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                     .inCell
                                     .grow()
                                 verticalGroup {
-                                    label("Y")
+                                    label("  Y  ")
                                     boundLabel({
                                         Share3dDebugData.nodeTranslation.y.toString()
                                     })
                                     horizontalGroup {
-                                        button { label("Y+") }
+                                        button { label("  Y+  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.translation.add(0f, 0.05f, 0f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
-                                        button { label("Y-") }
+                                        button { label("  Y-  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.translation.add(0f, -0.05f, 0f)
@@ -222,19 +226,19 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                     .expand()
                                     .fill()
                                 verticalGroup {
-                                    label("Z")
+                                    label("  Z  ")
                                     boundLabel({
                                         Share3dDebugData.nodeTranslation.z.toString()
                                     })
                                     horizontalGroup {
-                                        button { label("Z+") }
+                                        button { label("  Z+  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.translation.add(0f, 0f, 0.05f)
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
-                                        button { label("Z-") }
+                                        button { label("  Z-  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.translation.add(0f, 0f, -0.05f)
@@ -254,13 +258,13 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             row()
                             table {
                                 verticalGroup {
-                                    label("YAW")
+                                    label("  YAW  ")
                                     boundLabel({
                                         Share3dDebugData.nodeRotation.yaw.toString()
                                     })
                                     horizontalGroup {
                                         button {
-                                            label("YAW+")
+                                            label("  YAW+  ")
                                         }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
@@ -272,7 +276,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
-                                        button { label("YAW-") }
+                                        button { label("  YAW-  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.rotation.setEulerAngles(
@@ -288,12 +292,12 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                     .inCell
                                     .grow()
                                 verticalGroup {
-                                    label("PITCH")
+                                    label("  PITCH  ")
                                     boundLabel({
                                         Share3dDebugData.nodeRotation.pitch.toString()
                                     })
                                     horizontalGroup {
-                                        button { label("PITCH+") }
+                                        button { label("  PITCH+  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.rotation.setEulerAngles(
@@ -304,7 +308,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
-                                        button { label("PITCH-") }
+                                        button { label("  PITCH-  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.rotation.setEulerAngles(
@@ -321,12 +325,12 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                     .expand()
                                     .fill()
                                 verticalGroup {
-                                    label("ROLL")
+                                    label("  ROLL  ")
                                     boundLabel({
                                         Share3dDebugData.nodeRotation.roll.toString()
                                     })
                                     horizontalGroup {
-                                        button { label("ROLL+") }
+                                        button { label("  ROLL+  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.rotation.setEulerAngles(
@@ -337,7 +341,7 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                                     this.node.calculateTransforms(true)
                                                 }
                                             }
-                                        button { label("ROLL-") }
+                                        button { label("  ROLL-  ") }
                                             .onClick {
                                                 (Share3dDebugData.selectedNode as UiNode.ThreeDNode).apply {
                                                     this.node.rotation.setEulerAngles(
@@ -361,6 +365,109 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                             .inCell
                             .left()
                             .width(hudViewPort.worldWidth * 0.25f)
+                        table {
+                            label("Camera position")
+                            row()
+                            boundLabel({
+                                Share3dDebugData.cameraOffset.x.toString()
+                            })
+                            row()
+                            button { label("  X+  ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.add(0.1f, 0f, 0f)
+                                }
+                            button { label("  X-  ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.add(-0.1f, 0f, 0f)
+                                }
+                            row()
+                            boundLabel({
+                                Share3dDebugData.cameraOffset.y.toString()
+                            })
+                            row()
+                            button { label("  Y+  ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.add(0f, 0.1f, 0f)
+                                }
+                            button { label("  Y-  ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.add(0f, -0.1f, 0f)
+                                }
+                            row()
+                            boundLabel({
+                                Share3dDebugData.cameraOffset.z.toString()
+                            })
+                            row()
+                            button { label("  Z+  ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.add(0f, 0f, 0.1f)
+                                }
+                            button { label("  Z-  ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.add(0f, 0f, -0.1f)
+                                }
+                            row()
+                        }
+                            .inCell
+                            .expand()
+                            .fill()
+                        table {
+                            label("Camera zoom etc")
+                            row()
+                            boundLabel({
+                                gameCamera.zoom.toString()
+                            })
+                            row()
+                            button { label("  zoom+  ") }
+                                .onClick {
+                                    gameCamera.zoom += 0.05f
+                                }
+                            button { label("  zoom-  ") }
+                                .onClick {
+                                    gameCamera.zoom -= 0.05f
+                                }
+                            row()
+                            boundLabel({
+                                gameCamera.near.toString()
+                            })
+                            row()
+                            button { label("  near+  ") }
+                                .onClick {
+                                    gameCamera.near += 1f
+                                }
+                            button { label("  near-  ") }
+                                .onClick {
+                                    gameCamera.near -= 1f
+                                }
+                            row()
+                            boundLabel({
+                                gameCamera.far.toString()
+                            })
+                            row()
+                            button { label("  far+  ") }
+                                .onClick {
+                                    gameCamera.far += 1f
+                                }
+                            button { label("  far-  ") }
+                                .onClick {
+                                    gameCamera.far -= 1f
+                                }
+                            row()
+                        }
+                            .inCell
+                            .expand()
+                            .fill()
+                        table {
+                            label("More camera")
+                            row()
+                            button { label("  RESET UP  ") }
+                                .onClick {
+                                    gameCamera.up.set(Vector3.Y)
+                                }
+                        }
+                            .inCell
+                            .expand()
+                            .fill()
                     }
                         .inCell
                         .left()

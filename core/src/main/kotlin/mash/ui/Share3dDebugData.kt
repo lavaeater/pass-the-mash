@@ -35,6 +35,7 @@ object Share3dDebugData {
             field.set(value)
         }
 
+    val cameraOffset = vec3(0f, 0f, 1f)
 
     var drawSkeleton = false
     var drawDebugNode = true
