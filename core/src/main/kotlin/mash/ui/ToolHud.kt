@@ -464,6 +464,17 @@ class ToolHud(batch: PolygonSpriteBatch, private val inputMultiplexer: InputMult
                                 .onClick {
                                     gameCamera.up.set(Vector3.Y)
                                 }
+                            row()
+                            button { label("  RESET OFFSET  ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.set(Vector3.Z)
+                                }
+                            row()
+                            button { label("  TEST OFFSET ") }
+                                .onClick {
+                                    Share3dDebugData.cameraOffset.set(-0.5f, 0.5f, 0.5f)
+                                    gameCamera.up.set(Vector3.Y)
+                                }
                         }
                             .inCell
                             .expand()

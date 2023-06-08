@@ -123,6 +123,7 @@ object Context : InjectionContext() {
 //                position.set(1f, 1f, 1f)
                 near = gameSettings.cameraNear
                 far = gameSettings.cameraFar
+                zoom = gameSettings.cameraZoom
 //                rotate(Vector3.X, -30f)
 //                rotate(Vector3.Y, -45f)
             })

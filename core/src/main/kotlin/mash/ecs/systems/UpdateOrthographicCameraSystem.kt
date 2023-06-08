@@ -31,10 +31,10 @@ class UpdateOrthographicCameraSystem(
 
         SceneComponent.get(entity).scene.modelInstance.transform.getTranslation(target)
 
-        cameraPos.set(target).add(Share3dDebugData.cameraOffset).scl(worldToViewportRatio)
+        cameraPos.set(target).add(Share3dDebugData.cameraOffset)//.scl(worldToViewportRatio)
 
         orthographicCamera.position.set(cameraPos)
-        orthographicCamera.lookAt(target.scl(worldToViewportRatio))
+        orthographicCamera.lookAt(target)//.scl(worldToViewportRatio))
         orthographicCamera.update()
     }
 }
