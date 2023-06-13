@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.model.Node
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
@@ -42,6 +41,15 @@ class GirlSceneLoader : SceneLoader() {
 
     override fun loadScene(sceneManager: SceneManager, dynamicsWorld: btDynamicsWorld) {
         setUpScene(sceneManager)
+
+        loadMap(sceneManager, dynamicsWorld)
+        loadGirlKinematic(sceneManager, dynamicsWorld)
+    }
+
+    private fun loadMap(
+        sceneManager: SceneManager,
+        dynamicsWorld: btDynamicsWorld
+    ) {
         BulletStuffCreator
             .createTiledFloor(
                 25f,
@@ -64,7 +72,6 @@ class GirlSceneLoader : SceneLoader() {
                 CollisionFlags.WALL,
                 CollisionFlags.ALL
             )
-        loadGirlKinematic(sceneManager, dynamicsWorld)
     }
 
     private fun printNode(node: Node, level: Int = 0) {
